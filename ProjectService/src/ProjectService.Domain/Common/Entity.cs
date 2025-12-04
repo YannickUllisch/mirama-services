@@ -1,9 +1,7 @@
 
+namespace ProjectService.Domain.Common;
 
-
-namespace ProjectService.Domain.Entities;
-
-public class BaseEntity<TID>
+public class Entity<TID>
 {
     public TID Id { get; protected set; } = default!;
 
