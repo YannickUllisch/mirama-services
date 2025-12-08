@@ -25,6 +25,8 @@ public class Member : AuditableEntity
         CreatedBy = createdBy;
     }
 
+    private Member() { }
+
     public static Member Create(OrganizationId organizationId, UserId userId, OrganizationRole role, string createdBy)
     {
         return new Member(organizationId, userId, role, createdBy);

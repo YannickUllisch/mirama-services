@@ -5,7 +5,7 @@ using AccountService.Domain.User.ValueObjects;
 
 namespace AccountService.Domain.Organization;
 
-public class Organization : AuditableEntity
+public class Organization : AuditableEntity, IHasDomainEvent
 {
     public OrganizationId Id { get; private set; } = default!;
 
@@ -21,6 +21,8 @@ public class Organization : AuditableEntity
 
     public IReadOnlyList<Invitation.Invitation> Invitations => _invitations.AsReadOnly();
 
+    public List<DomainEvent> DomainEvents => [];
+
     private readonly List<Member> _members = [];
 
     private readonly List<Invitation.Invitation> _invitations = [];
@@ -35,6 +37,8 @@ public class Organization : AuditableEntity
         CreatedBy = createdBy;
     }
 
+    private Organization() { }
+
     public static Organization Create(string name, Address address, string createdBy)
     {
         return new Organization(name, address, createdBy);
@@ -46,7 +50,7 @@ public class Organization : AuditableEntity
         _members.Add(member);
         LastModified = DateTime.UtcNow;
         LastModifiedBy = modifiedBy;
-    } 
+    }
 
     public void AddMembers(List<(UserId uid, OrganizationRole role)> members, string modifiedBy)
     {
@@ -63,7 +67,7 @@ public class Organization : AuditableEntity
 
     public void RemoveMember(MemberId mid, string removedBy)
     {
-        Member? member = _members.Find(m => m.Id == mid) 
+        Member? member = _members.Find(m => m.Id == mid)
             ?? throw new ArgumentException($"Member with ID ${mid} could not be found");
 
         _members.Remove(member);
@@ -75,7 +79,7 @@ public class Organization : AuditableEntity
     {
         if (!newAddress.IsValid())
         {
-            throw new ArgumentException("Invalid address");   
+            throw new ArgumentException("Invalid address");
         }
 
         Address = newAddress;

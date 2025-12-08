@@ -8,11 +8,11 @@ namespace AccountService.Domain.Organization.Invitation;
 
 public class Invitation : AuditableEntity
 {
-    public InvitationId Id { get; private set; }
+    public InvitationId Id { get; private set; } = default!;
 
-    public OrganizationId OrganizationId { get; private set; }
+    public OrganizationId OrganizationId { get; private set; } = default!;
 
-    public string Email { get; private set; }
+    public string Email { get; private set; } = string.Empty;
 
     public OrganizationRole Role { get; private set; }
 
@@ -23,7 +23,7 @@ public class Invitation : AuditableEntity
     public UserId? InviterId { get; set; } = default!;
 
     private UserId? _acceptedBy = null;
-    
+
     private Invitation(OrganizationId orgId, string email, OrganizationRole role, UserId inviterId, string createdBy)
     {
         Id = new InvitationId(new Guid());
@@ -35,6 +35,9 @@ public class Invitation : AuditableEntity
         ExpiresAt = DateTime.Today.AddDays(7);
         InviterId = inviterId;
     }
+
+    private Invitation() { }
+
 
     public static Invitation Create(OrganizationId orgId, string email, OrganizationRole role, UserId inviteeId, string createdBy)
     {

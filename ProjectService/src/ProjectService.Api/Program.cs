@@ -51,7 +51,6 @@ builder.Services.AddControllers(opt =>
 });
 
 // Versioning
-
 builder.Services.AddApiVersioning(options =>
 {
     options.ReportApiVersions = true;

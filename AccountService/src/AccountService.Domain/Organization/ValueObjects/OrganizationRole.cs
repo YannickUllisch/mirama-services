@@ -1,6 +1,7 @@
 
 
 namespace AccountService.Domain.Organization.ValueObjects;
+
 public enum OrganizationRole
 {
     Owner,

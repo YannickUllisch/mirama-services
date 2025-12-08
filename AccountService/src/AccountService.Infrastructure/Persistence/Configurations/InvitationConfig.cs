@@ -1,0 +1,30 @@
+
+using AccountService.Domain.Organization.Invitation;
+using AccountService.Domain.Organization.Invitation.ValueObjects;
+using AccountService.Domain.Organization.ValueObjects;
+using AccountService.Domain.User.ValueObjects;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace AccountService.Infrastructure.Persistence.Configurations;
+
+public class InvitationConfiguration : IEntityTypeConfiguration<Invitation>
+{
+    public void Configure(EntityTypeBuilder<Invitation> builder)
+    {
+        builder.HasKey(i => i.Id);
+
+        builder.Property(m => m.Id).HasConversion(
+            invId => invId.Value,
+            val => new InvitationId(val));
+
+        builder.Property(m => m.InviterId).HasConversion(
+            invId => invId != null ? invId.Value : Guid.Empty,
+            val => new UserId(val));
+
+        builder.Property(m => m.OrganizationId).HasConversion(
+            orgId => orgId.Value,
+            val => new OrganizationId(val));
+
+    }
+}

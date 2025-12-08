@@ -27,6 +27,8 @@ public class User : AuditableEntity
         Image = image;
     }
 
+    private User() { }
+
     public static User Create(string name, string email, GlobalRole role, ContactInfo contactInfo, string? image)
     {
         return new User(name, email, role, contactInfo, image);
