@@ -1,0 +1,42 @@
+
+
+using AccountService.Application.Domain.User;
+using AccountService.Application.Domain.User.ValueObjects;
+using AccountService.Application.Infrastructure.Persistence;
+using ErrorOr;
+using MediatR;
+
+namespace AccountService.Application.Features.Users.Commands.UpdateUser;
+
+public class UpdateUserCommandHandler(ApplicationDbContext context) : IRequestHandler<UpdateUserCommand, ErrorOr<UserResponse>>
+{
+    private readonly ApplicationDbContext _context = context;
+
+    public async Task<ErrorOr<UserResponse>> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
+    {
+        User? user = await _context.User.FindAsync([request.Id], cancellationToken);
+
+        if (user == null)
+        {
+            return Error.NotFound("User could not be found");
+        }
+
+        if (!Enum.TryParse<GlobalRole>(request.Role, true, out var parsedRole))
+        {
+            return Error.Validation("Invalid role value.");
+        }
+
+        user.Update(
+            request.Name,
+            request.Email,
+            Enum.Parse<GlobalRole>(request.Role),
+            request.ContactEmail,
+            request.ContactPhoneNumber,
+            request.Image
+        );
+
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return user.MapResponse();
+    }
+}

@@ -1,5 +1,7 @@
 
+using AccountService.Application.Common;
 using AccountService.Application.Common.Behaviours;
+using AccountService.Application.Common.Interfaces;
 using AccountService.Application.Infrastructure.Persistence;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +20,8 @@ namespace AccountService.Application;
             options.AddOpenBehavior(typeof(ValidationBehaviour<,>));
          });
          services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly, includeInternalTypes: true);
+
+         services.AddSingleton<IGlobalRoleProvider, GlobalRoleProvider>();
          return services;
      }
 

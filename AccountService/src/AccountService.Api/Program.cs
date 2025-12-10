@@ -19,6 +19,8 @@ builder.Services
     .AddApplication()
     .AddInfrastructure(builder.Configuration);
 
+builder.Services.AddLogging();
+
 builder.Services.AddHealthChecks();
 builder.Services.AddHttpContextAccessor();
 

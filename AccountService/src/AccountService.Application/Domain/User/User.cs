@@ -36,4 +36,12 @@ public class User : AuditableEntity
         return new User(name, email, role, contactInfo, image);
     }
 
+    public void Update(string name, string email, GlobalRole role, string contactEmail, string contactPhone, string? image)
+    {
+        Name = name;
+        Email = email;
+        Role = role;
+        Contact = new ContactInfo(contactEmail, contactPhone);
+        Image = image;
+    }
 }

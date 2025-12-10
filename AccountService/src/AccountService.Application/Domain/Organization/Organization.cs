@@ -3,6 +3,7 @@
 using AccountService.Application.Domain.Abstractions;
 using AccountService.Application.Domain.Organization.ValueObjects;
 using AccountService.Application.Domain.User.ValueObjects;
+using ErrorOr;
 
 namespace AccountService.Application.Domain.Organization;
 
@@ -28,69 +29,76 @@ public class Organization : AuditableEntity, IHasDomainEvent
 
     private readonly List<Invitation.Invitation> _invitations = [];
 
-    private Organization(string name, Address address, string createdBy)
+    private Organization(string name, Address address)
     {
         Id = new OrganizationId(new Guid());
         Name = string.IsNullOrWhiteSpace(name) ? throw new ArgumentException("Name required") : name.Trim();
         Slug = GenerateSlug(name);
         Address = address ?? throw new ArgumentNullException(nameof(address));
         Created = DateTime.UtcNow;
-        CreatedBy = createdBy;
     }
 
     private Organization() { }
 
-    public static Organization Create(string name, Address address, string createdBy)
+    public static Organization Create(string name, Address address)
     {
-        return new Organization(name, address, createdBy);
+        return new Organization(name, address);
     }
 
-    public void AddMember(UserId uid, OrganizationRole role, string modifiedBy)
+    public ErrorOr<Created> AddMember(UserId uid, OrganizationRole role)
     {
-        Member member = Member.Create(this.Id, uid, role, modifiedBy);
+        Member member = Member.Create(this.Id, uid, role);
         _members.Add(member);
-        LastModified = DateTime.UtcNow;
-        LastModifiedBy = modifiedBy;
+
+        return Result.Created;
     }
 
-    public void AddMembers(List<(UserId uid, OrganizationRole role)> members, string modifiedBy)
+    public ErrorOr<Created> AddMembers(List<(UserId uid, OrganizationRole role)> members)
     {
         List<Member> membersToAdd = [];
         foreach (var (uid, role) in members)
         {
-            Member member = Member.Create(this.Id, uid, role, modifiedBy);
+            Member member = Member.Create(this.Id, uid, role);
             membersToAdd.Add(member);
         }
         _members.AddRange(membersToAdd);
-        LastModified = DateTime.UtcNow;
-        LastModifiedBy = modifiedBy;
+
+        return Result.Created;
     }
 
-    public void RemoveMember(MemberId mid, string removedBy)
+    public ErrorOr<Deleted> RemoveMember(MemberId mid)
     {
-        Member? member = _members.Find(m => m.Id == mid)
-            ?? throw new ArgumentException($"Member with ID ${mid} could not be found");
+        Member? member = _members.Find(m => m.Id == mid);
+
+        if (member == null)
+        {
+            return Error.NotFound("User not Found");
+        }
 
         _members.Remove(member);
-        LastModified = DateTime.UtcNow;
-        LastModifiedBy = removedBy;
+
+        return Result.Deleted;
     }
 
-    public void UpdateAddress(Address newAddress, string modifiedBy)
+    public ErrorOr<Updated> UpdateAddress(Address newAddress)
     {
         if (!newAddress.IsValid())
         {
-            throw new ArgumentException("Invalid address");
+            return Error.Validation("Invalid Address Type provided");
         }
 
         Address = newAddress;
-        LastModified = DateTime.UtcNow;
-        LastModifiedBy = modifiedBy;
+
+        return Result.Updated;
+    }
+
+    public bool HasMember(MemberId uid)
+    {
+        return _members.Any(m => m.Id == uid);
     }
 
     private static string GenerateSlug(string input)
     {
-        // Simple slug generator
         return input.Trim().ToLower().Replace(" ", "-");
     }
 

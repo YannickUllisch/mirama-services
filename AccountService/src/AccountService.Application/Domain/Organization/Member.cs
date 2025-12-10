@@ -16,27 +16,24 @@ public class Member : AuditableEntity
 
     public OrganizationRole Role { get; private set; }
 
-    private Member(OrganizationId organizationId, UserId userId, OrganizationRole role, string createdBy)
+    private Member(OrganizationId organizationId, UserId userId, OrganizationRole role)
     {
         Id = new MemberId(new Guid());
         OrganizationId = organizationId;
         UserId = userId;
         Role = role;
         Created = DateTime.UtcNow;
-        CreatedBy = createdBy;
     }
 
     private Member() { }
 
-    public static Member Create(OrganizationId organizationId, UserId userId, OrganizationRole role, string createdBy)
+    public static Member Create(OrganizationId organizationId, UserId userId, OrganizationRole role)
     {
-        return new Member(organizationId, userId, role, createdBy);
+        return new Member(organizationId, userId, role);
     }
 
-    public void SetRole(OrganizationRole role, string modifiedBy)
+    public void SetRole(OrganizationRole role)
     {
         Role = role;
-        LastModified = DateTime.UtcNow;
-        LastModifiedBy = modifiedBy;
     }
 }

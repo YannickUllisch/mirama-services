@@ -4,6 +4,7 @@ using AccountService.Application.Domain.Abstractions;
 using AccountService.Application.Domain.Organization.Invitation.Valueobjects;
 using AccountService.Application.Domain.Organization.ValueObjects;
 using AccountService.Application.Domain.User.ValueObjects;
+using ErrorOr;
 
 namespace AccountService.Application.Domain.Organization.Invitation;
 
@@ -25,14 +26,13 @@ public class Invitation : AuditableEntity
 
     public UserId? AcceptedBy = null;
 
-    private Invitation(OrganizationId orgId, string email, OrganizationRole role, UserId inviterId, string createdBy)
+    private Invitation(OrganizationId orgId, string email, OrganizationRole role, UserId inviterId)
     {
         Id = new InvitationId(new Guid());
         OrganizationId = orgId;
         Email = email;
         Status = InvitationStatus.Pending;
         Created = DateTime.UtcNow;
-        CreatedBy = createdBy;
         ExpiresAt = DateTime.Today.AddDays(7);
         InviterId = inviterId;
     }
@@ -40,30 +40,24 @@ public class Invitation : AuditableEntity
     private Invitation() { }
 
 
-    public static Invitation Create(OrganizationId orgId, string email, OrganizationRole role, UserId inviteeId, string createdBy)
+    public static Invitation Create(OrganizationId orgId, string email, OrganizationRole role, UserId inviteeId)
     {
-        return new Invitation(orgId, email, role, inviteeId, createdBy);
+        return new Invitation(orgId, email, role, inviteeId);
     }
 
-    public void Accept(UserId userId, string modifiedBy)
+    public void Accept(UserId userId)
     {
         Status = InvitationStatus.Accepted;
         AcceptedBy = userId;
-        LastModified = DateTime.UtcNow;
-        LastModifiedBy = modifiedBy;
     }
 
-    public void Decline(string modifiedBy)
+    public void Decline()
     {
         Status = InvitationStatus.Declined;
-        LastModified = DateTime.UtcNow;
-        LastModifiedBy = modifiedBy;
     }
 
-    public void ExtendFromToday(string modifiedBy)
+    public void ExtendFromToday()
     {
         ExpiresAt = DateTime.Today.AddDays(7);
-        LastModified = DateTime.UtcNow;
-        LastModifiedBy = modifiedBy;
     }
 }
