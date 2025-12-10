@@ -14,15 +14,18 @@ namespace AccountService.Application;
  {
      public static IServiceCollection AddApplication(this IServiceCollection services)
      {
-         services.AddMediatR(options =>
-         {
-            options.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly);
-            options.AddOpenBehavior(typeof(ValidationBehaviour<,>));
-         });
-         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly, includeInternalTypes: true);
+        var applicationAssembly = typeof(DependencyInjection).Assembly;
 
-         services.AddSingleton<IGlobalRoleProvider, GlobalRoleProvider>();
-         return services;
+        services.AddMediatR(options =>
+        {
+            options.RegisterServicesFromAssembly(applicationAssembly);
+            options.AddOpenBehavior(typeof(ValidationBehaviour<,>));
+        });
+
+        services.AddValidatorsFromAssembly(applicationAssembly, includeInternalTypes: true);
+
+        services.AddSingleton<IGlobalRoleProvider, GlobalRoleProvider>();
+        return services;
      }
 
      public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
@@ -30,6 +33,7 @@ namespace AccountService.Application;
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(config.GetConnectionString("Database"),
             b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
+            
         return services;
     }
  }
