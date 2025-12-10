@@ -1,0 +1,69 @@
+
+
+using AccountService.Application.Domain.Abstractions;
+using AccountService.Application.Domain.Organization.Invitation.Valueobjects;
+using AccountService.Application.Domain.Organization.ValueObjects;
+using AccountService.Application.Domain.User.ValueObjects;
+
+namespace AccountService.Application.Domain.Organization.Invitation;
+
+public class Invitation : AuditableEntity
+{
+    public InvitationId Id { get; private set; } = default!;
+
+    public OrganizationId OrganizationId { get; private set; } = default!;
+
+    public string Email { get; private set; } = string.Empty;
+
+    public OrganizationRole Role { get; private set; }
+
+    public InvitationStatus Status { get; private set; }
+
+    public DateTime ExpiresAt { get; private set; }
+
+    public UserId InviterId { get; set; } = default!;
+
+    public UserId? AcceptedBy = null;
+
+    private Invitation(OrganizationId orgId, string email, OrganizationRole role, UserId inviterId, string createdBy)
+    {
+        Id = new InvitationId(new Guid());
+        OrganizationId = orgId;
+        Email = email;
+        Status = InvitationStatus.Pending;
+        Created = DateTime.UtcNow;
+        CreatedBy = createdBy;
+        ExpiresAt = DateTime.Today.AddDays(7);
+        InviterId = inviterId;
+    }
+
+    private Invitation() { }
+
+
+    public static Invitation Create(OrganizationId orgId, string email, OrganizationRole role, UserId inviteeId, string createdBy)
+    {
+        return new Invitation(orgId, email, role, inviteeId, createdBy);
+    }
+
+    public void Accept(UserId userId, string modifiedBy)
+    {
+        Status = InvitationStatus.Accepted;
+        AcceptedBy = userId;
+        LastModified = DateTime.UtcNow;
+        LastModifiedBy = modifiedBy;
+    }
+
+    public void Decline(string modifiedBy)
+    {
+        Status = InvitationStatus.Declined;
+        LastModified = DateTime.UtcNow;
+        LastModifiedBy = modifiedBy;
+    }
+
+    public void ExtendFromToday(string modifiedBy)
+    {
+        ExpiresAt = DateTime.Today.AddDays(7);
+        LastModified = DateTime.UtcNow;
+        LastModifiedBy = modifiedBy;
+    }
+}

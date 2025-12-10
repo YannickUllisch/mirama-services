@@ -1,5 +1,5 @@
 using Microsoft.OpenApi;
-using AccountService.Infrastructure;
+using AccountService.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,8 +15,9 @@ builder.Services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title =
 
 builder.Services.AddProblemDetails();
 
-// builder.Services.AddApplication();
-builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services
+    .AddApplication()
+    .AddInfrastructure(builder.Configuration);
 
 builder.Services.AddHealthChecks();
 builder.Services.AddHttpContextAccessor();
