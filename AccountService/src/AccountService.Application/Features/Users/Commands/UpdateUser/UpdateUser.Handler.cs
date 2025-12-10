@@ -29,7 +29,7 @@ public class UpdateUserCommandHandler(ApplicationDbContext context) : IRequestHa
         user.Update(
             request.Name,
             request.Email,
-            Enum.Parse<GlobalRole>(request.Role),
+            parsedRole,
             request.ContactEmail,
             request.ContactPhoneNumber,
             request.Image
