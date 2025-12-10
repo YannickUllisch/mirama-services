@@ -8,7 +8,7 @@ using MediatR;
 
 namespace AccountService.Application.Features.Users.Commands.UpdateUser;
 
-public class UpdateUserCommandHandler(ApplicationDbContext context) : IRequestHandler<UpdateUserCommand, ErrorOr<UserResponse>>
+internal class UpdateUserCommandHandler(ApplicationDbContext context) : IRequestHandler<UpdateUserCommand, ErrorOr<UserResponse>>
 {
     private readonly ApplicationDbContext _context = context;
 

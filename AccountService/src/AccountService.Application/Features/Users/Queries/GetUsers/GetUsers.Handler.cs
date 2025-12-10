@@ -1,13 +1,13 @@
 
 using AccountService.Application.Common.Extensions;
-using AccountService.Application.Common.Model;
+using AccountService.Application.Common.Models;
 using AccountService.Application.Infrastructure.Persistence;
 using ErrorOr;
 using MediatR;
 
 namespace AccountService.Application.Features.Users.Queries.GetUsers;
 
-public class GetUsersQueryHandler(ApplicationDbContext context) : IRequestHandler<GetUsersQuery, ErrorOr<PaginatedList<UserResponse>>>
+internal class GetUsersQueryHandler(ApplicationDbContext context) : IRequestHandler<GetUsersQuery, ErrorOr<PaginatedList<UserResponse>>>
 {
     private readonly ApplicationDbContext _context = context;
 

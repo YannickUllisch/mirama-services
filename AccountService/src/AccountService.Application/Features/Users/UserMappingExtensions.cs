@@ -4,8 +4,8 @@ using ErrorOr;
 
 namespace AccountService.Application.Features.Users;
 
-public static class UserMapper {
-    public static ErrorOr<UserResponse> MapResponse(this User userModel, int? count = null)
+internal static class UserMapper {
+    internal static ErrorOr<UserResponse> MapResponse(this User userModel, int? count = null)
     {
         string? role = Enum.GetName(userModel.Role);
 

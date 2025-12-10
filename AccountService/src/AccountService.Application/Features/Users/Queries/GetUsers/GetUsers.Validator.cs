@@ -4,7 +4,7 @@ using FluentValidation;
 
 namespace AccountService.Application.Features.Users.Queries.GetUsers;
 
-public class GetUsersQueryValidator : AbstractValidator<GetUsersQuery>
+internal class GetUsersQueryValidator : AbstractValidator<GetUsersQuery>
 {
     public GetUsersQueryValidator(IGlobalRoleProvider roleProvider)
     {

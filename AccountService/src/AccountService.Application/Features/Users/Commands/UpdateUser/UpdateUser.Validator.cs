@@ -4,7 +4,7 @@ using FluentValidation;
 
 namespace AccountService.Application.Features.Users.Commands.UpdateUser;
 
-public class UpdateUserRequestValidator : AbstractValidator<UpdateUserCommand>
+internal class UpdateUserRequestValidator : AbstractValidator<UpdateUserCommand>
 {
     public UpdateUserRequestValidator(IGlobalRoleProvider roleProvider)
     {

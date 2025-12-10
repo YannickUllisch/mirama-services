@@ -1,6 +1,6 @@
 
 using System.Text.Json.Serialization;
-using AccountService.Application.Common.Model;
+using AccountService.Application.Common.Models;
 using ErrorOr;
 using MediatR;
 

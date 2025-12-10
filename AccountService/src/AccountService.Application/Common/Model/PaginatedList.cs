@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace AccountService.Application.Common.Model;
+namespace AccountService.Application.Common.Models;
 
 public class PaginatedList<T>(List<T> items, int count, int pageNumber, int pageSize)
 {

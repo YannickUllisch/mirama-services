@@ -1,6 +1,6 @@
 
 
-using AccountService.Application.Common.Model;
+using AccountService.Application.Common.Models;
 
 namespace AccountService.Application.Common.Extensions;
 
