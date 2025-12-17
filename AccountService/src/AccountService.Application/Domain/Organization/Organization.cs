@@ -1,5 +1,4 @@
 
-
 using AccountService.Application.Domain.Abstractions;
 using AccountService.Application.Domain.Organization.ValueObjects;
 using AccountService.Application.Domain.User.ValueObjects;
@@ -7,10 +6,8 @@ using ErrorOr;
 
 namespace AccountService.Application.Domain.Organization;
 
-public class Organization : AuditableEntity, IHasDomainEvent
+public class Organization : AggregateRoot<OrganizationId>
 {
-    public OrganizationId Id { get; private set; } = default!;
-
     public string Name { get; private set; } = string.Empty;
 
     public string Slug { get; private set; } = string.Empty;
@@ -23,42 +20,45 @@ public class Organization : AuditableEntity, IHasDomainEvent
 
     public IReadOnlyList<Invitation.Invitation> Invitations => _invitations.AsReadOnly();
 
-    public List<DomainEvent> DomainEvents => [];
-
     private readonly List<Member> _members = [];
 
     private readonly List<Invitation.Invitation> _invitations = [];
 
     private Organization(string name, Address address)
     {
-        Id = new OrganizationId(new Guid());
         Name = string.IsNullOrWhiteSpace(name) ? throw new ArgumentException("Name required") : name.Trim();
         Slug = GenerateSlug(name);
-        Address = address ?? throw new ArgumentNullException(nameof(address));
-        Created = DateTime.UtcNow;
+        Address = address;
     }
 
     private Organization() { }
 
-    public static Organization Create(string name, Address address)
+    public static ErrorOr<Organization> Create(string name, string street, string city, string country, string zipCode)
     {
-        return new Organization(name, address);
+        var addressResult = Address.Create(street, city, country, zipCode);
+        if (addressResult.IsError)
+            return addressResult.Errors;
+
+        var org = new Organization(name.Trim(), addressResult.Value);
+        return org;
     }
 
-    public ErrorOr<Created> AddMember(UserId uid, OrganizationRole role)
+    public ErrorOr<Created> AddMember(Guid uid, OrganizationRole role)
     {
-        Member member = Member.Create(this.Id, uid, role);
+        var userId = new UserId(uid);
+        Member member = Member.Create(this.Id, userId, role);
         _members.Add(member);
 
         return Result.Created;
     }
 
-    public ErrorOr<Created> AddMembers(List<(UserId uid, OrganizationRole role)> members)
+    public ErrorOr<Created> AddMembers(List<(Guid uid, OrganizationRole role)> members)
     {
         List<Member> membersToAdd = [];
         foreach (var (uid, role) in members)
         {
-            Member member = Member.Create(this.Id, uid, role);
+            var userId = new UserId(uid);
+            Member member = Member.Create(this.Id, userId, role);
             membersToAdd.Add(member);
         }
         _members.AddRange(membersToAdd);
@@ -66,9 +66,10 @@ public class Organization : AuditableEntity, IHasDomainEvent
         return Result.Created;
     }
 
-    public ErrorOr<Deleted> RemoveMember(MemberId mid)
+    public ErrorOr<Deleted> RemoveMember(Guid mid)
     {
-        Member? member = _members.Find(m => m.Id == mid);
+        var memberId = new MemberId(mid);
+        Member? member = _members.Find(m => m.Id == memberId);
 
         if (member == null)
         {
@@ -80,21 +81,24 @@ public class Organization : AuditableEntity, IHasDomainEvent
         return Result.Deleted;
     }
 
-    public ErrorOr<Updated> UpdateAddress(Address newAddress)
+    public ErrorOr<Updated> UpdateAddress(string street, string city, string country, string zipCode)
     {
-        if (!newAddress.IsValid())
-        {
-            return Error.Validation("Invalid Address Type provided");
-        }
+        var address = Address.Create(street, city, country, zipCode);
 
-        Address = newAddress;
-
-        return Result.Updated;
+        return address.Match<ErrorOr<Updated>>(
+            newAddress =>
+            {
+                Address = newAddress;
+                return Result.Updated;
+            },
+            err => err
+        );
     }
 
-    public bool HasMember(MemberId uid)
+    public bool HasMember(Guid mid)
     {
-        return _members.Any(m => m.Id == uid);
+        var memberId = new MemberId(mid);
+        return _members.Any(m => m.Id == memberId);
     }
 
     private static string GenerateSlug(string input)

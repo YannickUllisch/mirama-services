@@ -1,21 +1,60 @@
 
+using ErrorOr;
+
 namespace AccountService.Application.Domain.Organization.ValueObjects;
 
-public sealed record Address(string Street, string City, string Country, string ZipCode)
+public sealed record Address
 {
-    public string Street { get; init; } = Street.Trim();
+    public string Street { get; }
+    public string City { get; }
+    public string Country { get; }
+    public string ZipCode { get; }
 
-    public string City { get; init; } = City.Trim();
-
-    public string Country { get; init; } = Country.Trim();
-
-    public string ZipCode { get; init; } = ZipCode.Trim();
-    
-    public bool IsValid()
+    private Address(string street, string city, string country, string zipCode)
     {
-        return !string.IsNullOrWhiteSpace(Street)
-            && !string.IsNullOrWhiteSpace(City)
-            && !string.IsNullOrWhiteSpace(Country)
-            && !string.IsNullOrWhiteSpace(ZipCode);
+        Street = street;
+        City = city;
+        Country = country;
+        ZipCode = zipCode;
+    }
+
+    public static ErrorOr<Address> Create(string street, string city, string country, string zipCode)
+    {
+        var trimmedStreet = street.Trim();
+        var trimmedCity = city.Trim();
+        var trimmedCountry = country.Trim();
+        var trimmedZip = zipCode.Trim();
+
+        var validationResult = Validate(trimmedStreet, trimmedCity, trimmedCountry, trimmedZip);
+        if (validationResult.IsError)
+        {
+            return validationResult.Errors;
+        }
+
+        return new Address(trimmedStreet, trimmedCity, trimmedCountry, trimmedZip);
+
+    }
+
+    // <summary>
+    private static ErrorOr<Success> Validate(string street, string city, string country, string zipCode)
+    {
+        List<Error> errors = [];
+
+        if (string.IsNullOrWhiteSpace(street))
+            errors.Add(Error.Validation(code: "Address.Street", description: "Street is required"));
+
+        if (string.IsNullOrWhiteSpace(city))
+            errors.Add(Error.Validation(code: "Address.City", description: "City is required"));
+
+        if (string.IsNullOrWhiteSpace(country))
+            errors.Add(Error.Validation(code: "Address.Country", description: "Country is required"));
+
+        if (string.IsNullOrWhiteSpace(zipCode))
+            errors.Add(Error.Validation(code: "Address.ZipCode", description: "Zip code is required"));
+
+        if (errors.Count > 0)
+            return errors;
+
+        return Result.Success;
     }
 }

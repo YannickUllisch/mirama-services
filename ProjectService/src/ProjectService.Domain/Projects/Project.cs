@@ -25,7 +25,7 @@ public class Project : BaseEntity<ProjectId>
 
         var p = new Project
         {
-            Id = new ProjectId(new Guid()),
+            Id = new ProjectId(Guid.NewGuid()),
             Name = name.Trim(),
             Description = desc?.Trim() ?? string.Empty,
             StartDate = startDate,

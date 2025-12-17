@@ -2,18 +2,21 @@
 using AccountService.Application.Common;
 using AccountService.Application.Common.Behaviours;
 using AccountService.Application.Common.Interfaces;
+using AccountService.Application.Common.Options;
 using AccountService.Application.Infrastructure.Persistence;
+using AccountService.Application.Infrastructure.Services;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace AccountService.Application;
- 
- public static class DependencyInjection
- {
-     public static IServiceCollection AddApplication(this IServiceCollection services)
-     {
+
+public static class DependencyInjection
+{
+    public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration config)
+    {
         var applicationAssembly = typeof(DependencyInjection).Assembly;
 
         services.AddMediatR(options =>
@@ -25,15 +28,30 @@ namespace AccountService.Application;
         services.AddValidatorsFromAssembly(applicationAssembly, includeInternalTypes: true);
 
         services.AddSingleton<IGlobalRoleProvider, GlobalRoleProvider>();
-        return services;
-     }
 
-     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
-    {
-        services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(config.GetConnectionString("Database"),
-            b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
-            
+        services.Configure<ApplicationOptions>(config.GetSection(ApplicationOptions.Application));
         return services;
     }
- }
+
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
+    {
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
+
+        services
+            .AddOptions<InfrastructureOptions>()
+            .Bind(config.GetSection(InfrastructureOptions.Infrastructure))
+            .Validate(o => !string.IsNullOrWhiteSpace(o.DatabaseConnection),
+                      "Valid Database Connection string is required.")
+            .ValidateOnStart();
+
+        services.AddDbContext<ApplicationDbContext>((sp, options) =>
+        {
+            var infra = sp.GetRequiredService<IOptions<InfrastructureOptions>>().Value;
+            options.UseNpgsql(infra.DatabaseConnection, b => b
+                .MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)
+                .MigrationsHistoryTable(tableName: "__EFMigrationsHistory", schema: "auth"));
+        });
+
+        return services;
+    }
+}

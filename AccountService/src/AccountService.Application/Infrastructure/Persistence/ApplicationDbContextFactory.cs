@@ -1,5 +1,8 @@
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using DotNetEnv;
+using AccountService.Application.Infrastructure.Services;
 
 namespace AccountService.Application.Infrastructure.Persistence;
 
@@ -7,10 +10,19 @@ public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<Applicati
 {
     public ApplicationDbContext CreateDbContext(string[] args)
     {
+        Env.TraversePath().Load();
         var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-        var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__Database");
+        var connection = Environment.GetEnvironmentVariable("Infrastructure__DatabaseConnection");
 
-        optionsBuilder.UseNpgsql(connectionString);
-        return new ApplicationDbContext(optionsBuilder.Options);
+        if (string.IsNullOrWhiteSpace(connection))
+            throw new InvalidOperationException("Database connection string is not set.");
+
+        optionsBuilder.UseNpgsql(
+            connection,
+            b => b
+                .MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)
+                .MigrationsHistoryTable("__EFMigrationsHistory", "auth"));
+
+        return new ApplicationDbContext(optionsBuilder.Options, new DesignTimeCurrentUserService());
     }
 }

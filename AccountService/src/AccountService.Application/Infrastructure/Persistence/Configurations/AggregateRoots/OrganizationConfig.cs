@@ -4,7 +4,7 @@ using AccountService.Application.Domain.Organization.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace AccountService.Application.Infrastructure.Persistence.Configurations;
+namespace AccountService.Application.Infrastructure.Persistence.Configurations.AggregateRoots;
 
 public class OrganizationConfiguration : IEntityTypeConfiguration<Organization>
 {

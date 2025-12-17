@@ -12,9 +12,11 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     {
         builder.HasKey(u => u.Id);
 
-        builder.Property(u => u.Id).HasConversion(
+        builder.Property(m => m.Id).HasConversion(
             uid => uid.Value,
             val => new UserId(val));
+
+        builder.Ignore(e => e.DomainEvents);
 
         builder.OwnsOne(o => o.Contact, a =>
         {

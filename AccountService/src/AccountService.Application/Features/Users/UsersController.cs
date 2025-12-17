@@ -20,7 +20,7 @@ public class UsersController : ApiControllerBase
     [HttpPut("{id:guid}")]
     public async Task<IActionResult> Update([FromRoute] Guid id, UpdateUserCommand command)
     {
-        var cmd = command with { Id = id};
+        var cmd = command with { Id = id };
         var result = await Mediator.Send(command);
 
         return result.Match(

@@ -1,7 +1,6 @@
 
 
 using AccountService.Application.Domain.Organization;
-using AccountService.Application.Domain.Organization.ValueObjects;
 using AccountService.Application.Infrastructure.Persistence;
 
 namespace AccountService.Application.Infrastructure.Seeding;
@@ -14,7 +13,10 @@ public static class OrganizationSeed
         {
             ctx.Organizations.Add(Organization.Create(
                 "Mirama",
-                new Address("Street1", "Copenhagen", "Denmark", "2400"))
+                "Street1",
+                "Copenhagen",
+                "Denmark",
+                "24000").Value
             );
 
             await ctx.SaveChangesAsync();

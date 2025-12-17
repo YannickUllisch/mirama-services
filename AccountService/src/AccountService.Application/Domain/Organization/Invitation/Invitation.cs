@@ -4,14 +4,10 @@ using AccountService.Application.Domain.Abstractions;
 using AccountService.Application.Domain.Organization.Invitation.Valueobjects;
 using AccountService.Application.Domain.Organization.ValueObjects;
 using AccountService.Application.Domain.User.ValueObjects;
-using ErrorOr;
-
 namespace AccountService.Application.Domain.Organization.Invitation;
 
-public class Invitation : AuditableEntity
+public class Invitation : Entity<InvitationId>
 {
-    public InvitationId Id { get; private set; } = default!;
-
     public OrganizationId OrganizationId { get; private set; } = default!;
 
     public string Email { get; private set; } = string.Empty;
@@ -28,11 +24,10 @@ public class Invitation : AuditableEntity
 
     private Invitation(OrganizationId orgId, string email, OrganizationRole role, UserId inviterId)
     {
-        Id = new InvitationId(new Guid());
         OrganizationId = orgId;
         Email = email;
+        Role = role;
         Status = InvitationStatus.Pending;
-        Created = DateTime.UtcNow;
         ExpiresAt = DateTime.Today.AddDays(7);
         InviterId = inviterId;
     }

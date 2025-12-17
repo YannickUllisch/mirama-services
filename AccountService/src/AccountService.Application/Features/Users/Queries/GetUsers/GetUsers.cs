@@ -9,8 +9,8 @@ namespace AccountService.Application.Features.Users.Queries.GetUsers;
 public sealed record GetUsersQuery : IRequest<ErrorOr<PaginatedList<UserResponse>>>
 {
     [JsonPropertyName("pageSize")]
-    public int PageSize { get; init; } = 10;
+    public int? PageSize { get; init; } = null;
 
     [JsonPropertyName("pageNumber")]
-    public int PageNumber { get; init; } = 0;
+    public int? PageNumber { get; init; } = null;
 }

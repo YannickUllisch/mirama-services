@@ -6,10 +6,8 @@ using AccountService.Application.Domain.User.ValueObjects;
 
 namespace AccountService.Application.Domain.User;
 
-public class User : AuditableEntity
+public class User : AggregateRoot<UserId>
 {
-    public UserId Id { get; private set; } = default!;
-
     public string Name { get; private set; } = string.Empty;
 
     public string Email { get; private set; } = string.Empty;

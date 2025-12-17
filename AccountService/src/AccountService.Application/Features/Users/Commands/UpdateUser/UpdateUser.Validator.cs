@@ -10,7 +10,7 @@ internal class UpdateUserRequestValidator : AbstractValidator<UpdateUserCommand>
     {
         RuleFor(req => req.Email)
             .EmailAddress();
-            
+
         RuleFor(req => req.Name)
             .NotEmpty()
             .MinimumLength(3)

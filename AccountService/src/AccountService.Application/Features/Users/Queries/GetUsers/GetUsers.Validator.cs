@@ -8,7 +8,7 @@ internal class GetUsersQueryValidator : AbstractValidator<GetUsersQuery>
 {
     public GetUsersQueryValidator(IGlobalRoleProvider roleProvider)
     {
-        RuleFor(req => req.PageSize)
-            .LessThanOrEqualTo(50);
+        // RuleFor(req => req.PageSize)
+        //     .LessThanOrEqualTo(50);
     }
 }

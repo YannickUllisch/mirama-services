@@ -5,11 +5,8 @@ using AccountService.Application.Domain.User.ValueObjects;
 
 namespace AccountService.Application.Domain.Organization;
 
-
-public class Member : AuditableEntity
+public class Member : Entity<MemberId>
 {
-    public MemberId Id { get; private set; } = default!;
-
     public OrganizationId OrganizationId { get; private set; } = default!;
 
     public UserId UserId { get; private set; } = default!;
@@ -18,11 +15,9 @@ public class Member : AuditableEntity
 
     private Member(OrganizationId organizationId, UserId userId, OrganizationRole role)
     {
-        Id = new MemberId(new Guid());
         OrganizationId = organizationId;
         UserId = userId;
         Role = role;
-        Created = DateTime.UtcNow;
     }
 
     private Member() { }

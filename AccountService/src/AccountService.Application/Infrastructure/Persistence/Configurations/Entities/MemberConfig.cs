@@ -5,7 +5,7 @@ using AccountService.Application.Domain.User.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace AccountService.Application.Infrastructure.Persistence.Configurations;
+namespace AccountService.Application.Infrastructure.Persistence.Configurations.Entities;
 
 public class MemberConfiguration : IEntityTypeConfiguration<Member>
 {
@@ -13,16 +13,18 @@ public class MemberConfiguration : IEntityTypeConfiguration<Member>
     {
         builder.HasKey(m => m.Id);
 
+        builder.HasIndex(i => i.OrganizationId);
+
         builder.Property(m => m.Id).HasConversion(
-            memId => memId.Value,
+            uid => uid.Value,
             val => new MemberId(val));
 
         builder.Property(m => m.UserId).HasConversion(
             uid => uid.Value,
             val => new UserId(val));
 
-        builder.Property(m => m.OrganizationId).HasConversion(
-            oid => oid.Value,
+        builder.Property(o => o.OrganizationId).HasConversion(
+            orgId => orgId.Value,
             val => new OrganizationId(val));
     }
 }

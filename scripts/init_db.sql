@@ -10,6 +10,8 @@ CREATE USER auth_user WITH PASSWORD 'auth_password';
 -- Grant user access only to auth schema
 GRANT USAGE ON SCHEMA auth TO auth_user;
 
+GRANT CREATE ON SCHEMA auth TO auth_user;
+
 -- Allow the user to create tables in this schema (needed for EF migrations)
 GRANT INSERT, SELECT, UPDATE, DELETE ON ALL TABLES IN SCHEMA auth TO auth_user;
 
@@ -24,6 +26,8 @@ CREATE SCHEMA IF NOT EXISTS project;
 CREATE USER project_user WITH PASSWORD 'project_password';
 
 GRANT USAGE ON SCHEMA project TO project_user;
+
+GRANT CREATE ON SCHEMA project TO project_user;
 
 GRANT INSERT, SELECT, UPDATE, DELETE ON ALL TABLES IN SCHEMA project TO project_user;
 

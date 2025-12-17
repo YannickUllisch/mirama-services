@@ -1,5 +1,7 @@
 using Microsoft.OpenApi;
 using AccountService.Application;
+using AccountService.Application.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,7 +9,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddCors(options => options.AddDefaultPolicy(
-        policy => policy.AllowAnyOrigin()
+        policy => policy
+            .AllowAnyOrigin()
             .AllowAnyHeader()
             .AllowAnyMethod()));
 
@@ -16,7 +19,7 @@ builder.Services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title =
 builder.Services.AddProblemDetails();
 
 builder.Services
-    .AddApplication()
+    .AddApplication(builder.Configuration)
     .AddInfrastructure(builder.Configuration);
 
 builder.Services.AddLogging();
@@ -41,6 +44,20 @@ app.UseCors();
 if (app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/error-development");
+    using var scope = app.Services.CreateScope();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        logger.LogInformation("Applying database migrations...");
+        await db.Database.MigrateAsync();
+        logger.LogInformation("Database migrations applied successfully");
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "An error occurred while applying database migrations.");
+        throw;
+    }
 }
 else
 {
@@ -49,7 +66,8 @@ else
     app.UseExceptionHandler("/error");
 }
 
-app.UseAuthorization();
+// app.UseAuthentication();
+// app.UseAuthorization();
 app.MapControllers();
 
 app.Run();

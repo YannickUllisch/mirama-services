@@ -9,7 +9,7 @@ namespace AccountService.Application.Features.Users.Commands.UpdateUser;
 public sealed record UpdateUserCommand : IRequest<ErrorOr<UserResponse>>
 {
     public Guid Id { get; init; }
-    
+
     [JsonPropertyName("name")]
     public string Name { get; init; } = string.Empty;
 
