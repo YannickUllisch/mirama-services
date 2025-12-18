@@ -1,6 +1,6 @@
 
 
-namespace AccountService.Application.Domain.Abstractions;
+namespace AccountService.Application.Domain.Abstractions.Core;
 
 public abstract class AggregateRoot<TID> : Entity<TID>
 {

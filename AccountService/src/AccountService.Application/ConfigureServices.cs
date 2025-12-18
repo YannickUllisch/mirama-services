@@ -3,6 +3,7 @@ using AccountService.Application.Common;
 using AccountService.Application.Common.Behaviours;
 using AccountService.Application.Common.Interfaces;
 using AccountService.Application.Common.Options;
+using AccountService.Application.Infrastructure.Common.Interfaces;
 using AccountService.Application.Infrastructure.Persistence;
 using AccountService.Application.Infrastructure.Services;
 using FluentValidation;
@@ -35,7 +36,8 @@ public static class DependencyInjection
 
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
     {
-        services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddScoped<IUserContextService, UserContextService>();
+        services.AddScoped<ITenantContextService, TenantContextService>();
 
         services
             .AddOptions<InfrastructureOptions>()

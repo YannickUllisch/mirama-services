@@ -1,7 +1,5 @@
 
-
-
-using AccountService.Application.Domain.Abstractions;
+using AccountService.Application.Domain.Abstractions.Core;
 using AccountService.Application.Domain.User.ValueObjects;
 
 namespace AccountService.Application.Domain.User;

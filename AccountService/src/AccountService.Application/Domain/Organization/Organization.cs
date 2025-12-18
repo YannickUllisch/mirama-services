@@ -1,5 +1,5 @@
 
-using AccountService.Application.Domain.Abstractions;
+using AccountService.Application.Domain.Abstractions.Core;
 using AccountService.Application.Domain.Organization.ValueObjects;
 using AccountService.Application.Domain.User.ValueObjects;
 using ErrorOr;
@@ -46,7 +46,7 @@ public class Organization : AggregateRoot<OrganizationId>
     public ErrorOr<Created> AddMember(Guid uid, OrganizationRole role)
     {
         var userId = new UserId(uid);
-        Member member = Member.Create(this.Id, userId, role);
+        Member member = Member.Create(userId, role);
         _members.Add(member);
 
         return Result.Created;
@@ -58,7 +58,7 @@ public class Organization : AggregateRoot<OrganizationId>
         foreach (var (uid, role) in members)
         {
             var userId = new UserId(uid);
-            Member member = Member.Create(this.Id, userId, role);
+            Member member = Member.Create(userId, role);
             membersToAdd.Add(member);
         }
         _members.AddRange(membersToAdd);

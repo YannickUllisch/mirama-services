@@ -1,34 +1,41 @@
 
 using System.Reflection;
-using AccountService.Application.Common.Interfaces;
-using AccountService.Application.Domain.Abstractions;
+using AccountService.Application.Domain.Abstractions.Core;
+using AccountService.Application.Domain.Abstractions.Tenant;
 using AccountService.Application.Domain.Organization;
 using AccountService.Application.Domain.Organization.Invitation;
 using AccountService.Application.Domain.User;
+using AccountService.Application.Infrastructure.Common.Extensions;
+using AccountService.Application.Infrastructure.Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace AccountService.Application.Infrastructure.Persistence;
 
 public sealed class ApplicationDbContext : DbContext
 {
-    private readonly ICurrentUserService _currentUserService = default!;
+    private readonly IUserContextService _userContext = default!;
+    private readonly ITenantContextService _tenantContext = default!;
 
     public DbSet<Organization> Organizations => Set<Organization>();
     public DbSet<User> User => Set<User>();
     public DbSet<Invitation> Invitations => Set<Invitation>();
     public DbSet<Member> Members => Set<Member>();
 
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, ICurrentUserService currentUserService) : base(options)
+    public ApplicationDbContext(
+        DbContextOptions<ApplicationDbContext> options,
+        IUserContextService userContext,
+        ITenantContextService tenantContext) : base(options)
     {
-        _currentUserService = currentUserService;
+        _userContext = userContext;
+        _tenantContext = tenantContext;
     }
     public ApplicationDbContext() { }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        // Scans for IEntityTypeConfigurations in the Assembly, allowing us to extract configs from here
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         builder.HasDefaultSchema("auth");
+        builder.ApplyTenantQueryFilter(_tenantContext);
 
         base.OnModelCreating(builder);
     }
@@ -42,13 +49,19 @@ public sealed class ApplicationDbContext : DbContext
             switch (entry.State)
             {
                 case EntityState.Added:
-                    entry.Entity.SetCreated(DateTime.UtcNow, _currentUserService.UserId);
+                    entry.Entity.SetCreated(DateTime.UtcNow, _userContext.UserId);
                     break;
                 case EntityState.Modified:
-                    entry.Entity.SetModified(DateTime.UtcNow, _currentUserService.UserId);
+                    entry.Entity.SetModified(DateTime.UtcNow, _userContext.UserId);
                     break;
                 default:
                     break;
+            }
+
+            // Automatically add Tenant Id to newly created and TenantScoped Entities
+            if (entry.Entity is ITenantScoped tenantScoped && entry.State == EntityState.Added)
+            {
+                tenantScoped.SetOrganizationId(_tenantContext.OrganizationId);
             }
         }
 

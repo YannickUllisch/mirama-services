@@ -1,11 +1,11 @@
 
 using System.Security.Claims;
-using AccountService.Application.Common.Interfaces;
+using AccountService.Application.Infrastructure.Common.Interfaces;
 using Microsoft.AspNetCore.Http;
 
 namespace AccountService.Application.Infrastructure.Services;
 
-internal class CurrentUserService(IHttpContextAccessor httpContextAccessor) : ICurrentUserService
+internal class UserContextService(IHttpContextAccessor httpContextAccessor) : IUserContextService
 {
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 

@@ -35,7 +35,6 @@ public sealed record Address
 
     }
 
-    // <summary>
     private static ErrorOr<Success> Validate(string street, string city, string country, string zipCode)
     {
         List<Error> errors = [];

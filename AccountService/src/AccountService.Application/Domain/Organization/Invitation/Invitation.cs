@@ -1,15 +1,13 @@
 
 
-using AccountService.Application.Domain.Abstractions;
+using AccountService.Application.Domain.Abstractions.Tenant;
 using AccountService.Application.Domain.Organization.Invitation.Valueobjects;
 using AccountService.Application.Domain.Organization.ValueObjects;
 using AccountService.Application.Domain.User.ValueObjects;
 namespace AccountService.Application.Domain.Organization.Invitation;
 
-public class Invitation : Entity<InvitationId>
+public class Invitation : TenantEntity<InvitationId>
 {
-    public OrganizationId OrganizationId { get; private set; } = default!;
-
     public string Email { get; private set; } = string.Empty;
 
     public OrganizationRole Role { get; private set; }
@@ -22,9 +20,8 @@ public class Invitation : Entity<InvitationId>
 
     public UserId? AcceptedBy = null;
 
-    private Invitation(OrganizationId orgId, string email, OrganizationRole role, UserId inviterId)
+    private Invitation(string email, OrganizationRole role, UserId inviterId)
     {
-        OrganizationId = orgId;
         Email = email;
         Role = role;
         Status = InvitationStatus.Pending;
@@ -35,9 +32,9 @@ public class Invitation : Entity<InvitationId>
     private Invitation() { }
 
 
-    public static Invitation Create(OrganizationId orgId, string email, OrganizationRole role, UserId inviteeId)
+    public static Invitation Create(string email, OrganizationRole role, UserId inviteeId)
     {
-        return new Invitation(orgId, email, role, inviteeId);
+        return new Invitation(email, role, inviteeId);
     }
 
     public void Accept(UserId userId)

@@ -1,30 +1,27 @@
 
-using AccountService.Application.Domain.Abstractions;
+using AccountService.Application.Domain.Abstractions.Tenant;
 using AccountService.Application.Domain.Organization.ValueObjects;
 using AccountService.Application.Domain.User.ValueObjects;
 
 namespace AccountService.Application.Domain.Organization;
 
-public class Member : Entity<MemberId>
+public class Member : TenantEntity<MemberId>
 {
-    public OrganizationId OrganizationId { get; private set; } = default!;
-
     public UserId UserId { get; private set; } = default!;
 
     public OrganizationRole Role { get; private set; }
 
-    private Member(OrganizationId organizationId, UserId userId, OrganizationRole role)
+    private Member(UserId userId, OrganizationRole role)
     {
-        OrganizationId = organizationId;
         UserId = userId;
         Role = role;
     }
 
     private Member() { }
 
-    public static Member Create(OrganizationId organizationId, UserId userId, OrganizationRole role)
+    public static Member Create(UserId userId, OrganizationRole role)
     {
-        return new Member(organizationId, userId, role);
+        return new Member(userId, role);
     }
 
     public void SetRole(OrganizationRole role)

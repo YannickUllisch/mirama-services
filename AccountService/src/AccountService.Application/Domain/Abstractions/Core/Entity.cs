@@ -1,5 +1,5 @@
 
-namespace AccountService.Application.Domain.Abstractions;
+namespace AccountService.Application.Domain.Abstractions.Core;
 
 public abstract class Entity<TID> : IAuditable
 {

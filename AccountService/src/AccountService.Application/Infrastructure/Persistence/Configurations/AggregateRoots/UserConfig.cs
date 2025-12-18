@@ -4,7 +4,7 @@ using AccountService.Application.Domain.User.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace AccountService.Application.Infrastructure.Persistence.Configurations;
+namespace AccountService.Application.Infrastructure.Persistence.Configurations.AggregateRoots;
 
 public class UserConfiguration : IEntityTypeConfiguration<User>
 {
