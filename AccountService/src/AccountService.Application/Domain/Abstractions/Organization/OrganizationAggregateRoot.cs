@@ -2,9 +2,9 @@
 
 using AccountService.Application.Domain.Abstractions.Core;
 
-namespace AccountService.Application.Domain.Abstractions.Tenant;
+namespace AccountService.Application.Domain.Abstractions.Organization;
 
-public abstract class TenantAggregateRoot<TID> : TenantEntity<TID>
+public abstract class OrganizationAggregateRoot<TID> : OrganizationEntity<TID>
 {
     private readonly List<DomainEvent> _domainEvents = [];
 

@@ -2,7 +2,7 @@
 
 
 using AccountService.Application.Common.Interfaces;
-using AccountService.Application.Domain.User.ValueObjects;
+using AccountService.Application.Domain.Aggregates.User;
 
 namespace AccountService.Application.Common;
 

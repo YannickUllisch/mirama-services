@@ -1,7 +1,6 @@
 
 
-using AccountService.Application.Domain.User;
-using AccountService.Application.Domain.User.ValueObjects;
+using AccountService.Application.Domain.Aggregates.User;
 using AccountService.Application.Infrastructure.Persistence;
 using ErrorOr;
 using MediatR;

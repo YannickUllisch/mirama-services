@@ -4,7 +4,7 @@ using AccountService.Application.Common.Models;
 
 namespace AccountService.Application.Common.Extensions;
 
-public static class MappingExtensions
+public static class QueryableExtensions
 {
     public static Task<PaginatedList<TDestination>> PaginatedListAsync<TDestination>(
         this IQueryable<TDestination> queryable,

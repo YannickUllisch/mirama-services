@@ -1,12 +1,11 @@
 
 
-using AccountService.Application.Domain.Abstractions.Tenant;
-using AccountService.Application.Domain.Organization.Invitation.Valueobjects;
-using AccountService.Application.Domain.Organization.ValueObjects;
-using AccountService.Application.Domain.User.ValueObjects;
-namespace AccountService.Application.Domain.Organization.Invitation;
+using AccountService.Application.Domain.Abstractions.Organization;
+using AccountService.Application.Domain.Aggregates.User;
 
-public class Invitation : TenantEntity<InvitationId>
+namespace AccountService.Application.Domain.Aggregates.Organization.Invitation;
+
+public class Invitation : OrganizationEntity<InvitationId>
 {
     public string Email { get; private set; } = string.Empty;
 

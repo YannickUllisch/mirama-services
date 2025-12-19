@@ -1,6 +1,6 @@
 
 
-namespace AccountService.Application.Domain.Organization.ValueObjects;
+namespace AccountService.Application.Domain.Aggregates.Organization;
 
 public enum OrganizationRole
 {

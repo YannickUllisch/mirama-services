@@ -1,5 +1,5 @@
 
-using AccountService.Application.Domain.User;
+using AccountService.Application.Domain.Aggregates.User;
 using ErrorOr;
 
 namespace AccountService.Application.Features.Users;

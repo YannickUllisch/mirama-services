@@ -1,8 +1,7 @@
 
 using AccountService.Application.Domain.Abstractions.Core;
-using AccountService.Application.Domain.User.ValueObjects;
 
-namespace AccountService.Application.Domain.User;
+namespace AccountService.Application.Domain.Aggregates.User;
 
 public class User : AggregateRoot<UserId>
 {

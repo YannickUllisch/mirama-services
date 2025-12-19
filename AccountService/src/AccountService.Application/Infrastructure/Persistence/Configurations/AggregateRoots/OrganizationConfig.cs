@@ -1,6 +1,5 @@
 
-using AccountService.Application.Domain.Organization;
-using AccountService.Application.Domain.Organization.ValueObjects;
+using AccountService.Application.Domain.Aggregates.Organization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -11,12 +10,14 @@ public class OrganizationConfiguration : IEntityTypeConfiguration<Organization>
     public void Configure(EntityTypeBuilder<Organization> builder)
     {
         builder.HasKey(o => o.Id);
-
+        builder.HasIndex(o => o.TenantId);
+        
         builder.Ignore(e => e.DomainEvents);
 
         builder.Property(o => o.Id).HasConversion(
-            orgId => orgId.Value,
-            val => new OrganizationId(val));
+            id => id.Value,
+            v => new OrganizationId(v));
+        builder.Property(o => o.TenantId).IsRequired();
 
         builder.OwnsOne(o => o.Address, a =>
         {

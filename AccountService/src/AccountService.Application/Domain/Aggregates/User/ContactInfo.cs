@@ -1,5 +1,5 @@
 
-namespace AccountService.Application.Domain.User.ValueObjects;
+namespace AccountService.Application.Domain.Aggregates.User;
 
 public sealed record ContactInfo(string ContactEmail, string ContactPhoneNumber)
 {

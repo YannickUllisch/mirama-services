@@ -1,7 +1,6 @@
 
-using AccountService.Application.Domain.Organization;
-using AccountService.Application.Domain.Organization.ValueObjects;
-using AccountService.Application.Domain.User.ValueObjects;
+using AccountService.Application.Domain.Aggregates.Organization.Member;
+using AccountService.Application.Domain.Aggregates.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -22,9 +21,5 @@ public class MemberConfiguration : IEntityTypeConfiguration<Member>
         builder.Property(m => m.UserId).HasConversion(
             uid => uid.Value,
             val => new UserId(val));
-
-        builder.Property(o => o.OrganizationId).HasConversion(
-            orgId => orgId.Value,
-            val => new OrganizationId(val));
     }
 }

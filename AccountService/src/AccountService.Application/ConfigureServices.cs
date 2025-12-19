@@ -36,8 +36,8 @@ public static class DependencyInjection
 
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
     {
-        services.AddScoped<IUserContextService, UserContextService>();
-        services.AddScoped<ITenantContextService, TenantContextService>();
+        services.AddScoped<IUserProvider, UserProviderService>();
+        services.AddScoped<IOrganizationProvider, OrganizationProviderService>();
 
         services
             .AddOptions<InfrastructureOptions>()

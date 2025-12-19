@@ -1,7 +1,7 @@
 
 using ErrorOr;
 
-namespace AccountService.Application.Domain.Organization.ValueObjects;
+namespace AccountService.Application.Domain.ValueObjects;
 
 public sealed record Address
 {

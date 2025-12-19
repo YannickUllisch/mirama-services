@@ -1,7 +1,6 @@
 
-using AccountService.Application.Domain.Organization.Invitation;
-using AccountService.Application.Domain.Organization.Invitation.Valueobjects;
-using AccountService.Application.Domain.User.ValueObjects;
+using AccountService.Application.Domain.Aggregates.Organization.Invitation;
+using AccountService.Application.Domain.Aggregates.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

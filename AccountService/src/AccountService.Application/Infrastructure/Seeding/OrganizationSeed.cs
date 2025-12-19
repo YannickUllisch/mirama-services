@@ -1,6 +1,6 @@
 
 
-using AccountService.Application.Domain.Organization;
+using AccountService.Application.Domain.Aggregates.Organization;
 using AccountService.Application.Infrastructure.Persistence;
 
 namespace AccountService.Application.Infrastructure.Seeding;

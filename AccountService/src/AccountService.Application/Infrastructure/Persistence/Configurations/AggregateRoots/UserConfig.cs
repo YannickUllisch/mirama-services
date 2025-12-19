@@ -1,6 +1,5 @@
 
-using AccountService.Application.Domain.User;
-using AccountService.Application.Domain.User.ValueObjects;
+using AccountService.Application.Domain.Aggregates.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

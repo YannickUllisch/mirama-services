@@ -1,11 +1,10 @@
 
-using AccountService.Application.Domain.Abstractions.Tenant;
-using AccountService.Application.Domain.Organization.ValueObjects;
-using AccountService.Application.Domain.User.ValueObjects;
+using AccountService.Application.Domain.Abstractions.Organization;
+using AccountService.Application.Domain.Aggregates.User;
 
-namespace AccountService.Application.Domain.Organization;
+namespace AccountService.Application.Domain.Aggregates.Organization.Member;
 
-public class Member : TenantEntity<MemberId>
+public class Member : OrganizationEntity<MemberId>
 {
     public UserId UserId { get; private set; } = default!;
 

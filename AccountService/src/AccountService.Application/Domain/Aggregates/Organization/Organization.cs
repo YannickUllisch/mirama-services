@@ -1,12 +1,14 @@
 
 using AccountService.Application.Domain.Abstractions.Core;
-using AccountService.Application.Domain.Organization.ValueObjects;
-using AccountService.Application.Domain.User.ValueObjects;
+using AccountService.Application.Domain.Abstractions.Tenant;
+using AccountService.Application.Domain.Aggregates.Organization.Member;
+using AccountService.Application.Domain.Aggregates.User;
+using AccountService.Application.Domain.ValueObjects;
 using ErrorOr;
 
-namespace AccountService.Application.Domain.Organization;
+namespace AccountService.Application.Domain.Aggregates.Organization;
 
-public class Organization : AggregateRoot<OrganizationId>
+public class Organization : AggregateRoot<OrganizationId>, ITenantOwned
 {
     public string Name { get; private set; } = string.Empty;
 
@@ -16,11 +18,13 @@ public class Organization : AggregateRoot<OrganizationId>
 
     public Address Address { get; private set; } = default!;
 
-    public IReadOnlyList<Member> Members => _members.AsReadOnly();
+    public Guid TenantId { get; private set; } = Guid.Empty; // Set in DB Context
+
+    public IReadOnlyList<Member.Member> Members => _members.AsReadOnly();
 
     public IReadOnlyList<Invitation.Invitation> Invitations => _invitations.AsReadOnly();
 
-    private readonly List<Member> _members = [];
+    private readonly List<Member.Member> _members = [];
 
     private readonly List<Invitation.Invitation> _invitations = [];
 
@@ -46,7 +50,7 @@ public class Organization : AggregateRoot<OrganizationId>
     public ErrorOr<Created> AddMember(Guid uid, OrganizationRole role)
     {
         var userId = new UserId(uid);
-        Member member = Member.Create(userId, role);
+        var member = Member.Member.Create(userId, role);
         _members.Add(member);
 
         return Result.Created;
@@ -54,11 +58,11 @@ public class Organization : AggregateRoot<OrganizationId>
 
     public ErrorOr<Created> AddMembers(List<(Guid uid, OrganizationRole role)> members)
     {
-        List<Member> membersToAdd = [];
+        List<Member.Member> membersToAdd = [];
         foreach (var (uid, role) in members)
         {
             var userId = new UserId(uid);
-            Member member = Member.Create(userId, role);
+            var member = Member.Member.Create(userId, role);
             membersToAdd.Add(member);
         }
         _members.AddRange(membersToAdd);
@@ -69,7 +73,7 @@ public class Organization : AggregateRoot<OrganizationId>
     public ErrorOr<Deleted> RemoveMember(Guid mid)
     {
         var memberId = new MemberId(mid);
-        Member? member = _members.Find(m => m.Id == memberId);
+        var member = _members.Find(m => m.Id == memberId);
 
         if (member == null)
         {
@@ -106,4 +110,12 @@ public class Organization : AggregateRoot<OrganizationId>
         return input.Trim().ToLower().Replace(" ", "-");
     }
 
+    void ITenantOwned.SetTenantId(Guid tenantId)
+    {
+        if (TenantId != Guid.Empty)
+        {
+            throw new InvalidOperationException("OrganizationId already set.");
+        }
+        TenantId = tenantId;
+    }
 }
