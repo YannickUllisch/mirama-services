@@ -12,6 +12,8 @@ using AccountService.Application.Domain.Aggregates.User;
 using AccountService.Application.Infrastructure.Common.Extensions;
 using AccountService.Application.Infrastructure.Common.Interfaces;
 using AccountService.Application.Infrastructure.Messaging.Outbox;
+using AccountService.Application.Infrastructure.Persistence.Idempotency;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace AccountService.Application.Infrastructure.Persistence;
@@ -19,6 +21,7 @@ namespace AccountService.Application.Infrastructure.Persistence;
 public sealed class ApplicationDbContext : DbContext
 {
     private readonly IRequestContextProvider _requestContext = default!;
+    private readonly IMediator _mediator = default!;
 
     public DbSet<Organization> Organizations => Set<Organization>();
     public DbSet<User> Users => Set<User>();
@@ -26,13 +29,17 @@ public sealed class ApplicationDbContext : DbContext
     public DbSet<Invitation> Invitations => Set<Invitation>();
     public DbSet<Member> Members => Set<Member>();
     public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
+    public DbSet<IdempotencyRecord> IdempotencyRecords => Set<IdempotencyRecord>();
 
     public ApplicationDbContext(
         DbContextOptions<ApplicationDbContext> options,
+        IMediator mediator,
         IRequestContextProvider requestContext) : base(options)
     {
         _requestContext = requestContext;
+        _mediator = mediator;
     }
+
     public ApplicationDbContext() { }
 
     protected override void OnModelCreating(ModelBuilder builder)
@@ -81,16 +88,23 @@ public sealed class ApplicationDbContext : DbContext
             }
         }
 
-        // Persisting Domain events
-        var outboxMessages = ChangeTracker.Entries<IDomainEventEntity>()
+        // Persisting and Publishing Domain events in current transaction
+        var domainEvents = ChangeTracker.Entries<IDomainEventEntity>()
             .Select(e => e.Entity)
             .SelectMany(aggregate =>
             {
                 var events = aggregate.GetDomainEvents();
                 aggregate.ClearDomainEvents();
-
                 return events;
             })
+            .ToList();
+
+        foreach (var domainEvent in domainEvents)
+        {
+            await _mediator.Publish(domainEvent, cancellationToken);
+        }
+
+        var outboxMessages = domainEvents
             .Select(domainEvent => new OutboxMessage
             {
                 Id = Guid.NewGuid(),
