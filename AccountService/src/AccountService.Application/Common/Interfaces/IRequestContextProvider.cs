@@ -1,5 +1,5 @@
 
-namespace AccountService.Application.Infrastructure.Common.Interfaces;
+namespace AccountService.Application.Common.Interfaces;
 
 public interface IRequestContextProvider
 {

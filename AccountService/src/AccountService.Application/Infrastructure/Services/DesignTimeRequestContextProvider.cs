@@ -1,5 +1,5 @@
 
-using AccountService.Application.Infrastructure.Common.Interfaces;
+using AccountService.Application.Common.Interfaces;
 
 namespace AccountService.Application.Infrastructure.Services;
 

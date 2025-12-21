@@ -1,6 +1,6 @@
 
 using System.Security.Claims;
-using AccountService.Application.Infrastructure.Common.Interfaces;
+using AccountService.Application.Common.Interfaces;
 using Microsoft.AspNetCore.Http;
 
 namespace AccountService.Application.Infrastructure.Services;

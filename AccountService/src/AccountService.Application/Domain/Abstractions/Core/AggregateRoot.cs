@@ -1,4 +1,5 @@
 
+using AccountService.Application.Domain.Abstractions.Events;
 
 namespace AccountService.Application.Domain.Abstractions.Core;
 

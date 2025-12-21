@@ -1,14 +1,15 @@
 
 using System.Reflection;
 using System.Text.Json;
+using AccountService.Application.Common.Extensions;
+using AccountService.Application.Common.Interfaces;
 using AccountService.Application.Domain.Abstractions.Core;
+using AccountService.Application.Domain.Abstractions.Events;
 using AccountService.Application.Domain.Aggregates.Organization;
 using AccountService.Application.Domain.Aggregates.Organization.Invitation;
 using AccountService.Application.Domain.Aggregates.Organization.Member;
 using AccountService.Application.Domain.Aggregates.Tenant;
 using AccountService.Application.Domain.Aggregates.User;
-using AccountService.Application.Infrastructure.Common.Extensions;
-using AccountService.Application.Infrastructure.Common.Interfaces;
 using AccountService.Application.Infrastructure.Messaging.Outbox;
 using AccountService.Application.Infrastructure.Persistence.Idempotency;
 using MediatR;

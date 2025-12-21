@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 using AccountService.Application.Domain.Abstractions.Core;
 using Microsoft.EntityFrameworkCore;
 
-namespace AccountService.Application.Infrastructure.Common.Extensions;
+namespace AccountService.Application.Common.Extensions;
 
 internal static class ModelBuilderExtensions
 {

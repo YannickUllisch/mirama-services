@@ -55,20 +55,6 @@ public class Organization : AggregateRoot<OrganizationId>, ITenantOwned
         return Result.Created;
     }
 
-    public ErrorOr<Created> AddMembers(List<(Guid uid, OrganizationRole role)> members)
-    {
-        List<Member.Member> membersToAdd = [];
-        foreach (var (uid, role) in members)
-        {
-            var userId = new UserId(uid);
-            var member = Member.Member.Create(userId, role);
-            membersToAdd.Add(member);
-        }
-        _members.AddRange(membersToAdd);
-
-        return Result.Created;
-    }
-
     public ErrorOr<Deleted> RemoveMember(Guid mid)
     {
         var memberId = new MemberId(mid);
@@ -104,11 +90,6 @@ public class Organization : AggregateRoot<OrganizationId>, ITenantOwned
         return _members.Any(m => m.Id == memberId);
     }
 
-    private static string GenerateSlug(string input)
-    {
-        return input.Trim().ToLower().Replace(" ", "-");
-    }
-
     void ITenantOwned.SetTenantId(Guid tenantId)
     {
         if (TenantId != Guid.Empty)
@@ -116,5 +97,10 @@ public class Organization : AggregateRoot<OrganizationId>, ITenantOwned
             throw new InvalidOperationException("OrganizationId already set.");
         }
         TenantId = tenantId;
+    }
+
+    private static string GenerateSlug(string input)
+    {
+        return input.Trim().ToLower().Replace(" ", "-");
     }
 }
