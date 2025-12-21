@@ -2,6 +2,7 @@ using Microsoft.OpenApi;
 using AccountService.Application;
 using AccountService.Application.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using AccountService.Api.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,21 +30,9 @@ builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
-// Enable middleware to serve generated Swagger as a JSON endpoint.
-app.UseSwagger();
-
-// Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
-app.UseSwaggerUI(options =>
-{
-    options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-    options.RoutePrefix = string.Empty;
-});
-
-app.UseCors();
-
+// Applying migrations immediately in Development, handled in CICD pipeline for production
 if (app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/error-development");
     using var scope = app.Services.CreateScope();
     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
     try
@@ -59,12 +48,27 @@ if (app.Environment.IsDevelopment())
         throw;
     }
 }
-else
+
+app.UseExceptionHandler();
+
+// Forcing HTTPS
+if (app.Environment.IsProduction())
 {
     app.UseHsts();
     app.UseHttpsRedirection();
-    app.UseExceptionHandler("/error");
 }
+
+// Swagger Middleware
+app.UseSwagger();
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+    options.RoutePrefix = string.Empty;
+});
+app.UseRouting();
+app.UseCors();
+app.UseIdempotency();
+
 
 // app.UseAuthentication();
 // app.UseAuthorization();

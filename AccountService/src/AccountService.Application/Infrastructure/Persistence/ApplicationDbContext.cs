@@ -1,5 +1,7 @@
 
 using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using AccountService.Application.Domain.Abstractions.Core;
 using AccountService.Application.Domain.Abstractions.Organization;
 using AccountService.Application.Domain.Abstractions.Tenant;
@@ -10,6 +12,7 @@ using AccountService.Application.Domain.Aggregates.Tenant;
 using AccountService.Application.Domain.Aggregates.User;
 using AccountService.Application.Infrastructure.Common.Extensions;
 using AccountService.Application.Infrastructure.Common.Interfaces;
+using AccountService.Application.Infrastructure.Messaging.Outbox;
 using Microsoft.EntityFrameworkCore;
 
 namespace AccountService.Application.Infrastructure.Persistence;
@@ -23,6 +26,7 @@ public sealed class ApplicationDbContext : DbContext
     public DbSet<Tenant> Tenants => Set<Tenant>();
     public DbSet<Invitation> Invitations => Set<Invitation>();
     public DbSet<Member> Members => Set<Member>();
+    public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
 
     public ApplicationDbContext(
         DbContextOptions<ApplicationDbContext> options,
@@ -50,6 +54,7 @@ public sealed class ApplicationDbContext : DbContext
     {
         var entries = ChangeTracker.Entries<IAuditable>();
 
+        // Handling Auditable Entities
         foreach (var entry in entries)
         {
             switch (entry.State)
@@ -75,6 +80,30 @@ public sealed class ApplicationDbContext : DbContext
             {
                 tenantScoped.SetTenantId(_requestContext.TenantId);
             }
+        }
+
+        // Persisting Domain events
+        var outboxMessages = ChangeTracker.Entries<IDomainEventEntity>()
+            .Select(e => e.Entity)
+            .SelectMany(aggregate =>
+            {
+                var events = aggregate.GetDomainEvents();
+                aggregate.ClearDomainEvents();
+
+                return events;
+            })
+            .Select(domainEvent => new OutboxMessage
+            {
+                Id = Guid.NewGuid(),
+                OccurredAtUtc = domainEvent.OccurredAt,
+                Type = domainEvent.GetType().Name,
+                Content = JsonSerializer.Serialize(domainEvent)
+            })
+            .ToList();
+        
+        if (outboxMessages.Count != 0)
+        {
+            OutboxMessages.AddRange(outboxMessages);
         }
 
         return await base.SaveChangesAsync(cancellationToken);
