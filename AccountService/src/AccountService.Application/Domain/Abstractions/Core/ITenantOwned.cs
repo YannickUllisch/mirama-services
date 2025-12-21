@@ -1,5 +1,5 @@
 
-namespace AccountService.Application.Domain.Abstractions.Tenant;
+namespace AccountService.Application.Domain.Abstractions.Core;
 
 public interface ITenantOwned
 {

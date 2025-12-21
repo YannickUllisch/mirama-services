@@ -13,7 +13,7 @@ internal class UpdateUserCommandHandler(ApplicationDbContext context) : IRequest
 
     public async Task<ErrorOr<UserResponse>> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
     {
-        User? user = await _context.User.FindAsync([request.Id], cancellationToken);
+        User? user = await _context.Users.FindAsync([request.Id], cancellationToken);
 
         if (user == null)
         {

@@ -1,4 +1,5 @@
 
+using AccountService.Application.Domain.Aggregates.Organization;
 using AccountService.Application.Domain.Aggregates.Organization.Invitation;
 using AccountService.Application.Domain.Aggregates.User;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,11 @@ public class InvitationConfiguration : IEntityTypeConfiguration<Invitation>
         builder.HasKey(i => i.Id);
 
         builder.HasIndex(i => i.OrganizationId);
+        builder.Property(m => m.InviterId).IsRequired();
+
+        builder.Property(i => i.OrganizationId).HasConversion(
+                orgId => orgId.Value,
+                val => new OrganizationId(val));
 
         builder.Property(m => m.Id).HasConversion(
             invId => invId.Value,

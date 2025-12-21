@@ -1,6 +1,5 @@
 
 using AccountService.Application.Domain.Abstractions.Core;
-using AccountService.Application.Domain.Abstractions.Tenant;
 using AccountService.Application.Domain.Aggregates.Organization.Member;
 using AccountService.Application.Domain.Aggregates.User;
 using AccountService.Application.Domain.ValueObjects;

@@ -1,9 +1,11 @@
 
-namespace AccountService.Application.Domain.Abstractions.Organization;
+using AccountService.Application.Domain.Aggregates.Organization;
+
+namespace AccountService.Application.Domain.Abstractions.Core;
 
 public interface IOrganizationOwned
 {
-    Guid OrganizationId { get; }
+    OrganizationId OrganizationId { get; }
 
     void SetOrganizationId(Guid organizationId);
 }

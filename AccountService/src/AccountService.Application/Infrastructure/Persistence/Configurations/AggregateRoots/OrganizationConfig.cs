@@ -15,6 +15,7 @@ public class OrganizationConfiguration : IEntityTypeConfiguration<Organization>
         builder.Property(o => o.Id).HasConversion(
             id => id.Value,
             v => new OrganizationId(v));
+            
         builder.Property(o => o.TenantId).IsRequired();
 
         builder.OwnsOne(o => o.Address, a =>
@@ -33,6 +34,6 @@ public class OrganizationConfiguration : IEntityTypeConfiguration<Organization>
         builder.HasMany(o => o.Members)
             .WithOne()
             .HasForeignKey(i => i.OrganizationId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -1,4 +1,5 @@
 
+using AccountService.Application.Domain.Aggregates.Organization;
 using AccountService.Application.Domain.Aggregates.Organization.Member;
 using AccountService.Application.Domain.Aggregates.User;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,13 @@ public class MemberConfiguration : IEntityTypeConfiguration<Member>
         builder.HasKey(m => m.Id);
 
         builder.HasIndex(i => i.OrganizationId);
+
+        builder.Property(m => m.UserId).IsRequired();
+        builder.Property(m => m.Role).IsRequired();
+
+        builder.Property(i => i.OrganizationId).HasConversion(
+            orgId => orgId.Value,
+            val => new OrganizationId(val));
 
         builder.Property(m => m.Id).HasConversion(
             uid => uid.Value,

@@ -10,6 +10,8 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     public void Configure(EntityTypeBuilder<User> builder)
     {
         builder.HasKey(u => u.Id);
+        
+        builder.Property(m => m.Role).IsRequired();
 
         builder.Property(m => m.Id).HasConversion(
             uid => uid.Value,

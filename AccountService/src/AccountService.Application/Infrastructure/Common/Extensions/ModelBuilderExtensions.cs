@@ -1,7 +1,6 @@
 
 using System.Linq.Expressions;
-using AccountService.Application.Domain.Abstractions.Organization;
-using AccountService.Application.Domain.Abstractions.Tenant;
+using AccountService.Application.Domain.Abstractions.Core;
 using Microsoft.EntityFrameworkCore;
 
 namespace AccountService.Application.Infrastructure.Common.Extensions;
@@ -54,12 +53,11 @@ internal static class ModelBuilderExtensions
                 continue;
 
             var parameter = Expression.Parameter(entityType.ClrType, "e");
+            var orgIdProperty = Expression.Property(parameter, nameof(IOrganizationOwned.OrganizationId));
+            var valueProperty = Expression.Property(orgIdProperty, "Value");
+            var orgIdValue = Expression.Constant(orgId);
 
-            var property = Expression.Property(parameter, nameof(IOrganizationOwned.OrganizationId));
-            var tenantValue = Expression.Constant(orgId);
-
-            var body = Expression.Equal(property, tenantValue);
-
+            var body = Expression.Equal(valueProperty, orgIdValue);
             var lambda = Expression.Lambda(body, parameter);
 
             entityType.SetQueryFilter(lambda);

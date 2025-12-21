@@ -2,8 +2,6 @@
 using System.Reflection;
 using System.Text.Json;
 using AccountService.Application.Domain.Abstractions.Core;
-using AccountService.Application.Domain.Abstractions.Organization;
-using AccountService.Application.Domain.Abstractions.Tenant;
 using AccountService.Application.Domain.Aggregates.Organization;
 using AccountService.Application.Domain.Aggregates.Organization.Invitation;
 using AccountService.Application.Domain.Aggregates.Organization.Member;
@@ -75,16 +73,18 @@ public sealed class ApplicationDbContext : DbContext
                     break;
             }
 
-            // Automatically add Organization Id to newly created and OrganizationScoped Entities
-            if (entry.Entity is IOrganizationOwned orgScoped && entry.State == EntityState.Added && _requestContext.OrganizationId != null)
+            // Set OrganizationId and TenantId for newly added entities if applicable
+            if (entry.State == EntityState.Added)
             {
-                orgScoped.SetOrganizationId(_requestContext.OrganizationId.Value);
-            }
+                if (entry.Entity is IOrganizationOwned orgScoped && _requestContext.OrganizationId != null)
+                {
+                    orgScoped.SetOrganizationId(_requestContext.OrganizationId.Value);
+                }
 
-            // Automatically add Tenant Id to newly created and TenantScoped Entities
-            if (entry.Entity is ITenantOwned tenantScoped && entry.State == EntityState.Added)
-            {
-                tenantScoped.SetTenantId(_requestContext.TenantId);
+                if (entry.Entity is ITenantOwned tenantScoped)
+                {
+                    tenantScoped.SetTenantId(_requestContext.TenantId);
+                }
             }
         }
 
