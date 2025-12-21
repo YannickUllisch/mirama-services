@@ -1,6 +1,7 @@
 
 using AccountService.Application.Domain.Abstractions.Core;
 using AccountService.Application.Domain.Aggregates.User;
+using ErrorOr;
 
 namespace AccountService.Application.Domain.Aggregates.Tenant;
 
@@ -10,12 +11,10 @@ public sealed class Tenant : AggregateRoot<Guid>
     
     public UserId AdminUserId { get; init; } = default!;
 
-    public int MaxOrganizations { get; private set; } = 1;
-
-    public int MaxUsers { get; private set; } = 3;
-
     public BillingPlan BillingPlan { get; private set; } = BillingPlan.Free;
-    
+
+    public TenantSettings Settings { get; private set; } = default!;
+
     public bool IsActive { get; private set; } = true;
 
     public bool IsDeleted { get; private set; } = false;
@@ -27,10 +26,28 @@ public sealed class Tenant : AggregateRoot<Guid>
 
     private Tenant() { }
 
-    public static Tenant Create(Guid adminUserId)
+    public static ErrorOr<Tenant> Create(Guid adminUserId, BillingPlanType planType)
     {
         var userId = new UserId(adminUserId);
+        var tenant = new Tenant(userId);
+        
+        var setPlanResult = tenant.SetBillingPlan(planType);
+        if (setPlanResult.IsError)
+            return setPlanResult.Errors;
 
-        return new Tenant(userId);
+        return tenant;
+    }
+
+    public ErrorOr<Success> SetBillingPlan(BillingPlanType planType)
+    {
+        var plan = BillingPlanFactory.FromType(planType);
+
+        if (plan.IsError)
+        {
+            return plan.Errors;
+        }
+
+        BillingPlan = plan.Value;
+        return Result.Success;
     }
 }

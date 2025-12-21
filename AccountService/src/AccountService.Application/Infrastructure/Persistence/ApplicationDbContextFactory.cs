@@ -23,6 +23,6 @@ public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<Applicati
                 .MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)
                 .MigrationsHistoryTable("__EFMigrationsHistory", "auth"));
 
-        return new ApplicationDbContext(optionsBuilder.Options, new DesignTimeUserProvider(), new DesignTimeOrganizationProvider());
+        return new ApplicationDbContext(optionsBuilder.Options, new DesignTimeRequestContextProvider());
     }
 }

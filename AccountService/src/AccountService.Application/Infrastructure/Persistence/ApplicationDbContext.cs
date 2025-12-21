@@ -1,7 +1,6 @@
 
 using System.Reflection;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using AccountService.Application.Domain.Abstractions.Core;
 using AccountService.Application.Domain.Abstractions.Organization;
 using AccountService.Application.Domain.Abstractions.Tenant;
@@ -22,7 +21,7 @@ public sealed class ApplicationDbContext : DbContext
     private readonly IRequestContextProvider _requestContext = default!;
 
     public DbSet<Organization> Organizations => Set<Organization>();
-    public DbSet<User> User => Set<User>();
+    public DbSet<User> Users => Set<User>();
     public DbSet<Tenant> Tenants => Set<Tenant>();
     public DbSet<Invitation> Invitations => Set<Invitation>();
     public DbSet<Member> Members => Set<Member>();

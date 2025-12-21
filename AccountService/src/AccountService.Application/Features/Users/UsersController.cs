@@ -2,6 +2,7 @@
 
 
 using AccountService.Application.Common;
+using AccountService.Application.Common.Models;
 using AccountService.Application.Features.Users.Commands.UpdateUser;
 using AccountService.Application.Features.Users.Queries.GetUsers;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +12,7 @@ namespace AccountService.Application.Features.Users;
 public class UsersController : ApiControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<UserResponse>> Get([FromQuery] GetUsersQuery query)
+    public async Task<ActionResult<PaginatedList<UserResponse>>> Get([FromQuery] GetUsersQuery query)
     {
         var res = await Mediator.Send(query);
         return res.Match(Ok, Problem);

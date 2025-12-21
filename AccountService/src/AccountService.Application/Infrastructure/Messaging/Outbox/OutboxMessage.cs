@@ -1,7 +1,7 @@
 
 namespace AccountService.Application.Infrastructure.Messaging.Outbox;
 
-public sealed record OutboxMessage
+public sealed class OutboxMessage
 {
     public Guid Id { get; init; }
 

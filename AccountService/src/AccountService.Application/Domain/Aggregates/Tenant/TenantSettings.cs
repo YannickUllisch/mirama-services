@@ -1,28 +1,36 @@
 
 using AccountService.Application.Domain.Abstractions.Core;
-using AccountService.Application.Domain.Abstractions.Tenant;
+using ErrorOr;
 
 namespace AccountService.Application.Domain.Aggregates.Tenant;
 
-public sealed class TenantSettings : ValueObject
+public class TenantSettings : ValueObject
 {
-    public string Name { get; private set;} = string.Empty;
+    public string? BrandingColor { get; } = null;
+    public string? LogoUrl { get; } = null;
+    public bool ReceiveNotifications { get; } = true;
 
-    public int QuotaTeams { get; private set; } = 3;
+    private TenantSettings() { }
 
-    public int QuotaUsers { get; private set; } = 3;
-
-    public int QuotaOrganizations { get; private set; } = 3;
-
-    public Guid TenantId => throw new NotImplementedException();
-
-    public void SetTenantId(Guid tenantId)
+    public TenantSettings(
+        string? brandingColor = null,
+        string? logoUrl = null,
+        bool receiveNotifications = true)
     {
-        throw new NotImplementedException();
+        BrandingColor = brandingColor;
+        LogoUrl = logoUrl;
+        ReceiveNotifications = receiveNotifications;
+    }
+
+    public static ErrorOr<TenantSettings> Create(string? brandingColor, string? logoUrl, bool receiveNotifications)
+    {
+        return new TenantSettings(brandingColor, logoUrl, receiveNotifications);
     }
 
     protected override IEnumerable<object> GetEqualityComponents()
     {
-        throw new NotImplementedException();
+        yield return BrandingColor ?? string.Empty;
+        yield return LogoUrl ?? string.Empty;
+        yield return ReceiveNotifications;
     }
 }

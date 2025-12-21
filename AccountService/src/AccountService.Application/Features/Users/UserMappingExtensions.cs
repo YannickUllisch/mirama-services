@@ -6,7 +6,7 @@ namespace AccountService.Application.Features.Users;
 
 internal static class UserMapper
 {
-    internal static ErrorOr<UserResponse> MapResponse(this User userModel, int? count = null)
+    internal static ErrorOr<UserResponse> MapResponse(this User userModel)
     {
         string? role = Enum.GetName(userModel.Role);
 
@@ -24,7 +24,6 @@ internal static class UserMapper
             Image = userModel.Image,
             Name = userModel.Name,
             Role = role,
-            Count = count,
         };
     }
 }

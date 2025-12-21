@@ -15,8 +15,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             uid => uid.Value,
             val => new UserId(val));
 
-        builder.Ignore(e => e.DomainEvents);
-
         builder.OwnsOne(o => o.Contact, a =>
         {
             a.Property(x => x.ContactEmail).HasColumnName("ContactEmail");

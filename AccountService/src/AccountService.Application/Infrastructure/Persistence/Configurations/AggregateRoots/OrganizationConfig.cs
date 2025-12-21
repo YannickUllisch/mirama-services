@@ -11,8 +11,6 @@ public class OrganizationConfiguration : IEntityTypeConfiguration<Organization>
     {
         builder.HasKey(o => o.Id);
         builder.HasIndex(o => o.TenantId);
-        
-        builder.Ignore(e => e.DomainEvents);
 
         builder.Property(o => o.Id).HasConversion(
             id => id.Value,

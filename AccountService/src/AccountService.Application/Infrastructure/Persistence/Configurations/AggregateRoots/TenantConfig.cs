@@ -13,8 +13,6 @@ public class TenantConfiguration : IEntityTypeConfiguration<Tenant>
     {
         builder.HasKey(u => u.Id);
 
-        builder.Ignore(u => u.DomainEvents);
-
         builder.Property(t => t.AdminUserId)
         .HasConversion(
             id => id.Value,
@@ -28,6 +26,20 @@ public class TenantConfiguration : IEntityTypeConfiguration<Tenant>
             .WithOne()
             .HasForeignKey<Tenant>(t => t.AdminUserId)
             .OnDelete(DeleteBehavior.Restrict);
+        
+        builder.OwnsOne(a => a.Settings, s =>
+        {
+            s.Property(x => x.BrandingColor).HasColumnName("BrandingColor");
+            s.Property(x => x.LogoUrl).HasColumnName("LogoUrl");
+            s.Property(x => x.ReceiveNotifications).HasColumnName("ReceiveNotifications");
+        });
 
+        builder.OwnsOne(t => t.BillingPlan, bp =>
+        {
+            bp.Property(x => x.Name).HasColumnName("BillingPlanName");
+            bp.Property(x => x.QuotaTeams).HasColumnName("BillingPlanQuotaTeams");
+            bp.Property(x => x.QuotaUsers).HasColumnName("BillingPlanQuotaUsers");
+            bp.Property(x => x.QuotaOrganizations).HasColumnName("BillingPlanQuotaOrganizations");
+        });
     }
 }

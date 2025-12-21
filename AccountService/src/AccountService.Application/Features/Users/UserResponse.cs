@@ -26,7 +26,4 @@ public sealed record UserResponse
 
     [JsonPropertyName("contactPhoneNumber")]
     public string ContactPhoneNumber { get; init; } = string.Empty;
-
-    [JsonPropertyName("count")]
-    public int? Count { get; init; }
 }

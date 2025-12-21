@@ -1,11 +1,12 @@
 
 
+using AccountService.Application.Domain.Abstractions.Core;
 using AccountService.Application.Domain.Abstractions.Organization;
 using AccountService.Application.Domain.Aggregates.User;
 
 namespace AccountService.Application.Domain.Aggregates.Organization.Invitation;
 
-public class Invitation : OrganizationEntity<InvitationId>
+public class Invitation : Entity<InvitationId>, IOrganizationOwned
 {
     public string Email { get; private set; } = string.Empty;
 
@@ -18,6 +19,9 @@ public class Invitation : OrganizationEntity<InvitationId>
     public UserId InviterId { get; set; } = default!;
 
     public UserId? AcceptedBy = null;
+
+    public Guid OrganizationId { get; private set; } = default!;
+
 
     private Invitation(string email, OrganizationRole role, UserId inviterId)
     {
@@ -50,5 +54,14 @@ public class Invitation : OrganizationEntity<InvitationId>
     public void ExtendFromToday()
     {
         ExpiresAt = DateTime.Today.AddDays(7);
+    }
+
+    void IOrganizationOwned.SetOrganizationId(Guid organizationId)
+    {
+        if (OrganizationId != Guid.Empty)
+        {
+            throw new InvalidOperationException("OrganizationId already set.");
+        }
+        OrganizationId = organizationId;
     }
 }
