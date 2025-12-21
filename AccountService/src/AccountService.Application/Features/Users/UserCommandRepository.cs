@@ -13,22 +13,22 @@ public sealed class UserCommandRepository(ApplicationDbContext dbContext) : ICom
 
     public Task AddAsync(User entity, CancellationToken cancellationToken = default)
     {
-        _dbContext.User.Add(entity);
+        _dbContext.Users.Add(entity);
         return Task.CompletedTask;
     }
 
    public async Task<ErrorOr<Success>> DeleteAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        var user = await _dbContext.User.FirstOrDefaultAsync(u => u.Id.Value == id, cancellationToken);
+        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id.Value == id, cancellationToken);
         if (user is null)
             return Error.NotFound("User not found.");
 
-        _dbContext.User.Remove(user);
+        _dbContext.Users.Remove(user);
         return Result.Success;
     }
 
     public async Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return await _dbContext.User.FirstOrDefaultAsync(u => u.Id.Value == id, cancellationToken);
+        return await _dbContext.Users.FirstOrDefaultAsync(u => u.Id.Value == id, cancellationToken);
     }
 }
