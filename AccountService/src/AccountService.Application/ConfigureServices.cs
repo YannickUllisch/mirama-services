@@ -3,9 +3,11 @@ using AccountService.Application.Common;
 using AccountService.Application.Common.Behaviours;
 using AccountService.Application.Common.Interfaces;
 using AccountService.Application.Common.Options;
+using AccountService.Application.Domain.Aggregates.Organization;
+using AccountService.Application.Domain.Aggregates.Tenant;
 using AccountService.Application.Domain.Aggregates.User;
+using AccountService.Application.Features.Organizations;
 using AccountService.Application.Features.Users;
-using AccountService.Application.Infrastructure.Common.Interfaces;
 using AccountService.Application.Infrastructure.Persistence;
 using AccountService.Application.Infrastructure.Persistence.Repositories;
 using AccountService.Application.Infrastructure.Services;
@@ -33,6 +35,9 @@ public static class DependencyInjection
 
         services.AddSingleton<IGlobalRoleProvider, GlobalRoleProvider>();
         services.AddScoped<ICommandRepository<User>, UserCommandRepository>();
+        services.AddScoped<ICommandRepository<Organization>, OrganizationCommandRepository>();
+        services.AddScoped<ICommandRepository<Tenant>, TenantCommandRepository>();
+
 
         services.Configure<ApplicationOptions>(config.GetSection(ApplicationOptions.Application));
         return services;
