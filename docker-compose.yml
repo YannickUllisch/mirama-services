@@ -1,6 +1,18 @@
 
 
 services:
+  authservice:
+    build:
+      context: ./AuthService
+      dockerfile: Dockerfile
+      target: final
+    ports:
+      - 8085:8080
+    env_file:
+      - ./AuthService/.env
+    depends_on:
+      db:
+        condition: service_healthy
   accountservice:
     build:
       context: ./AccountService
