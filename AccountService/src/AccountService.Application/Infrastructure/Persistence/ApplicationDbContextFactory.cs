@@ -21,7 +21,7 @@ public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<Applicati
             connection,
             b => b
                 .MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)
-                .MigrationsHistoryTable("__EFMigrationsHistory", "auth"));
+                .MigrationsHistoryTable("__EFMigrationsHistory", "account"));
 
         return new ApplicationDbContext(optionsBuilder.Options, null!, new DesignTimeRequestContextProvider());
     }

@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using AuthService.Models;
+using AuthService.Server.Models;
 
-namespace AuthService.Controllers;
+namespace AuthService.Server.Controllers;
 
 public class HomeController : Controller
 {

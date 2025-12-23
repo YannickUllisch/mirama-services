@@ -60,7 +60,7 @@ public static class DependencyInjection
             var infra = sp.GetRequiredService<IOptions<InfrastructureOptions>>().Value;
             options.UseNpgsql(infra.DatabaseConnection, b => b
                 .MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)
-                .MigrationsHistoryTable(tableName: "__EFMigrationsHistory", schema: "auth"));
+                .MigrationsHistoryTable(tableName: "__EFMigrationsHistory", schema: "account"));
         });
 
         return services;

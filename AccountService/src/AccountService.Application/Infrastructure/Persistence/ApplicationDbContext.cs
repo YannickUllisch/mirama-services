@@ -44,7 +44,7 @@ public sealed class ApplicationDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-        builder.HasDefaultSchema("auth");
+        builder.HasDefaultSchema("account");
         builder.ApplyTenantQueryFilter(_requestContext.TenantId);
 
         if (_requestContext.OrganizationId != null)

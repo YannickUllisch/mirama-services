@@ -1,4 +1,4 @@
-namespace AuthService.Models;
+namespace AuthService.Server.Models;
 
 public class ErrorViewModel
 {
