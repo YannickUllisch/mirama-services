@@ -3,6 +3,9 @@ using AccountService.Application;
 using AccountService.Application.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using AccountService.Api.Middleware;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authorization;
+using AccountService.Api.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +30,32 @@ builder.Services.AddLogging();
 
 builder.Services.AddHealthChecks();
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddAuthentication()
+    .AddJwtBearer(options =>
+    {
+        options.Authority = "https://localhost:8085";
+        options.Audience = "api://account";     
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = "https://localhost:8085",
+            ValidAudience = "api://account",
+        };
+
+        if (builder.Environment.IsDevelopment())
+        {
+            options.RequireHttpsMetadata = false;
+        }
+    });
+builder.Services.AddSingleton<IAuthorizationHandler, TenantAndOrgOnUserHandler>();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireTenantAndOrg", policy =>
+        policy.Requirements.Add(new JWTRequirements()));
+});
 
 var app = builder.Build();
 

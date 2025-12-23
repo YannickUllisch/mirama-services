@@ -1,5 +1,6 @@
 using ErrorOr;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -9,6 +10,7 @@ namespace AccountService.Application.Common;
 
 [ApiController]
 [Route("api/{orgId:guid}/[controller]")]
+[Authorize(Policy = "RequireTenantAndOrg")]
 public abstract class ApiControllerBase : ControllerBase
 {
     private ISender? _mediator;
