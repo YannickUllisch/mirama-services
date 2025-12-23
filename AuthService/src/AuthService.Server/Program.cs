@@ -7,6 +7,8 @@ using Microsoft.Extensions.Options;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 using AuthService.Server.Infrastructure.BackgroundJobs;
 using AuthService.Server.Infrastructure.Persistence;
+using static OpenIddict.Server.OpenIddictServerEvents;
+using AuthService.Server.EventHandlers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +45,7 @@ builder.Services.AddOpenIddict()
     {
         options.UseEntityFrameworkCore()
                .UseDbContext<OpenIdDbContext>();
+
     })
     .AddServer((options) =>
     {
@@ -51,7 +54,7 @@ builder.Services.AddOpenIddict()
 
         options.SetTokenEndpointUris("/connect/token")
                 .SetAuthorizationEndpointUris("/connect/authorize")
-                .SetEndSessionEndpointUris("connect/logout");
+                .SetEndSessionEndpointUris("/connect/logout");
 
         // Allow auth for registered Microservice clients and User clients
         // and Token exchange flow for organization/tenant switches
@@ -61,12 +64,10 @@ builder.Services.AddOpenIddict()
         
         // Adding PKCE
         options.RequireProofKeyForCodeExchange();
-
         options.UseDataProtection();
         
-        options.AddEphemeralEncryptionKey()
-               .AddEphemeralSigningKey()
-               .DisableAccessTokenEncryption();
+        options.AddDevelopmentEncryptionCertificate()
+            .AddDevelopmentSigningCertificate();
 
         options.RegisterAudiences("api://account", "api://project");
 
@@ -80,9 +81,12 @@ builder.Services.AddOpenIddict()
                .EnableTokenEndpointPassthrough()
                .EnableAuthorizationEndpointPassthrough();
 
-        options.AddSigningKey(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.SigningKey)));
-
         options.RegisterScopes(Scopes.OpenId, Scopes.Roles, Scopes.OfflineAccess, Scopes.Profile, Scopes.Email, "organization");
+
+        // options.AddEventHandler<ProcessSignInContext>(builder =>
+        // {
+        //     builder.UseScopedHandler<AccountUserProvisioningHandler>();
+        // });
     });
 
 // CORS Policy
@@ -131,10 +135,9 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
-    app.UseHttpsRedirection();
 }
 
-
+app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseCors("AllowAll");
@@ -148,6 +151,5 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
-
 
 app.Run();
