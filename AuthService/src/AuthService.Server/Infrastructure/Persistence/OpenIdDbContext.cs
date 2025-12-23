@@ -3,13 +3,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AuthService.Server.Infrastructure.Persistence;
 
-public sealed class OpenIdDbContext(
-    DbContextOptions<OpenIdDbContext> options) : DbContext(options)
-{
-    
+public class OpenIdDbContext(DbContextOptions<OpenIdDbContext> options) : DbContext(options)
+    {
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.HasDefaultSchema("auth");
+        builder.UseOpenIddict();
         base.OnModelCreating(builder);
     }
 }

@@ -1,10 +1,8 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.IdentityModel.Tokens;
-using OpenIddict.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using AuthService.Server.Common.Options;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 using AuthService.Server.Infrastructure.BackgroundJobs;
@@ -17,7 +15,6 @@ builder.Services.AddControllersWithViews();
 // Options pattern Configuration
 builder.Services.Configure<ApplicationOptions>(builder.Configuration.GetSection(ApplicationOptions.Application));
 builder.Services.Configure<GoogleOptions>(builder.Configuration.GetSection(GoogleOptions.Google));
-
 
 builder.Services.AddAuthentication(options =>
     {
@@ -53,9 +50,8 @@ builder.Services.AddOpenIddict()
             ?? throw new InvalidOperationException("Application option configuration is missing or invalid.");
 
         options.SetTokenEndpointUris("/connect/token")
-               .SetAuthorizationEndpointUris("/connect/authorize");
-            // .SetEndSessionEndpointUris("connect/logout")
-            //    .SetUserInfoEndpointUris("connect/userinfo");
+                .SetAuthorizationEndpointUris("/connect/authorize")
+                .SetEndSessionEndpointUris("connect/logout");
 
         // Allow auth for registered Microservice clients and User clients
         // and Token exchange flow for organization/tenant switches
@@ -83,9 +79,6 @@ builder.Services.AddOpenIddict()
         options.UseAspNetCore()
                .EnableTokenEndpointPassthrough()
                .EnableAuthorizationEndpointPassthrough();
-            //    .EnableEndSessionEndpointPassthrough()
-            //    .EnableStatusCodePagesIntegration()
-            //    .EnableUserInfoEndpointPassthrough();
 
         options.AddSigningKey(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.SigningKey)));
 
@@ -112,10 +105,27 @@ builder.Services.AddDbContext<OpenIdDbContext>((sp, options) =>
     options.UseNpgsql(infra.DatabaseConnection, b => b
         .MigrationsAssembly(typeof(OpenIdDbContext).Assembly.FullName)
         .MigrationsHistoryTable(tableName: "__EFMigrationsHistory", schema: "auth"));
-    options.UseOpenIddict();
 });
 
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<OpenIdDbContext>();
+        logger.LogInformation("Applying database migrations...");
+        await db.Database.MigrateAsync();
+        logger.LogInformation("Database migrations applied successfully");
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "An error occurred while applying database migrations.");
+        throw;
+    }
+}
 
 if (!app.Environment.IsDevelopment())
 {

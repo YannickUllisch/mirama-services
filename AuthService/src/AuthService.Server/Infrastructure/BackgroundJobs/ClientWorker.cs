@@ -136,7 +136,7 @@ public class ClientWorker(IServiceProvider serviceProvider) : IHostedService
                     Permissions.Scopes.Profile,
                     Permissions.Scopes.Email,
                     Permissions.Scopes.Roles,
-                    Permissions.Prefixes.Scope + "postmam"
+                    Permissions.Prefixes.Scope + "postman"
                 }
         };
 
