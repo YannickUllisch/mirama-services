@@ -5,20 +5,22 @@ using Microsoft.EntityFrameworkCore;
 using AccountService.Api.Middleware;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
-using AccountService.Api.Authorization;
+using AccountService.Api.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddCors(options => options.AddDefaultPolicy(
+builder.Services.AddCors(options => options
+    .AddDefaultPolicy(
         policy => policy
             .AllowAnyOrigin()
             .AllowAnyHeader()
             .AllowAnyMethod()));
 
-builder.Services.AddSwaggerGen(c => c.SwaggerDoc("v1", new OpenApiInfo { Title = "Mirama Account Service API", Version = "v1" }));
+builder.Services.AddSwaggerGen(c => c
+    .SwaggerDoc("v1", new OpenApiInfo { Title = "Mirama Account Service API", Version = "v1" }));
 
 builder.Services.AddProblemDetails();
 
@@ -31,30 +33,33 @@ builder.Services.AddLogging();
 builder.Services.AddHealthChecks();
 builder.Services.AddHttpContextAccessor();
 
+var authSection = builder.Configuration.GetSection("Authentication");
+
 builder.Services.AddAuthentication()
     .AddJwtBearer(options =>
     {
-        options.Authority = "https://localhost:8085";
-        options.Audience = "api://account";     
+        options.Authority = authSection["Authority"];
+        options.Audience = authSection["Audience"];     
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = "https://localhost:8085",
-            ValidAudience = "api://account",
+            ValidIssuer = authSection["Authority"],
+            ValidAudience = authSection["Audience"],
         };
-
-        if (builder.Environment.IsDevelopment())
-        {
-            options.RequireHttpsMetadata = false;
-        }
     });
-builder.Services.AddSingleton<IAuthorizationHandler, TenantAndOrgOnUserHandler>();
+
+builder.Services.AddSingleton<IAuthorizationHandler, RequireTenantAndOrgHandler>();
+builder.Services.AddSingleton<IAuthorizationHandler, RequireTenantOnlyHandler>();
+
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("RequireTenantAndOrg", policy =>
-        policy.Requirements.Add(new JWTRequirements()));
+        policy.Requirements.Add(new TenantAndOrgRequirement()));
+
+    options.AddPolicy("RequireTenantOnly", policy =>
+        policy.Requirements.Add(new TenantOnlyRequirement()));
 });
 
 var app = builder.Build();

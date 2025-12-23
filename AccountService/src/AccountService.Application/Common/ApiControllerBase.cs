@@ -10,7 +10,7 @@ namespace AccountService.Application.Common;
 
 [ApiController]
 [Route("api/{orgId:guid}/[controller]")]
-[Authorize(Policy = "RequireTenantAndOrg")]
+[Authorize(Policy = "RequireTenantOnly")]
 public abstract class ApiControllerBase : ControllerBase
 {
     private ISender? _mediator;
