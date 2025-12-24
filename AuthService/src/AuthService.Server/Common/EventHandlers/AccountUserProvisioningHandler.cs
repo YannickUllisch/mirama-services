@@ -2,7 +2,7 @@ using OpenIddict.Server;
 using OpenIddict.Abstractions;
 using static OpenIddict.Server.OpenIddictServerEvents;
 
-namespace AuthService.Server.EventHandlers;
+namespace AuthService.Server.Common.EventHandlers;
 
 public class AccountUserProvisioningHandler() : IOpenIddictServerHandler<ProcessSignInContext>
 {
@@ -12,9 +12,9 @@ public class AccountUserProvisioningHandler() : IOpenIddictServerHandler<Process
     {
         var principal = context.Principal;
         // var userId = principal!.GetClaim(OpenIddictConstants.Claims.Subject);
+        // var email = principal!.GetClaim(OpenIddictConstants.Claims.Email);
 
-        // var userInfo = await _accountService.GetOrCreateUserAsync(userId, email);
-        principal!.SetClaim("tenantId", "tmp2");
-        principal!.SetClaim("orgId", "tmp");
+
+        // var userInfo = await _accountService.CreateIfNotExists(userId, email);
     }
 }

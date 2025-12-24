@@ -36,7 +36,6 @@ public class AuthorizationController(IOpenIddictApplicationManager applicationMa
     {
         // Note: the client credentials are automatically validated by OpenIddict:
         // if client_id or client_secret are invalid, this action won't be invoked.
-
         var application = await _applicationManager.FindByClientIdAsync(request.ClientId!) ??
             throw new InvalidOperationException("The application cannot be found.");
 

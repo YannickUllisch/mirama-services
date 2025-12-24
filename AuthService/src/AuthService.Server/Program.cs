@@ -1,14 +1,11 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
 using AuthService.Server.Common.Options;
 using Microsoft.Extensions.Options;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 using AuthService.Server.Infrastructure.BackgroundJobs;
 using AuthService.Server.Infrastructure.Persistence;
-using static OpenIddict.Server.OpenIddictServerEvents;
-using AuthService.Server.EventHandlers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -72,7 +69,7 @@ builder.Services.AddOpenIddict()
         options.RegisterAudiences("api://account", "api://project");
 
         // Issuer refers to this Auth Server, hardcoded for testing purposes
-        options.SetIssuer(new Uri("http://localhost:8085"));
+        options.SetIssuer(new Uri(config.SelfUrl));
 
         options.SetAccessTokenLifetime(TimeSpan.FromMinutes(30));
         options.SetRefreshTokenLifetime(TimeSpan.FromDays(30));
@@ -137,6 +134,8 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+// Required for production, since TLS is terminated on proxy
+app.UseForwardedHeaders();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();

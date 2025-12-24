@@ -42,6 +42,7 @@ ScaffoldingReadMe.txt
 CodeCoverage/
 .env
 .env*
+!.env.example
 # MSBuild Binary and Structured Log
 *.binlog
 
@@ -57,3 +58,5 @@ nunit-*.xml
 # VsCode
 .DS_Store
 .vscode
+
+certs

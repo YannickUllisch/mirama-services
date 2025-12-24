@@ -19,6 +19,8 @@ RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages \
 FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS final
 WORKDIR /app
 
+EXPOSE 8080
+
 # Copy everything needed to run the app from the "build" stage.
 COPY --from=build /app .
 
@@ -26,5 +28,6 @@ COPY --from=build /app .
 # See https://docs.docker.com/go/dockerfile-user-best-practices/
 # and https://github.com/dotnet/dotnet-docker/discussions/4764
 USER $APP_UID
+
 
 ENTRYPOINT ["dotnet", "AuthService.Server.dll"]
