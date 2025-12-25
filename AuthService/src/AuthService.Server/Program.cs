@@ -6,6 +6,10 @@ using Microsoft.Extensions.Options;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 using AuthService.Server.Infrastructure.BackgroundJobs;
 using AuthService.Server.Infrastructure.Persistence;
+using AuthService.Server.Common.Enums;
+using AuthService.Server.Common.Extensions;
+using static OpenIddict.Server.OpenIddictServerEvents;
+using AuthService.Server.Common.EventHandlers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +53,7 @@ builder.Services.AddOpenIddict()
         var config = builder.Configuration.GetSection(ApplicationOptions.Application).Get<ApplicationOptions>() 
             ?? throw new InvalidOperationException("Application option configuration is missing or invalid.");
 
+
         options.SetTokenEndpointUris("/connect/token")
                 .SetAuthorizationEndpointUris("/connect/authorize")
                 .SetEndSessionEndpointUris("/connect/logout");
@@ -61,11 +66,13 @@ builder.Services.AddOpenIddict()
         
         // Adding PKCE
         options.RequireProofKeyForCodeExchange();
-        options.UseDataProtection();
         
-        options.AddDevelopmentEncryptionCertificate()
-            .AddDevelopmentSigningCertificate();
-
+        if (builder.Environment.IsDevelopment())
+        {
+            options.AddDevelopmentSigningCertificate()
+                .AddDevelopmentEncryptionCertificate();
+        }
+        options.DisableAccessTokenEncryption(); // TODO: Remove this
         options.RegisterAudiences("api://account", "api://project");
 
         // Issuer refers to this Auth Server, hardcoded for testing purposes
@@ -78,12 +85,20 @@ builder.Services.AddOpenIddict()
                .EnableTokenEndpointPassthrough()
                .EnableAuthorizationEndpointPassthrough();
 
-        options.RegisterScopes(Scopes.OpenId, Scopes.Roles, Scopes.OfflineAccess, Scopes.Profile, Scopes.Email, "organization");
+        options.RegisterScopes(
+            Scopes.OpenId,
+            Scopes.Roles,
+            Scopes.OfflineAccess,
+            Scopes.Profile,
+            Scopes.Email,
+            ScopeExtensionType.Tenant.AsString(),
+            ScopeExtensionType.Organization.AsString(),
+            ScopeExtensionType.Postman.AsString());
 
-        // options.AddEventHandler<ProcessSignInContext>(builder =>
-        // {
-        //     builder.UseScopedHandler<AccountUserProvisioningHandler>();
-        // });
+        options.AddEventHandler<ProcessSignInContext>(builder =>
+        {
+            builder.UseScopedHandler<AccountUserProvisioningHandler>();
+        });
     });
 
 // CORS Policy
@@ -118,7 +133,10 @@ if (app.Environment.IsDevelopment())
     {
         var db = scope.ServiceProvider.GetRequiredService<OpenIdDbContext>();
         logger.LogInformation("Applying database migrations...");
-        await db.Database.MigrateAsync();
+        if (db.Database.GetPendingMigrations().Any())
+        {
+            await db.Database.MigrateAsync();
+        }
         logger.LogInformation("Database migrations applied successfully");
     }
     catch (Exception ex)

@@ -1,4 +1,6 @@
 using System.Security.Claims;
+using AuthService.Server.Common.Enums;
+using AuthService.Server.Common.Extensions;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
@@ -42,12 +44,33 @@ public class AuthorizationController(IOpenIddictApplicationManager applicationMa
         // Create a new ClaimsIdentity containing the claims that
         // will be used to create an id_token, a token or a code.
         var identity = new ClaimsIdentity(TokenValidationParameters.DefaultAuthenticationType, Claims.Name, Claims.Role);
-
+        var scopes = request.GetScopes();
+        
         // Use the client_id as the subject identifier.
         identity.SetClaim(Claims.Subject, await _applicationManager.GetClientIdAsync(application));
-        identity.SetClaim(Claims.Name, await _applicationManager.GetDisplayNameAsync(application));
+
+        // Organization has precedent over tenant, if organization scope is requested we ignore tenant scope
+        if (scopes.Contains(ScopeExtensionType.Organization.AsString()))
+        {
+            // Fetch requested orgId from body (since token request is POST)
+            var requestedOrgId = request.GetParameter("organization_id")?.ToString();
+
+            // Hardcoded permission check for demo
+            if (string.IsNullOrEmpty(requestedOrgId) || requestedOrgId != "orgIdExample")
+            {
+                return BadRequest(new { error = "invalid_request", error_description = "Invalid organization requested." });
+            }
+        
+            identity.SetClaim("tid", "tenantIdExample");
+            identity.SetClaim("oid", requestedOrgId);
+        }
+        else if (scopes.Contains(ScopeExtensionType.Tenant.AsString())) 
+        {
+            identity.SetClaim("tid", "tenantOnlyScopeId");
+        }
 
         identity.SetDestinations(GetDestinations);
+        
 
         return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
     }
@@ -74,8 +97,46 @@ public class AuthorizationController(IOpenIddictApplicationManager applicationMa
 
     private async Task<IActionResult> HandleRefreshTokenGrantAsync(OpenIddictRequest request)
     {
-        throw new NotImplementedException();
+        // Authenticate the incoming refresh token
+        var authenticateResult = await HttpContext.AuthenticateAsync(
+            OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+
+        var principal = authenticateResult.Principal;
+        if (principal is null)
+            return Forbid(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+
+        var identity = (ClaimsIdentity)principal.Identity!;
+        var scopes = principal.GetScopes(); // scopes associated with this token
+
+        // Hardcoded IDs, change later with results from Account Service
+        var tenantId = "tenantIdExample";
+        var orgId = "orgIdExample";
+
+        if (scopes.Contains(ScopeExtensionType.Organization.AsString()))
+        {
+            // Organization scope is present, we revalidate permissions for the org
+            var isOrgAllowed = true;
+            if (!isOrgAllowed)
+            {
+                return Forbid(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+            }
+
+            // Add both organization and assumed tenant values
+            identity.SetClaim("oid", orgId);
+            identity.SetClaim("tid", tenantId);
+        }
+        else if (scopes.Contains(ScopeExtensionType.Tenant.AsString()))
+        {
+            // Only tenant scope -> return tenant claim, if only tenant is present
+            // user can only ever get access to its own tenantId
+            // We should still refetch it just for extra safety
+            identity.SetClaim("tid", tenantId);
+        }
+
+        return SignIn(new ClaimsPrincipal(identity),
+                    OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
     }
+
 
     private async Task<IActionResult> HandleTokenExchangeGrantAsync(OpenIddictRequest request)
     {
@@ -122,10 +183,18 @@ public class AuthorizationController(IOpenIddictApplicationManager applicationMa
 
                 yield break;
             
-            case "organization":
+            case "oid":
                 yield return Destinations.AccessToken;
 
-                if (claim.Subject!.HasScope("organization") == true)
+                if (claim.Subject!.HasScope("oid") == true)
+                    yield return Destinations.IdentityToken;
+
+                yield break;
+            
+            case "tid":
+                yield return Destinations.AccessToken;
+
+                if (claim.Subject!.HasScope("tid") == true)
                     yield return Destinations.IdentityToken;
 
                 yield break;

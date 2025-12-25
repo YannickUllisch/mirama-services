@@ -1,3 +1,5 @@
+using AuthService.Server.Common.Enums;
+using AuthService.Server.Common.Extensions;
 using AuthService.Server.Infrastructure.Persistence;
 using OpenIddict.Abstractions;
 using static OpenIddict.Abstractions.OpenIddictConstants;
@@ -34,15 +36,15 @@ public class ClientWorker(IServiceProvider serviceProvider) : IHostedService
         {
             new OpenIddictScopeDescriptor
             {
-                Name = "organization",
+                Name = ScopeExtensionType.Organization.AsString(),
                 DisplayName = "Organization Access",
                 Resources = { "api://account", "api://project" }
             }, 
             new OpenIddictScopeDescriptor
             {
-                Name = "postman",
-                DisplayName = "Postman Access",
-                Resources = { "api://account", "api://project" }
+                Name = ScopeExtensionType.Tenant.AsString(),
+                DisplayName = "Tenant Access",
+                Resources = { "api://account" }
             }
         };
 
@@ -93,7 +95,8 @@ public class ClientWorker(IServiceProvider serviceProvider) : IHostedService
                     Permissions.Scopes.Profile,
                     Permissions.Scopes.Email,
                     Permissions.Scopes.Roles,
-                    Permissions.Prefixes.Scope + "organization"
+                    Permissions.Prefixes.Scope + ScopeExtensionType.Organization.AsString(),
+                    Permissions.Prefixes.Scope + ScopeExtensionType.Tenant.AsString()
                 }
         };
 
@@ -136,7 +139,8 @@ public class ClientWorker(IServiceProvider serviceProvider) : IHostedService
                     Permissions.Scopes.Profile,
                     Permissions.Scopes.Email,
                     Permissions.Scopes.Roles,
-                    Permissions.Prefixes.Scope + "postman"
+                    Permissions.Prefixes.Scope + ScopeExtensionType.Organization.AsString(),
+                    Permissions.Prefixes.Scope + ScopeExtensionType.Tenant.AsString()
                 }
         };
 

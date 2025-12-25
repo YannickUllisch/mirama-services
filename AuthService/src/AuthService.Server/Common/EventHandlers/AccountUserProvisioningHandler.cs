@@ -1,20 +1,25 @@
-using OpenIddict.Server;
+using System.Security.Claims;
+using AuthService.Server.Common.Enums;
+using AuthService.Server.Common.Extensions;
 using OpenIddict.Abstractions;
+using OpenIddict.Server;
+using static OpenIddict.Abstractions.OpenIddictConstants;
 using static OpenIddict.Server.OpenIddictServerEvents;
 
 namespace AuthService.Server.Common.EventHandlers;
 
-public class AccountUserProvisioningHandler() : IOpenIddictServerHandler<ProcessSignInContext>
+public class AccountUserProvisioningHandler : IOpenIddictServerHandler<ProcessSignInContext>
 {
     // private readonly IAccountService _accountService = accountService;
 
-    public async ValueTask HandleAsync(ProcessSignInContext context)
+    public ValueTask HandleAsync(ProcessSignInContext context)
     {
         var principal = context.Principal;
-        // var userId = principal!.GetClaim(OpenIddictConstants.Claims.Subject);
-        // var email = principal!.GetClaim(OpenIddictConstants.Claims.Email);
+        var identity = (ClaimsIdentity)principal!.Identity!;
+        var scopes = principal.GetScopes();
 
+        Console.WriteLine(ScopeExtensionType.Organization.AsString(), ScopeExtensionType.Postman.AsString());
 
-        // var userInfo = await _accountService.CreateIfNotExists(userId, email);
+        return ValueTask.CompletedTask;
     }
 }
