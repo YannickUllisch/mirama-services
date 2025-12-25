@@ -134,6 +134,7 @@ public class ClientWorker(IServiceProvider serviceProvider) : IHostedService
                     Permissions.ResponseTypes.Code,
 
                     Permissions.GrantTypes.ClientCredentials,
+                    Permissions.GrantTypes.AuthorizationCode,
                     Permissions.GrantTypes.RefreshToken,
 
                     Permissions.Scopes.Profile,

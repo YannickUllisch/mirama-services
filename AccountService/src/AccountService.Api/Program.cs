@@ -43,6 +43,7 @@ builder.Services.AddAuthentication()
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
+            ValidateLifetime = true,
             ValidateAudience = true,
             ValidateIssuerSigningKey = true,
             ValidIssuer = authSection["Authority"],

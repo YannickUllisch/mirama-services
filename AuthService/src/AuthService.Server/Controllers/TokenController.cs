@@ -11,9 +11,10 @@ using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace AuthService.Server.Controllers;
 
-public class AuthorizationController(IOpenIddictApplicationManager applicationManager) : Controller
+public class TokenController(IOpenIddictApplicationManager applicationManager, IOpenIddictScopeManager scopeManager) : Controller
 {
     private readonly IOpenIddictApplicationManager _applicationManager = applicationManager;
+    private readonly IOpenIddictScopeManager _scopeManager = scopeManager;
 
     [HttpPost("~/connect/token"), Produces("application/json")]
     public async Task<IActionResult> Exchange()
@@ -77,24 +78,32 @@ public class AuthorizationController(IOpenIddictApplicationManager applicationMa
 
     private async Task<IActionResult> HandleAuthorizationCodeGrantAsync(OpenIddictRequest request)
     {
-        var authenticateResult = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
-        var principal = authenticateResult.Principal;
-
-        if (principal == null)
-        {
+        var result = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+        if (result?.Principal?.Identity is not ClaimsIdentity identity)
             return Forbid(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
-        }
-        
-        if (principal.Identity is not ClaimsIdentity identity)
+
+        var scopes = result.Principal.GetScopes();
+
+        // Example: Add tenant/org claims based on scopes
+        if (scopes.Contains(ScopeExtensionType.Organization.AsString()))
         {
-            return Forbid(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+            identity.SetClaim("tid", "tenantIdExample");
+            identity.SetClaim("oid", "orgIdExample");
+        }
+        else if (scopes.Contains(ScopeExtensionType.Tenant.AsString()))
+        {
+            identity.SetClaim("tid", "tenantOnlyScopeId");
         }
 
-        identity.SetDestinations(GetDestinations); 
+        // Set audiences based on resources of requested scopes
+        var resources = await _scopeManager.ListResourcesAsync(scopes).ToListAsync();
+        identity.SetResources(resources);
+
+        identity.SetDestinations(GetDestinations);
 
         return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
     }
-
+    
     private async Task<IActionResult> HandleRefreshTokenGrantAsync(OpenIddictRequest request)
     {
         // Authenticate the incoming refresh token

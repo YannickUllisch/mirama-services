@@ -26,6 +26,8 @@ builder.Services.AddAuthentication(options =>
     .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
     {
         options.LoginPath = "/auth/login";
+        options.Cookie.SameSite = SameSiteMode.None;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     })
     .AddGoogle(options =>
     {
@@ -33,9 +35,13 @@ builder.Services.AddAuthentication(options =>
             ?? throw new InvalidOperationException("Google authentication configuration is missing or invalid.");
         options.ClientId = config.ClientId;
         options.ClientSecret = config.ClientSecret;
+        options.CallbackPath = "/auth/login/callback/google";
+
+        options.CorrelationCookie.SameSite = SameSiteMode.None;
+        options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
         options.Events.OnRedirectToAuthorizationEndpoint = context =>
         {
-            context.Response.Redirect(context.RedirectUri + "&prompt=consent");
+            context.Response.Redirect(context.RedirectUri + "&prompt=select_account");
             return Task.CompletedTask;
         };
     });

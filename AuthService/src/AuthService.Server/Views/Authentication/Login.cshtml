@@ -14,11 +14,9 @@
 <body>
     <div class="page-wrapper">
         <div class="login-card">
-            <h1>OpenID Demo</h1>
-
-            <p class="subtitle">Sign in to continue</p>
-
-            <form asp-controller="Auth" asp-action="GoogleLogin" method="post">
+            <h1>OpenID</h1>
+            <form action="/auth/GoogleLogin" method="post">
+                <input type="hidden" name="returnUrl" value="@Model.ReturnUrl" />
                 <button class="google-btn" type="submit">
                     <i class="fab fa-google"></i>
                     Login with Google
