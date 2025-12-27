@@ -1,9 +1,6 @@
 using System.Security.Claims;
-using AuthService.Server.Common.Enums;
-using AuthService.Server.Common.Extensions;
 using OpenIddict.Abstractions;
 using OpenIddict.Server;
-using static OpenIddict.Abstractions.OpenIddictConstants;
 using static OpenIddict.Server.OpenIddictServerEvents;
 
 namespace AuthService.Server.Common.EventHandlers;
@@ -18,7 +15,6 @@ public class AccountUserProvisioningHandler : IOpenIddictServerHandler<ProcessSi
         var identity = (ClaimsIdentity)principal!.Identity!;
         var scopes = principal.GetScopes();
 
-        Console.WriteLine(ScopeExtensionType.Organization.AsString(), ScopeExtensionType.Postman.AsString());
 
         return ValueTask.CompletedTask;
     }

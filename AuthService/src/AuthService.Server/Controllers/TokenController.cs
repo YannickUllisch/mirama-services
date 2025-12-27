@@ -1,6 +1,6 @@
+using System.Collections.Immutable;
 using System.Security.Claims;
-using AuthService.Server.Common.Enums;
-using AuthService.Server.Common.Extensions;
+using AuthService.Server.Common.Types;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
@@ -51,7 +51,8 @@ public class TokenController(IOpenIddictApplicationManager applicationManager, I
         identity.SetClaim(Claims.Subject, await _applicationManager.GetClientIdAsync(application));
 
         // Organization has precedent over tenant, if organization scope is requested we ignore tenant scope
-        if (scopes.Contains(ScopeExtensionType.Organization.AsString()))
+        // TODO: Delete from client creds flow, only here for testing
+        if (scopes.Contains(ScopeType.Organization))
         {
             // Fetch requested orgId from body (since token request is POST)
             var requestedOrgId = request.GetParameter("organization_id")?.ToString();
@@ -65,7 +66,7 @@ public class TokenController(IOpenIddictApplicationManager applicationManager, I
             identity.SetClaim("tid", "tenantIdExample");
             identity.SetClaim("oid", requestedOrgId);
         }
-        else if (scopes.Contains(ScopeExtensionType.Tenant.AsString())) 
+        else if (scopes.Contains(ScopeType.Tenant)) 
         {
             identity.SetClaim("tid", "tenantOnlyScopeId");
         }
@@ -85,12 +86,12 @@ public class TokenController(IOpenIddictApplicationManager applicationManager, I
         var scopes = result.Principal.GetScopes();
 
         // Example: Add tenant/org claims based on scopes
-        if (scopes.Contains(ScopeExtensionType.Organization.AsString()))
+        if (scopes.Contains(ScopeType.Organization))
         {
             identity.SetClaim("tid", "tenantIdExample");
             identity.SetClaim("oid", "orgIdExample");
         }
-        else if (scopes.Contains(ScopeExtensionType.Tenant.AsString()))
+        else if (scopes.Contains(ScopeType.Tenant))
         {
             identity.SetClaim("tid", "tenantOnlyScopeId");
         }
@@ -121,7 +122,7 @@ public class TokenController(IOpenIddictApplicationManager applicationManager, I
         var tenantId = "tenantIdExample";
         var orgId = "orgIdExample";
 
-        if (scopes.Contains(ScopeExtensionType.Organization.AsString()))
+        if (scopes.Contains(ScopeType.Organization))
         {
             // Organization scope is present, we revalidate permissions for the org
             var isOrgAllowed = true;
@@ -134,7 +135,7 @@ public class TokenController(IOpenIddictApplicationManager applicationManager, I
             identity.SetClaim("oid", orgId);
             identity.SetClaim("tid", tenantId);
         }
-        else if (scopes.Contains(ScopeExtensionType.Tenant.AsString()))
+        else if (scopes.Contains(ScopeType.Tenant))
         {
             // Only tenant scope -> return tenant claim, if only tenant is present
             // user can only ever get access to its own tenantId
@@ -149,7 +150,37 @@ public class TokenController(IOpenIddictApplicationManager applicationManager, I
 
     private async Task<IActionResult> HandleTokenExchangeGrantAsync(OpenIddictRequest request)
     {
-        throw new NotImplementedException();
+        // Authenticate the subject token (the original token)
+        var authenticateResult = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+        var principal = authenticateResult.Principal;
+        if (principal is null)
+            return Forbid(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+
+        var identity = (ClaimsIdentity)principal.Identity!;
+
+        // Get orgId from the request
+        var orgId = request.GetParameter("organization_id")?.ToString();
+        if (string.IsNullOrEmpty(orgId))
+            return BadRequest(new { error = "invalid_request", error_description = "Missing organization_id." });
+
+        // Simulate permission check (replace with real logic)
+        var userHasAccessToOrg = true; // TODO: check user's org membership
+        if (!userHasAccessToOrg)
+            return Forbid(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+
+        // Grant organization scope and claims
+        var grantedScopes = new ImmutableArray<string> { "organization", "account.read", "account.write", "tenant" };
+        identity.SetScopes(grantedScopes);
+        identity.SetClaim("oid", orgId);
+        identity.SetClaim("tid", "tenantIdExample"); // Set tenant as well if needed
+
+        // Set resources based on granted scopes
+        var resources = await _scopeManager.ListResourcesAsync(grantedScopes).ToListAsync();
+        identity.SetResources(resources);
+
+        identity.SetDestinations(GetDestinations);
+
+        return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
     }
 
     private static IEnumerable<string> GetDestinations(Claim claim)

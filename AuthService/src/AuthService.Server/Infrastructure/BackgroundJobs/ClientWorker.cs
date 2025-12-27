@@ -1,14 +1,18 @@
-using AuthService.Server.Common.Enums;
-using AuthService.Server.Common.Extensions;
+
+using AuthService.Server.Common.Types;
+using AuthService.Server.Common.Options;
 using AuthService.Server.Infrastructure.Persistence;
+using Microsoft.Extensions.Options;
 using OpenIddict.Abstractions;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace AuthService.Server.Infrastructure.BackgroundJobs;
 
-public class ClientWorker(IServiceProvider serviceProvider) : IHostedService
+public class ClientWorker(IServiceProvider serviceProvider, IOptions<OAuthClientOptions> clientOptions) : IHostedService
 {
     private readonly IServiceProvider _serviceProvider = serviceProvider;
+    private readonly IOptions<OAuthClientOptions> _clientOptions = clientOptions;
+
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
@@ -19,8 +23,8 @@ public class ClientWorker(IServiceProvider serviceProvider) : IHostedService
 
         // Run Worker on Startup only
         await InitOIDCScopes(scope, cancellationToken);
-        await RegisterNextjs(scope, cancellationToken);
-        await RegisterPostman(scope, cancellationToken);
+        await RegisterMiramaFrontend(scope, _clientOptions.Value, cancellationToken);
+        await RegisterPostman(scope, _clientOptions.Value, cancellationToken);
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
@@ -36,16 +40,52 @@ public class ClientWorker(IServiceProvider serviceProvider) : IHostedService
         {
             new OpenIddictScopeDescriptor
             {
-                Name = ScopeExtensionType.Organization.AsString(),
+                Name = ScopeType.Organization,
                 DisplayName = "Organization Access",
-                Resources = { "api://account", "api://project" }
+                Resources = { ResourceType.Account, ResourceType.Project }
             }, 
             new OpenIddictScopeDescriptor
             {
-                Name = ScopeExtensionType.Tenant.AsString(),
+                Name = ScopeType.Tenant,
                 DisplayName = "Tenant Access",
-                Resources = { "api://account" }
-            }
+                Resources = { ResourceType.Account }
+            },
+            new OpenIddictScopeDescriptor
+            {
+                Name = ScopeType.AccountRead,
+                DisplayName = "Read access to Account API",
+                Resources = { ResourceType.Account }
+            },
+            new OpenIddictScopeDescriptor
+            {
+                Name = ScopeType.AccountWrite,
+                DisplayName = "Write access to Account API",
+                Resources = { ResourceType.Account }
+            },
+            new OpenIddictScopeDescriptor
+            {
+                Name = ScopeType.ProjectRead,
+                DisplayName = "Read access to Project API",
+                Resources = { ResourceType.Project }
+            },
+            new OpenIddictScopeDescriptor
+            {
+                Name = ScopeType.ProjectWrite,
+                DisplayName = "Write access to Project API",
+                Resources = { ResourceType.Project }
+            },
+            new OpenIddictScopeDescriptor
+            {
+                Name = ScopeType.LLMRead,
+                DisplayName = "Read access to LLM API",
+                Resources = { ResourceType.LLM }
+            },
+            new OpenIddictScopeDescriptor
+            {
+                Name = ScopeType.LLMWrite,
+                DisplayName = "Write access to LLM API",
+                Resources = { ResourceType.LLM }
+            },
         };
 
         foreach (var scopeDescriptor in scopes)
@@ -68,16 +108,16 @@ public class ClientWorker(IServiceProvider serviceProvider) : IHostedService
         }
     }
 
-    private static async ValueTask RegisterNextjs(IServiceScope scopeService, CancellationToken cancellationToken)
+    private static async ValueTask RegisterMiramaFrontend(IServiceScope scopeService, OAuthClientOptions clientOptions, CancellationToken cancellationToken)
     {
         var appManager = scopeService.ServiceProvider.GetRequiredService<IOpenIddictApplicationManager>();
 
         var appDescriptor = new OpenIddictApplicationDescriptor
         {
-            ClientId = "temp-id",
-            ClientSecret = "temp-secret",
-            DisplayName = "OpenIdNextjs",
-            RedirectUris = { new Uri("http://localhost:3000/api/auth/callback/oidc") },
+            ClientId = clientOptions.MiramaFrontendClientId,
+            ClientSecret = clientOptions.MiramaFrontendClientSecret,
+            DisplayName = "OpenIdMiramaFrontend",
+            RedirectUris = { new Uri(clientOptions.MiramaFrontendRedirectUri) },
             ClientType = ClientTypes.Confidential,
             ConsentType = ConsentTypes.Explicit,
             Permissions =
@@ -95,8 +135,14 @@ public class ClientWorker(IServiceProvider serviceProvider) : IHostedService
                     Permissions.Scopes.Profile,
                     Permissions.Scopes.Email,
                     Permissions.Scopes.Roles,
-                    Permissions.Prefixes.Scope + ScopeExtensionType.Organization.AsString(),
-                    Permissions.Prefixes.Scope + ScopeExtensionType.Tenant.AsString()
+                    Permissions.Prefixes.Scope + ScopeType.Organization,
+                    Permissions.Prefixes.Scope + ScopeType.Tenant,
+                    Permissions.Prefixes.Scope + ScopeType.AccountRead,
+                    Permissions.Prefixes.Scope + ScopeType.AccountWrite,
+                    Permissions.Prefixes.Scope + ScopeType.ProjectRead,
+                    Permissions.Prefixes.Scope + ScopeType.ProjectWrite,
+                    Permissions.Prefixes.Scope + ScopeType.LLMRead,
+                    Permissions.Prefixes.Scope + ScopeType.LLMWrite,
                 }
         };
 
@@ -112,16 +158,16 @@ public class ClientWorker(IServiceProvider serviceProvider) : IHostedService
         }
     }
 
-    private static async ValueTask RegisterPostman(IServiceScope scopeService, CancellationToken cancellationToken)
+    private static async ValueTask RegisterPostman(IServiceScope scopeService, OAuthClientOptions clientOptions, CancellationToken cancellationToken)
     {
         var appManager = scopeService.ServiceProvider.GetRequiredService<IOpenIddictApplicationManager>();
 
         var appDescriptor = new OpenIddictApplicationDescriptor
         {
-            ClientId = "open-id-postman",
-            ClientSecret = "open-id-postman-secret",
+            ClientId = clientOptions.PostmanClientId,
+            ClientSecret = clientOptions.PostmanClientSecret,
             DisplayName = "OpenIDPostman",
-            RedirectUris = { new Uri("https://oauth.pstmn.io/v1/callback") },
+            RedirectUris = { new Uri(clientOptions.PostmanRedirectUri) },
             ClientType = ClientTypes.Confidential,
             ConsentType = ConsentTypes.Explicit,
             Permissions =
@@ -140,8 +186,14 @@ public class ClientWorker(IServiceProvider serviceProvider) : IHostedService
                     Permissions.Scopes.Profile,
                     Permissions.Scopes.Email,
                     Permissions.Scopes.Roles,
-                    Permissions.Prefixes.Scope + ScopeExtensionType.Organization.AsString(),
-                    Permissions.Prefixes.Scope + ScopeExtensionType.Tenant.AsString()
+                    Permissions.Prefixes.Scope + ScopeType.Organization,
+                    Permissions.Prefixes.Scope + ScopeType.Tenant,
+                    Permissions.Prefixes.Scope + ScopeType.AccountRead,
+                    Permissions.Prefixes.Scope + ScopeType.AccountWrite,
+                    Permissions.Prefixes.Scope + ScopeType.ProjectRead,
+                    Permissions.Prefixes.Scope + ScopeType.ProjectWrite,
+                    Permissions.Prefixes.Scope + ScopeType.LLMRead,
+                    Permissions.Prefixes.Scope + ScopeType.LLMWrite,
                 }
         };
 

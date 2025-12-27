@@ -1,4 +1,4 @@
-using System.Text;
+
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using AuthService.Server.Common.Options;
@@ -6,8 +6,7 @@ using Microsoft.Extensions.Options;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 using AuthService.Server.Infrastructure.BackgroundJobs;
 using AuthService.Server.Infrastructure.Persistence;
-using AuthService.Server.Common.Enums;
-using AuthService.Server.Common.Extensions;
+using AuthService.Server.Common.Types;
 using static OpenIddict.Server.OpenIddictServerEvents;
 using AuthService.Server.Common.EventHandlers;
 
@@ -18,6 +17,7 @@ builder.Services.AddControllersWithViews();
 // Options pattern Configuration
 builder.Services.Configure<ApplicationOptions>(builder.Configuration.GetSection(ApplicationOptions.Application));
 builder.Services.Configure<GoogleOptions>(builder.Configuration.GetSection(GoogleOptions.Google));
+builder.Services.Configure<OAuthClientOptions>(builder.Configuration.GetSection(OAuthClientOptions.Clients));
 
 builder.Services.AddAuthentication(options =>
     {
@@ -36,7 +36,6 @@ builder.Services.AddAuthentication(options =>
         options.ClientId = config.ClientId;
         options.ClientSecret = config.ClientSecret;
         options.CallbackPath = "/auth/login/callback/google";
-
         options.CorrelationCookie.SameSite = SameSiteMode.None;
         options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
         options.Events.OnRedirectToAuthorizationEndpoint = context =>
@@ -70,7 +69,7 @@ builder.Services.AddOpenIddict()
                .AllowAuthorizationCodeFlow()
                .AllowTokenExchangeFlow();
         
-        // Adding PKCE
+        // Force PKCE for Authorization Code flow
         options.RequireProofKeyForCodeExchange();
         
         if (builder.Environment.IsDevelopment())
@@ -78,8 +77,13 @@ builder.Services.AddOpenIddict()
             options.AddDevelopmentSigningCertificate()
                 .AddDevelopmentEncryptionCertificate();
         }
-        options.DisableAccessTokenEncryption(); // TODO: Remove this
-        options.RegisterAudiences("api://account", "api://project");
+
+        // For now we just use JWTs instead of JWEs, maybe in the future we add JWE support
+        options.DisableAccessTokenEncryption();
+        options.RegisterAudiences(
+                ResourceType.Account,
+                ResourceType.Project,
+                ResourceType.LLM);
 
         // Issuer refers to this Auth Server, hardcoded for testing purposes
         options.SetIssuer(new Uri(config.SelfUrl));
@@ -97,9 +101,14 @@ builder.Services.AddOpenIddict()
             Scopes.OfflineAccess,
             Scopes.Profile,
             Scopes.Email,
-            ScopeExtensionType.Tenant.AsString(),
-            ScopeExtensionType.Organization.AsString(),
-            ScopeExtensionType.Postman.AsString());
+            ScopeType.Tenant,
+            ScopeType.Organization,
+            ScopeType.AccountWrite,
+            ScopeType.AccountRead,
+            ScopeType.ProjectWrite,
+            ScopeType.ProjectRead,
+            ScopeType.LLMWrite,
+            ScopeType.LLMRead);
 
         options.AddEventHandler<ProcessSignInContext>(builder =>
         {
