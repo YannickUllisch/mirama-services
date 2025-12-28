@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using System.Security.Claims;
 using AuthService.Server.Common.Types;
+using AuthService.Server.Common.Utils;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
@@ -71,9 +72,8 @@ public class TokenController(IOpenIddictApplicationManager applicationManager, I
             identity.SetClaim("tid", "tenantOnlyScopeId");
         }
 
-        identity.SetDestinations(GetDestinations);
+        identity.SetDestinations(ClaimDestinations.GetDestinations);
         
-
         return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
     }
 
@@ -88,19 +88,19 @@ public class TokenController(IOpenIddictApplicationManager applicationManager, I
         // Example: Add tenant/org claims based on scopes
         if (scopes.Contains(ScopeType.Organization))
         {
-            identity.SetClaim("tid", "tenantIdExample");
-            identity.SetClaim("oid", "orgIdExample");
+            identity.SetClaim(ClaimType.Tenant, "tenantIdExample");
+            identity.SetClaim(ClaimType.Organization, "orgIdExample");
         }
         else if (scopes.Contains(ScopeType.Tenant))
         {
-            identity.SetClaim("tid", "tenantOnlyScopeId");
+            identity.SetClaim(ClaimType.Tenant, "tenantOnlyScopeId");
         }
 
         // Set audiences based on resources of requested scopes
         var resources = await _scopeManager.ListResourcesAsync(scopes).ToListAsync();
         identity.SetResources(resources);
 
-        identity.SetDestinations(GetDestinations);
+        identity.SetDestinations(ClaimDestinations.GetDestinations);
 
         return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
     }
@@ -124,7 +124,7 @@ public class TokenController(IOpenIddictApplicationManager applicationManager, I
 
         if (scopes.Contains(ScopeType.Organization))
         {
-            // Organization scope is present, we revalidate permissions for the org
+            // Organization scope is present, we revalidate permissions for the org, check if user still active otherwise revoke session
             var isOrgAllowed = true;
             if (!isOrgAllowed)
             {
@@ -132,15 +132,15 @@ public class TokenController(IOpenIddictApplicationManager applicationManager, I
             }
 
             // Add both organization and assumed tenant values
-            identity.SetClaim("oid", orgId);
-            identity.SetClaim("tid", tenantId);
+            identity.SetClaim(ClaimType.Organization, orgId);
+            identity.SetClaim(ClaimType.Tenant, tenantId);
         }
         else if (scopes.Contains(ScopeType.Tenant))
         {
             // Only tenant scope -> return tenant claim, if only tenant is present
             // user can only ever get access to its own tenantId
             // We should still refetch it just for extra safety
-            identity.SetClaim("tid", tenantId);
+            identity.SetClaim(ClaimType.Tenant, tenantId);
         }
 
         return SignIn(new ClaimsPrincipal(identity),
@@ -159,92 +159,34 @@ public class TokenController(IOpenIddictApplicationManager applicationManager, I
         var identity = (ClaimsIdentity)principal.Identity!;
 
         // Get orgId from the request
-        var orgId = request.GetParameter("organization_id")?.ToString();
+        var orgId = request.GetParameter("orgId")?.ToString();
+        
+        // If OrgId is not given, exchange must be to "only tenant" state, without org specific access
         if (string.IsNullOrEmpty(orgId))
-            return BadRequest(new { error = "invalid_request", error_description = "Missing organization_id." });
+        {
+            // TODO: Return JWT with default requested scopes, tenant and account read/write scopes. No organization logic
+        }
 
         // Simulate permission check (replace with real logic)
         var userHasAccessToOrg = true; // TODO: check user's org membership
         if (!userHasAccessToOrg)
+        {
             return Forbid(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+        }
 
         // Grant organization scope and claims
+        var requestedScopes = principal.GetScopes(); // TODO figure our if the scopes are on principal or identity
         var grantedScopes = new ImmutableArray<string> { "organization", "account.read", "account.write", "tenant" };
         identity.SetScopes(grantedScopes);
-        identity.SetClaim("oid", orgId);
-        identity.SetClaim("tid", "tenantIdExample"); // Set tenant as well if needed
+        identity.SetClaim(ClaimType.Organization, orgId);
+        identity.SetClaim(ClaimType.Tenant, "tenantIdExample"); // Set tenant as well if needed
 
         // Set resources based on granted scopes
         var resources = await _scopeManager.ListResourcesAsync(grantedScopes).ToListAsync();
         identity.SetResources(resources);
 
-        identity.SetDestinations(GetDestinations);
+        identity.SetDestinations(ClaimDestinations.GetDestinations);
 
         return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
-    }
-
-    private static IEnumerable<string> GetDestinations(Claim claim)
-    {
-        // Note: by default, claims are NOT automatically included in the access and identity tokens.
-        // To allow OpenIddict to serialize them, you must attach them a destination, that specifies
-        // whether they should be included in access tokens, in identity tokens or in both.
-
-        switch (claim.Type)
-        {
-            case Claims.Name or Claims.PreferredUsername:
-                yield return Destinations.AccessToken;
-
-                if (claim.Subject!.HasScope(Scopes.Profile))
-                    yield return Destinations.IdentityToken;
-
-                yield break;
-
-            case Claims.Email:
-                yield return Destinations.AccessToken;
-
-                if (claim.Subject!.HasScope(Scopes.Email))
-                    yield return Destinations.IdentityToken;
-
-                yield break;
-
-            case Claims.Role:
-                yield return Destinations.AccessToken;
-
-                if (claim.Subject!.HasScope(Scopes.Roles))
-                    yield return Destinations.IdentityToken;
-
-                yield break;
-            
-            case Claims.Profile:
-                yield return Destinations.AccessToken;
-
-                if (claim.Subject!.HasScope(Scopes.Profile))
-                    yield return Destinations.IdentityToken;
-
-                yield break;
-            
-            case "oid":
-                yield return Destinations.AccessToken;
-
-                if (claim.Subject!.HasScope("oid") == true)
-                    yield return Destinations.IdentityToken;
-
-                yield break;
-            
-            case "tid":
-                yield return Destinations.AccessToken;
-
-                if (claim.Subject!.HasScope("tid") == true)
-                    yield return Destinations.IdentityToken;
-
-                yield break;
-
-            // Never include the security stamp in the access and identity tokens, as it's a secret value.
-            case "AspNet.Identity.SecurityStamp": yield break;
-
-            default:
-                yield return Destinations.AccessToken;
-                yield break;
-        }
     }
 }

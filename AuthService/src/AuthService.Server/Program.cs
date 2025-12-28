@@ -88,7 +88,7 @@ builder.Services.AddOpenIddict()
         // Issuer refers to this Auth Server, hardcoded for testing purposes
         options.SetIssuer(new Uri(config.SelfUrl));
 
-        options.SetAccessTokenLifetime(TimeSpan.FromMinutes(30));
+        options.SetAccessTokenLifetime(TimeSpan.FromMinutes(10));
         options.SetRefreshTokenLifetime(TimeSpan.FromDays(30));
 
         options.UseAspNetCore()

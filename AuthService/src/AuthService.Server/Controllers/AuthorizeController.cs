@@ -61,12 +61,11 @@ public class AuthorizeController(IOpenIddictApplicationManager applicationManage
         identity.SetResources(grantedScopes);
 
         // Settings Base Claims, rest will be set in SignInContext Event handler and validated again in Token endpoint
-        identity.SetClaim(Claims.Subject, result.Principal!.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        // identity.SetClaim(Claims.Subject, result.Principal!.FindFirst(ClaimTypes.NameIdentifier)!.Value);
         identity.SetClaim(Claims.Email, result.Principal!.FindFirst(ClaimTypes.Email)!.Value);
-
         // Specifying claim destinations i.e. which go to ID and access token
         identity.SetDestinations(ClaimDestinations.GetDestinations);
-
+        
         return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
     }
 
