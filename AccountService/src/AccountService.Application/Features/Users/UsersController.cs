@@ -3,8 +3,6 @@
 
 using AccountService.Application.Common;
 using AccountService.Application.Common.Models;
-using AccountService.Application.Features.Users.Commands.UpdateUser;
-using AccountService.Application.Features.Users.Queries.GetUsers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AccountService.Application.Features.Users;

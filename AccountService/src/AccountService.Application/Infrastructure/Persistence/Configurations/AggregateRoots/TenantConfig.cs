@@ -14,10 +14,10 @@ public class TenantConfiguration : IEntityTypeConfiguration<Tenant>
         builder.HasKey(u => u.Id);
 
         builder.Property(t => t.AdminUserId)
-        .HasConversion(
-            id => id.Value,
-            v => new UserId(v))
-        .IsRequired();
+            .HasConversion(
+                id => id.Value,
+                v => new UserId(v))
+            .IsRequired();
 
         builder.HasIndex(t => t.AdminUserId)
             .IsUnique();

@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace AccountService.Application.Common;
 
 [ApiController]
-[Route("api/{orgId:guid}/[controller]")]
+[Route("api/v{version:apiVersion}/[controller]")]
 [Authorize(Policy = "RequireTenantOnly")]
 public abstract class ApiControllerBase : ControllerBase
 {

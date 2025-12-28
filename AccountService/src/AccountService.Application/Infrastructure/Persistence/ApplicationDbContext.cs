@@ -5,6 +5,7 @@ using AccountService.Application.Common.Extensions;
 using AccountService.Application.Common.Interfaces;
 using AccountService.Application.Domain.Abstractions.Core;
 using AccountService.Application.Domain.Abstractions.Events;
+using AccountService.Application.Domain.Aggregates.Account;
 using AccountService.Application.Domain.Aggregates.Organization;
 using AccountService.Application.Domain.Aggregates.Organization.Invitation;
 using AccountService.Application.Domain.Aggregates.Organization.Member;
@@ -27,6 +28,7 @@ public sealed class ApplicationDbContext : DbContext
     public DbSet<Tenant> Tenants => Set<Tenant>();
     public DbSet<Invitation> Invitations => Set<Invitation>();
     public DbSet<Member> Members => Set<Member>();
+    public DbSet<Account> Accounts => Set<Account>();
     public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
     public DbSet<IdempotencyRecord> IdempotencyRecords => Set<IdempotencyRecord>();
 
