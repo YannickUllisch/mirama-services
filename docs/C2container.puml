@@ -1,0 +1,110 @@
+@startuml container
+!NEW_C4_STYLE=1
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
+!include FONTAWESOME/users.puml
+!include FONTAWESOME/python.puml
+!include FONTAWESOME/node.puml
+!include FONTAWESOME/database.puml
+!include FONTAWESOME/server.puml
+!include FONTAWESOME/aws.puml
+!include FONTAWESOME/eye.puml
+!include <tupadr3/devicons/dotnet>
+
+title System Container Diagram 
+
+LAYOUT_WITH_LEGEND()
+SHOW_PERSON_OUTLINE()
+
+' Tags
+AddElementTag("backendContainer", $fontColor=$ELEMENT_FONT_COLOR, $bgColor="#335DA5", $shape=EightSidedShape(), $legendText="backend container (eight sided)")
+AddRelTag("async", $textColor=$ARROW_FONT_COLOR, $lineColor=$ARROW_COLOR, $lineStyle=DashedLine())
+
+Person(user, "End Users", "Use the web application")
+
+System_Boundary(platform, "Mirama Project Management Platform") {
+
+    System_Boundary(nextjs_boundary, "Next.js Application") {
+        Container(ui, "Web UI", "Next.js / React", "Browser-based user interface", $sprite="node")
+        Container(bff, "BFF API", "Next.js API Routes (Node.js)", "Backend for Frontend", $sprite="node")
+    }
+
+    System_Boundary(backend, "Backend Services") {
+        System_Boundary(account_boundary, "Account Service") {
+            Container(account_service, "Account Service", ".NET", "Exposes API endpoints and publishes integration events via internal worker", $sprite="dotnet", $tags="backendContainer")
+            ContainerDb(account_db, "Account Database", "PostgreSQL", "Stores tenants, users, memberships", $sprite="database")
+        }
+
+        System_Boundary(project_boundary, "Project Service") {
+            Container(project_service, "Project Service", ".NET", "Exposes API endpoints and publishes integration events via internal worker", $sprite="dotnet", $tags="backendContainer")
+            ContainerDb(project_db, "Project Database", "PostgreSQL", "Stores projects, tasks, and related data", $sprite="database")
+        }
+
+        System_Boundary(auth_boundary, "Auth Service") {
+            Container(auth_api, "Auth API", ".NET + OpenIddict", "OAuth2 / OIDC authorization server (Client Credential & Code Authorization flows)", $sprite="dotnet", $tags="backendContainer")
+            ContainerDb(auth_db, "Auth Database", "PostgreSQL", "Stores clients, grants, tokens, consents", $sprite="database")
+        }
+
+        System_Boundary(llm_system, "LLM Service (PLANNED)") {
+            Container(mcp_server, "MCP Server", "TypeScript / Node.js", "MCP protocol server exposing tools for LLM agents", $sprite="server")
+            Container(llm_agent_system, "LLM Agent System", "Python / LangChain", "Handles reasoning, tool orchestration and embeddings", $sprite="python", $tags="backendContainer")
+            ContainerDb(vector_db, "Vector Database", "Pinecone", "Stores embeddings for context, memory and tool data", $sprite="database")
+        }
+
+        Container(notification_api, "Notification Service", "Node.js", "Consumes integration events and sends notifications", $sprite="node", $tags="backendContainer")
+    }
+}
+
+' User to UI relation
+Rel(user, ui, "Uses", "HTTPS")
+
+' External systems
+Container(otel_collector, "OTel Collector", "OpenTelemetry", "Receives OTLP telemetry and forwards it", $sprite="server")
+System_Ext(idp, "External Identity Providers", "Google & Microsoft", $sprite="users") 
+System_Ext(messaging, "Cloud Messaging", "AWS SNS + AWS SQS for integration events", $sprite="aws") 
+System_Ext(email, "Email Service", "Amazon SES", $sprite="aws")
+System_Ext(observability, "Observability Backend", "Prometheus, Grafana, Logs (self-hosted)", $sprite="eye")
+
+' Notification relations
+Rel(notification_api, messaging, "Consumes events", "SQS")
+Rel(notification_api, email, "Sends emails", "SES / SMTP")
+
+' Service to SNS relations
+Rel(account_service, messaging, "Publishes integration events", "SNS / SQS", $tags="async")
+Rel(project_service, messaging, "Publishes integration events", "SNS / SQS", $tags="async")
+
+' Nextjs relations
+Rel(ui, bff, "Calls", "HTTPS / JSON")
+Rel(bff, auth_api, "Authenticates users", "OIDC Authorization Code + PKCE")
+Rel(auth_api, idp, "Delegates authentication to", "OIDC")
+
+' Backend internal relations
+Rel(account_service, auth_api, "Validates access tokens", "JWT")
+Rel(project_service, auth_api, "Validates access tokens", "JWT")
+Rel(llm_agent_system, auth_api, "Validates access tokens", "JWT")
+Rel(auth_api, account_service, "Retrieves tenant & membership data", "HTTPS / JSON")
+Rel(auth_api, auth_db, "Reads/Writes", "EF Core")
+Rel(account_service, account_db, "Reads/Writes", "EF Core", $tags="async")
+Rel(project_service, project_db, "Reads/Writes", "EF Core", $tags="async")
+
+' Forwarding relations
+Rel(bff, project_service, "Forwards Request with JWT Accesstoken", "HTTPS / JSON")
+Rel(bff, account_service, "Forwards Request with JWT Accesstoken", "HTTPS / JSON")
+Rel(bff, llm_agent_system, "Forwards Request with JWT Accesstoken", "HTTPS / JSON")
+
+' OTLP
+Rel(backend, otel_collector, "Exports telemetry", "OTLP", $tags="async")
+Rel(otel_collector, observability, "Forwards telemetry", "Remote write / scrape")
+
+' Storage
+' System_Ext(storage, "Object Storage", "Amazon S3")
+' Rel(account_service, storage, "Stores files", "HTTPS")
+' Rel(project_service, storage, "Stores files", "HTTPS")
+
+' AI Service - comes later hence commented out for now
+Rel(bff, llm_agent_system, "Sends user requests / Natural language input", "HTTPS / JSON")
+Rel(llm_agent_system, mcp_server, "Invokes tools via MCP protocol", "MCP / JSON")
+Rel(llm_agent_system, vector_db, "Reads/Writes embeddings", "Vector queries", $tags="async")
+
+@enduml

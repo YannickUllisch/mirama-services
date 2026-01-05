@@ -1,0 +1,39 @@
+@startuml Context
+!NEW_C4_STYLE=1
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+SHOW_PERSON_OUTLINE()
+!define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
+!include FONTAWESOME/users.puml
+
+LAYOUT_WITH_LEGEND()
+SHOW_PERSON_OUTLINE()
+
+title System Context Diagram
+
+Person(user, "End Users", "Manages personal workspaces and collaborates in organizations", $sprite="users")
+Person(admin, "Platform Administrators", "Manages tenants, users, and platform configuration", $sprite="users")
+
+System(platform, "Mirama Project Management Platform", "Multi-tenant SaaS for project and task management", $sprite="system")
+
+System_Ext(idp, "External Identity Providers", "Google, Entra ID")
+System_Ext(email, "Email Service", "Transactional email delivery")
+System_Ext(messaging, "Cloud Messaging", "Asynchronous domain events")
+System_Ext(storage, "Object Storage", "File uploads and attachments")
+System_Ext(observability, "Observability Platform", "Logs, metrics and traces")
+
+Rel(user, platform, "Uses", "Web HTTPS")
+Rel(admin, platform, "Uses", "Web HTTPS")
+
+System_Ext(external_ai, "External LLM Provider", "OpenAI / ChatGPT / Hosted LLM API")
+Rel(platform, external_ai, "Requests completions or embeddings")
+
+
+Rel(platform, idp, "Delegates authentication to")
+Rel(platform, email, "Sends emails via")
+Rel(platform, messaging, "Publishes and consumes events")
+Rel(platform, storage, "Stores files in")
+Rel(platform, observability, "Exports telemetry to")
+
+SHOW_LEGEND()
+@enduml
