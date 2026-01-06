@@ -11,28 +11,23 @@ SHOW_PERSON_OUTLINE()
 
 title System Context Diagram
 
-Person(user, "End Users", "Manages personal workspaces and collaborates in organizations", $sprite="users")
-Person(admin, "Platform Administrators", "Manages tenants, users, and platform configuration", $sprite="users")
+Person(user, "End Users", "Use the web application")
+Person(admin, "System Administrators", "Manages tenants, users, and platform configuration")
 
 System(platform, "Mirama Project Management Platform", "Multi-tenant SaaS for project and task management", $sprite="system")
 
 System_Ext(idp, "External Identity Providers", "Google, Entra ID")
 System_Ext(email, "Email Service", "Transactional email delivery")
 System_Ext(messaging, "Cloud Messaging", "Asynchronous domain events")
-System_Ext(storage, "Object Storage", "File uploads and attachments")
 System_Ext(observability, "Observability Platform", "Logs, metrics and traces")
+System_Ext(external_ai, "External LLM Provider", "OpenAI LLM API")
 
-Rel(user, platform, "Uses", "Web HTTPS")
-Rel(admin, platform, "Uses", "Web HTTPS")
-
-System_Ext(external_ai, "External LLM Provider", "OpenAI / ChatGPT / Hosted LLM API")
+Rel(user, platform, "Visits Mirama", "Web HTTPS")
+Rel(admin, platform, "Visits Mirama", "Web HTTPS")
 Rel(platform, external_ai, "Requests completions or embeddings")
-
-
 Rel(platform, idp, "Delegates authentication to")
 Rel(platform, email, "Sends emails via")
 Rel(platform, messaging, "Publishes and consumes events")
-Rel(platform, storage, "Stores files in")
 Rel(platform, observability, "Exports telemetry to")
 
 SHOW_LEGEND()
