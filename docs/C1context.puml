@@ -1,5 +1,11 @@
 @startuml context
-' !NEW_C4_STYLE=1
+skinparam linetype default
+skinparam nodesep 60
+skinparam ranksep 70
+skinparam ArrowThickness 1.3
+skinparam ArrowColor #444444
+skinparam ClassBorderColor #333333
+skinparam ClassBackgroundColor #FFFFFF
 
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
 SHOW_PERSON_OUTLINE()

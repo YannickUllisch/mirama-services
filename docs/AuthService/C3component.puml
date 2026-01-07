@@ -1,4 +1,11 @@
 @startuml authComponent
+skinparam linetype default
+skinparam nodesep 60
+skinparam ranksep 70
+skinparam ArrowThickness 1.3
+skinparam ArrowColor #444444
+skinparam ClassBorderColor #333333
+skinparam ClassBackgroundColor #FFFFFF
 
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
 !define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
