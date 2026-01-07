@@ -1,0 +1,120 @@
+%% Mirama Account Service Domain Model (DDD)
+
+%% Aggregate Root Classes
+classDiagram
+    class User {
+        +string Id
+        +string Name
+        +string Email
+        +string Image
+        +string Role
+        +ContactInfo ContactInfo
+    }
+    <<AggregateRoot>> User
+
+    class Account {
+        +string Id
+        +string UserId
+        +string Provider
+        +string ProviderUserId
+    }
+    <<AggregateRoot>> Account
+
+    class Organization {
+        +string Id
+        +string Name
+        +string Slug
+        +string Logo
+        +string Address
+    }
+    <<AggregateRoot>> Organization
+
+    class Tenant {
+        +string Id
+        +string Name
+        +string AdminUserId
+        +bool IsActive
+        +bool IsDeleted
+    }
+    <<AggregateRoot>> Tenant
+
+%% Tenant-owned Entities
+    class TenantSettings {
+        +string? BrandingColor
+        +string? LogoUrl
+        +bool ReceiveNotifications
+    }
+    <<ValueObject>> TenantSettings
+
+    class BillingPlan {
+        +int QuotaOrganizations
+        +int QuotaUsers
+        +int QuotaTeams
+    }
+    <<ValueObject>> BillingPlan
+
+
+%% Organization-owned Entities
+    class OrganizationMember {
+        +string Id
+        +string UserId
+        +string Role
+    }
+
+    <<Entity>> OrganizationMember
+
+    class Team {
+        +string Id
+        +string Name
+    }
+
+    <<Entity>> Team
+
+    class TeamMember {
+        +string Id
+        +string TeamId
+        +string MemberId
+        +bool IsManager
+    }
+    <<Entity>> TeamMember
+
+    class Invitation {
+        +string Id
+        +string Email
+        +string Role
+        +string Status
+        +timestamp ExpiresAt
+        +string InviterId
+        +string? AcceptedBy
+    }
+    <<Entity>> Invitation
+
+
+%% Value Objects
+    class ContactInfo {
+        +string? Phone
+        +string? Address
+    }
+    <<ValueObject>> ContactInfo
+
+%% Relationships
+
+%% User / Account
+    User "1" o-- "0..*" Account : owns
+    User "1" o-- "1" ContactInfo : has
+
+%% Tenant / Tenant-owned entities
+    Tenant "1" o-- "1" TenantSettings : has
+    Tenant "1" o-- "1" BillingPlan : has
+
+%% Tenant / Organization
+    Tenant "1" o-- "0..*" Organization : owns
+
+%% Organization / Organization-owned entities
+    Organization "1" o-- "0..*" OrganizationMember : has
+    Organization "1" o-- "0..*" Invitation : has
+    Organization "1" o-- "0..*" Team : has
+
+%% Teams / Team Members
+    Team "1" o-- "0..*" TeamMember : has
+    OrganizationMember "1" o-- "0..*" TeamMember : linkedTo
