@@ -1,5 +1,5 @@
-@startuml Context
-!NEW_C4_STYLE=1
+@startuml context
+' !NEW_C4_STYLE=1
 
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
 SHOW_PERSON_OUTLINE()
@@ -20,14 +20,14 @@ System_Ext(idp, "External Identity Providers", "Google, Entra ID")
 System_Ext(email, "Email Service", "Transactional email delivery")
 System_Ext(messaging, "Cloud Messaging", "Asynchronous domain events")
 System_Ext(observability, "Observability Platform", "Logs, metrics and traces")
-System_Ext(external_ai, "External LLM Provider", "OpenAI LLM API")
+' System_Ext(external_ai, "External LLM Provider", "OpenAI LLM API")
 
 Rel(user, platform, "Visits Mirama", "Web HTTPS")
 Rel(admin, platform, "Visits Mirama", "Web HTTPS")
-Rel(platform, external_ai, "Requests completions or embeddings")
+' Rel(platform, external_ai, "Requests completions or embeddings")
 Rel(platform, idp, "Delegates authentication to")
 Rel(platform, email, "Sends emails via")
-Rel(platform, messaging, "Publishes and consumes events")
+BiRel(platform, messaging, "Publishes & consumes integration events")
 Rel(platform, observability, "Exports telemetry to")
 
 SHOW_LEGEND()

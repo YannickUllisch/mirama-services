@@ -53,19 +53,23 @@ public class AuthorizeController(IOpenIddictApplicationManager applicationManage
             Scopes.OfflineAccess,
             Scopes.Roles};
 
-        var requestedScopes = request.GetScopes();
-        var grantedScopes = requestedScopes.Intersect(allowedInitialScopes);
-
-        // Set scopes and resources requested by the client
-        identity.SetScopes(grantedScopes);
-        identity.SetResources(grantedScopes);
-
         // Settings Base Claims, rest will be set in SignInContext Event handler and validated again in Token endpoint
+        // Setting Claims at Identity level
         // identity.SetClaim(Claims.Subject, result.Principal!.FindFirst(ClaimTypes.NameIdentifier)!.Value);
         identity.SetClaim(Claims.Email, result.Principal!.FindFirst(ClaimTypes.Email)!.Value);
         // Specifying claim destinations i.e. which go to ID and access token
         identity.SetDestinations(ClaimDestinations.GetDestinations);
-        
+
+
+        var principal = new ClaimsPrincipal(identity);
+
+        var requestedScopes = request.GetScopes();
+        var grantedScopes = requestedScopes.Intersect(allowedInitialScopes);
+
+        // Set scopes and resources requested by the client at principal level
+        principal.SetScopes(grantedScopes);
+        principal.SetResources(grantedScopes);
+
         return SignIn(new ClaimsPrincipal(identity), OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
     }
 

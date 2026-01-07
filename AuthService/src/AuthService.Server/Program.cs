@@ -9,6 +9,7 @@ using AuthService.Server.Infrastructure.Persistence;
 using AuthService.Server.Common.Types;
 using static OpenIddict.Server.OpenIddictServerEvents;
 using AuthService.Server.Common.EventHandlers;
+using AuthService.Server.Infrastructure.OpenIddict;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,10 +56,6 @@ builder.Services.AddOpenIddict()
     })
     .AddServer((options) =>
     {
-        var config = builder.Configuration.GetSection(ApplicationOptions.Application).Get<ApplicationOptions>() 
-            ?? throw new InvalidOperationException("Application option configuration is missing or invalid.");
-
-
         options.SetTokenEndpointUris("/connect/token")
                 .SetAuthorizationEndpointUris("/connect/authorize")
                 .SetEndSessionEndpointUris("/connect/logout");
@@ -69,51 +66,19 @@ builder.Services.AddOpenIddict()
                .AllowAuthorizationCodeFlow()
                .AllowTokenExchangeFlow();
         
-        // Force PKCE for Authorization Code flow
-        options.RequireProofKeyForCodeExchange();
-        
+        // TODO: Add Valid Certificate for Production
         if (builder.Environment.IsDevelopment())
         {
             options.AddDevelopmentSigningCertificate()
                 .AddDevelopmentEncryptionCertificate();
         }
 
-        // For now we just use JWTs instead of JWEs, maybe in the future we add JWE support
-        options.DisableAccessTokenEncryption();
-        options.RegisterAudiences(
-                ResourceType.Account,
-                ResourceType.Project,
-                ResourceType.LLM);
-
-        // Issuer refers to this Auth Server, hardcoded for testing purposes
-        options.SetIssuer(new Uri(config.SelfUrl));
-
-        options.SetAccessTokenLifetime(TimeSpan.FromMinutes(10));
-        options.SetRefreshTokenLifetime(TimeSpan.FromDays(30));
-
         options.UseAspNetCore()
                .EnableTokenEndpointPassthrough()
                .EnableAuthorizationEndpointPassthrough();
 
-        options.RegisterScopes(
-            Scopes.OpenId,
-            Scopes.Roles,
-            Scopes.OfflineAccess,
-            Scopes.Profile,
-            Scopes.Email,
-            ScopeType.Tenant,
-            ScopeType.Organization,
-            ScopeType.AccountWrite,
-            ScopeType.AccountRead,
-            ScopeType.ProjectWrite,
-            ScopeType.ProjectRead,
-            ScopeType.LLMWrite,
-            ScopeType.LLMRead);
-
-        options.AddEventHandler<ProcessSignInContext>(builder =>
-        {
-            builder.UseScopedHandler<AccountUserProvisioningHandler>();
-        });
+        // Main configuration of server
+        options.ConfigureServer(builder.Configuration);
     });
 
 // CORS Policy

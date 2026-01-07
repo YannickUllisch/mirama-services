@@ -1,0 +1,75 @@
+@startuml component
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+!define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
+!include FONTAWESOME/node.puml
+!include FONTAWESOME/database.puml
+!include <tupadr3/devicons/dotnet>
+
+LAYOUT_TOP_DOWN()
+LAYOUT_WITH_LEGEND()
+SHOW_PERSON_OUTLINE()
+
+System_Ext(idp, "External Identity Providers", "Google & Microsoft")
+Container(bff, "BFF API", "Next.js API Routes (Node.js)", "Backend for Frontend", $sprite="node")
+Container(backend, "Backend Services", "Backend Microservices", "The different Microservices in the setup validating and authenticating via the Auth server", $sprite="node")
+
+System_Boundary(auth_boundary, "Centralized Auth / OIDC") {
+
+    System_Boundary(auth_api_boundary, "Auth Service") {
+
+        Boundary(mvc_view, "View Layer") {
+            Component(auth_views, "Razor Views", "MVC View", "Renders Login Page")
+        }
+
+        Boundary(controller_layer, "Controller Layer") {
+            Component(authorize_controller, "AuthorizeController", "MVC Controller", "Handles /authorize endpoint")
+            Component(token_controller, "TokenController", "MVC Controller", "Handles /token endpoint")
+            Component(logout_controller, "LogoutController", "MVC Controller", "Handles /logout endpoint")
+            Component(oidc_metadata, "OpenID Metadata Endpoints", "API Routes", "Exposes OpenId Config & JWKS (.well-known)") 
+        }
+
+        Boundary(business_layer, "Application Layer") {
+            Component(authorize_logic, "Authorize Logic", "Service Model", "Business logic for authorization")
+            Component(token_logic, "Token Logic", "Service Model", "Business logic for token issuance for different OAuth2 grants/flows")
+            Component(logout_logic, "Logout Logic", "Service Model", "Business logic for logout")
+        }
+
+        Boundary(infra_layer, "Infrastructure Layer") {
+            Component(db_context, "OpenIdDbContext", "EF Core", "Data access for OpenIddict entities")
+            Component(account_service_client, "AccountServiceHttpClient", "HTTP Client", "Fetches user, tenant, org data from Account Service")
+            Component(client_worker, "ClientWorker", "Background Job", "Seeds OAuth2 clients and scopes on startup")
+        }
+    }
+    ContainerDb(auth_db, "Auth Database (Schema)", "PostgreSQL", "Stores clients, scopes, tokens", $sprite="database")
+}
+
+' External Provider Relations
+Rel_L(auth_views, idp, "Redirects user to login", "HTTPS / OAuth2 Authorization Request")
+Rel(idp, authorize_controller, "Redirects back with authorization code", "HTTPS / OAuth2 Callback")
+
+Rel(bff, auth_api_boundary, "Authenticates users & session logout", "OIDC Authorization Code + PKCE")
+Rel(account_service_client, backend, "Fetches user/tenant/org data with self-signed JWT", "HTTP")
+Rel(backend, oidc_metadata, "Validate accesstoken with OpenId Configuration & JWKS Metadata", "HTTP")
+Rel(backend, auth_api_boundary, "Authenticates with Client Credential Flow", "HTTPS")
+
+' View flow
+Rel_U(authorize_controller, auth_views, "Redirects for Authentication", "HTTPS / Redirect")
+
+' Controller to business logic 
+Rel(authorize_controller, authorize_logic, "Delegates to", "Method call")
+Rel(token_controller, token_logic, "Delegates to", "Method call")
+Rel(logout_controller, logout_logic, "Delegates to", "Method call")
+
+' Business logic to infrastructure
+Rel(authorize_logic, db_context, "Reads/Writes", "EF Core")
+Rel(token_logic, db_context, "Reads/Writes", "EF Core")
+Rel(logout_logic, db_context, "Reads/Writes", "EF Core")
+Rel(authorize_logic, account_service_client, "Validates user and builds JWT", "Method call")
+Rel(token_logic, account_service_client, "Validates user and builds JWT", "Method call")
+
+' Infrastructure to database
+Rel(db_context, auth_db, "Reads/Writes", "SQL")
+Rel(client_worker, auth_db, "Seeds clients/scopes", "SQL")
+
+@enduml
