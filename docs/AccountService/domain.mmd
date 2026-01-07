@@ -2,6 +2,14 @@
 
 %% Aggregate Root Classes
 classDiagram
+    class AggregateRoot {
+        +string Id
+    }
+
+    class Entity {
+        +string Id
+    }
+
     class User {
         +string Id
         +string Name
@@ -98,7 +106,7 @@ classDiagram
     <<ValueObject>> ContactInfo
 
 %% Relationships
-
+AggregateRoot "1" --> "1" Entity : implements
 %% User / Account
     User "1" o-- "0..*" Account : owns
     User "1" o-- "1" ContactInfo : has
