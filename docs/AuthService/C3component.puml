@@ -17,18 +17,17 @@ Container(backend, "Backend Services", "Backend Microservices", "The different M
 System_Boundary(auth_boundary, "Centralized Auth / OIDC") {
 
     System_Boundary(auth_api_boundary, "Auth Service") {
-
-        Boundary(mvc_view, "View Layer") {
-            Component(auth_views, "Razor Views", "MVC View", "Renders Login Page")
+        Boundary(presentation_layer, "Presentation Layer") {
+            Boundary(views, "Views") {
+                Component(auth_views, "Razor Views", "MVC View", "Renders Login Page")
+            }
+            Boundary(controllers, "Controllers") {
+                Component(authorize_controller, "AuthorizeController", "MVC Controller", "Handles /authorize endpoint")
+                Component(token_controller, "TokenController", "MVC Controller", "Handles /token endpoint")
+                Component(logout_controller, "LogoutController", "MVC Controller", "Handles /logout endpoint")
+                Component(oidc_metadata, "OpenID Metadata Endpoints", "API Routes", "Exposes OpenId Config & JWKS (.well-known)")
+            }
         }
-
-        Boundary(controller_layer, "Controller Layer") {
-            Component(authorize_controller, "AuthorizeController", "MVC Controller", "Handles /authorize endpoint")
-            Component(token_controller, "TokenController", "MVC Controller", "Handles /token endpoint")
-            Component(logout_controller, "LogoutController", "MVC Controller", "Handles /logout endpoint")
-            Component(oidc_metadata, "OpenID Metadata Endpoints", "API Routes", "Exposes OpenId Config & JWKS (.well-known)") 
-        }
-
         Boundary(business_layer, "Application Layer") {
             Component(authorize_logic, "Authorize Logic", "Service Model", "Business logic for authorization")
             Component(token_logic, "Token Logic", "Service Model", "Business logic for token issuance for different OAuth2 grants/flows")
@@ -51,7 +50,7 @@ Rel(idp, authorize_controller, "Redirects back with authorization code", "HTTPS 
 Rel(bff, auth_api_boundary, "Authenticates users & session logout", "OIDC Authorization Code + PKCE")
 Rel(account_service_client, backend, "Fetches user/tenant/org data with self-signed JWT", "HTTP")
 Rel(backend, oidc_metadata, "Validate accesstoken with OpenId Configuration & JWKS Metadata", "HTTP")
-Rel(backend, auth_api_boundary, "Authenticates with Client Credential Flow", "HTTPS")
+Rel_U(backend, auth_api_boundary, "Authenticates with Client Credential Flow", "HTTPS")
 
 ' View flow
 Rel_U(authorize_controller, auth_views, "Redirects for Authentication", "HTTPS / Redirect")
