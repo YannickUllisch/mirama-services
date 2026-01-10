@@ -35,6 +35,7 @@ public static class DependencyInjection
         services.AddScoped<IClaimContributor, OrganizationClaimContributor>();
         services.AddScoped<IClaimContributor, TenantClaimContributor>();
         services.AddScoped<IClaimContributor, SubjectClaimContributor>();
+        services.AddScoped<IClaimContributor, ResourcesContributor>();
 
         return services;
     }

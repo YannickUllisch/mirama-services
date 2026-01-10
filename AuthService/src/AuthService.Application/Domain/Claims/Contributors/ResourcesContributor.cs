@@ -18,7 +18,5 @@ public sealed class ResourcesContributor(IOpenIddictScopeManager scopeManager) :
     {
         var resources = await _scopeManager.ListResourcesAsync(context.GrantedScopes.ToImmutableArray()).ToListAsync();
         identity.SetResources(resources);
-
-        identity.SetResources(resources);
     }
 }
