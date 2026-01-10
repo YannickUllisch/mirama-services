@@ -1,5 +1,7 @@
 <Solution>
-  <Folder Name="/src/" />
+  <Folder Name="/src/">
+    <Project Path="src/AuthService.Application/AuthService.Application.csproj" />
+  </Folder>
   <Folder Name="/src/AuthService.Server/">
     <Project Path="src/AuthService.Server/AuthService.Server.csproj" />
   </Folder>

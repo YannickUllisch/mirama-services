@@ -1,0 +1,47 @@
+
+
+using AuthService.Application.Common;
+using AuthService.Application.Common.Interfaces;
+using AuthService.Application.Common.Interfaces.Services;
+using AuthService.Application.Domain.Claims;
+using AuthService.Application.Domain.Scopes;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
+
+namespace AuthService.Application.Services;
+
+public sealed class TokenService(
+    IAuthorizationContextFactory contextFactory,
+    IScopePolicyPipeline scopePipeline,
+    IClaimsPipeline claimsPipeline
+) : ITokenService
+{
+    private readonly IAuthorizationContextFactory _contextFactory = contextFactory;
+    private readonly IScopePolicyPipeline _scopePipeline = scopePipeline;
+    private readonly IClaimsPipeline _claimsPipeline = claimsPipeline;
+
+    /// <summary>
+    /// Handles all token flows in a unified way:
+    /// AuthorizationCode, RefreshToken, ClientCredentials, TokenExchange
+    /// </summary>
+    public async Task<AuthorizationResult> HandleAsync(HttpContext httpContext, AuthenticateResult result)
+    {
+        // Build the context based on the flow
+        var context = await _contextFactory.CreateForTokenAsync(httpContext, result);
+
+        // Apply scope rules (permissions)
+        var decision = _scopePipeline.Evaluate(context);
+        if (decision.IsDenied)
+        {
+            return AuthorizationResult.Deny(
+                decision.Error!,
+                decision.ErrorDescription!);
+        }
+
+        // Build claims principal (includes claims + scopes + resources via contributors)
+        var principal = await _claimsPipeline.BuildAsync(decision.Context);
+
+        // Return for OpenIddict to sign
+        return AuthorizationResult.Success(principal);
+    }
+}

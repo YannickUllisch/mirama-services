@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Security.Claims;
+using AuthService.Application.Common.Interfaces.Services;
 using AuthService.Server.Common.Types;
 using AuthService.Server.Common.Utils;
 using Microsoft.AspNetCore;
@@ -12,29 +13,55 @@ using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace AuthService.Server.Controllers;
 
-public class TokenController(IOpenIddictApplicationManager applicationManager, IOpenIddictScopeManager scopeManager) : Controller
+public class TokenController(IOpenIddictApplicationManager applicationManager, IOpenIddictScopeManager scopeManager, ITokenService tokenService) : Controller
 {
     private readonly IOpenIddictApplicationManager _applicationManager = applicationManager;
     private readonly IOpenIddictScopeManager _scopeManager = scopeManager;
+    private readonly ITokenService _tokenService = tokenService;
 
     [HttpPost("~/connect/token"), Produces("application/json")]
-    public async Task<IActionResult> Exchange()
+    public async Task<IActionResult> GetToken()
     {
-        var request = HttpContext.GetOpenIddictServerRequest();
-        if (request is null)
+        var auth = await HttpContext.AuthenticateAsync(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+
+        var result = await _tokenService.HandleAsync(HttpContext, auth);
+
+        if (result.IsDenied)
         {
-            return BadRequest("Invalid OpenIddict request.");
+            return Forbid(
+                new AuthenticationProperties
+                {
+                    Items =
+                    {
+                        [OpenIddictServerAspNetCoreConstants.Properties.Error] = result.Error,
+                        [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = result.ErrorDescription
+                    }
+                },
+                OpenIddictServerAspNetCoreDefaults.AuthenticationScheme
+            );
         }
 
-        return request.GrantType switch
-        {
-            GrantTypes.ClientCredentials => await HandleClientCredentialsGrantAsync(request),
-            GrantTypes.AuthorizationCode => await HandleAuthorizationCodeGrantAsync(request),
-            GrantTypes.RefreshToken => await HandleRefreshTokenGrantAsync(request),
-            GrantTypes.TokenExchange => await HandleTokenExchangeGrantAsync(request),
-            _ => BadRequest("Unsupported grant type."),
-        };
+        return SignIn(result.Principal!, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
     }
+
+    // [HttpPost("~/connect/token"), Produces("application/json")]
+    // public async Task<IActionResult> Exchange()
+    // {
+    //     var request = HttpContext.GetOpenIddictServerRequest();
+    //     if (request is null)
+    //     {
+    //         return BadRequest("Invalid OpenIddict request.");
+    //     }
+
+    //     return request.GrantType switch
+    //     {
+    //         GrantTypes.ClientCredentials => await HandleClientCredentialsGrantAsync(request),
+    //         GrantTypes.AuthorizationCode => await HandleAuthorizationCodeGrantAsync(request),
+    //         GrantTypes.RefreshToken => await HandleRefreshTokenGrantAsync(request),
+    //         GrantTypes.TokenExchange => await HandleTokenExchangeGrantAsync(request),
+    //         _ => BadRequest("Unsupported grant type."),
+    //     };
+    // }
 
     private async Task<IActionResult> HandleClientCredentialsGrantAsync(OpenIddictRequest request)
     {

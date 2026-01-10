@@ -3,13 +3,10 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using AuthService.Server.Common.Options;
 using Microsoft.Extensions.Options;
-using static OpenIddict.Abstractions.OpenIddictConstants;
 using AuthService.Server.Infrastructure.BackgroundJobs;
 using AuthService.Server.Infrastructure.Persistence;
-using AuthService.Server.Common.Types;
-using static OpenIddict.Server.OpenIddictServerEvents;
-using AuthService.Server.Common.EventHandlers;
 using AuthService.Server.Infrastructure.OpenIddict;
+using AuthService.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -64,6 +61,7 @@ builder.Services.AddOpenIddict()
         // and Token exchange flow for organization/tenant switches
         options.AllowClientCredentialsFlow()
                .AllowAuthorizationCodeFlow()
+               .AllowRefreshTokenFlow()
                .AllowTokenExchangeFlow();
         
         // TODO: Add Valid Certificate for Production
@@ -102,6 +100,9 @@ builder.Services.AddDbContext<OpenIdDbContext>((sp, options) =>
         .MigrationsAssembly(typeof(OpenIdDbContext).Assembly.FullName)
         .MigrationsHistoryTable(tableName: "__EFMigrationsHistory", schema: "auth"));
 });
+
+// Application Services DI injection
+builder.Services.AddApplication();
 
 var app = builder.Build();
 
