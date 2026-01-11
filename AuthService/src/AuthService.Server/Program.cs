@@ -1,21 +1,14 @@
 
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
-using AuthService.Server.Common.Options;
-using Microsoft.Extensions.Options;
-using AuthService.Server.Infrastructure.BackgroundJobs;
-using AuthService.Server.Infrastructure.Persistence;
-using AuthService.Server.Infrastructure.OpenIddict;
 using AuthService.Application;
+using AuthService.Application.Infrastructure.OpenIddict;
+using AuthService.Application.Infrastructure.Persistence;
+using AuthService.Application.Common.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
-
-// Options pattern Configuration
-builder.Services.Configure<ApplicationOptions>(builder.Configuration.GetSection(ApplicationOptions.Application));
-builder.Services.Configure<GoogleOptions>(builder.Configuration.GetSection(GoogleOptions.Google));
-builder.Services.Configure<OAuthClientOptions>(builder.Configuration.GetSection(OAuthClientOptions.Clients));
 
 builder.Services.AddAuthentication(options =>
     {
@@ -91,18 +84,10 @@ builder.Services.AddCors(options =>
         });
 });
 
-builder.Services.AddHostedService<ClientWorker>();
-
-builder.Services.AddDbContext<OpenIdDbContext>((sp, options) =>
-{
-    var infra = sp.GetRequiredService<IOptions<ApplicationOptions>>().Value;
-    options.UseNpgsql(infra.DatabaseConnection, b => b
-        .MigrationsAssembly(typeof(OpenIdDbContext).Assembly.FullName)
-        .MigrationsHistoryTable(tableName: "__EFMigrationsHistory", schema: "auth"));
-});
-
 // Application Services DI injection
-builder.Services.AddApplication().AddInfrastructure();
+builder.Services
+    .AddApplication()
+    .AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 

@@ -1,5 +1,6 @@
 
 using AuthService.Application.Common.Interfaces;
+using AuthService.Application.Common.Options;
 using AuthService.Application.Domain.Authorization;
 using AuthService.Application.Domain.Authorization.Interfaces;
 using AuthService.Application.Domain.Claims;
@@ -10,8 +11,13 @@ using AuthService.Application.Domain.Scopes.Interfaces;
 using AuthService.Application.Domain.Scopes.Rules.Expansion;
 using AuthService.Application.Domain.Scopes.Rules.Filtering;
 using AuthService.Application.Domain.Scopes.Rules.Validation;
+using AuthService.Application.Infrastructure.BackgroundJobs;
+using AuthService.Application.Infrastructure.Persistence;
 using AuthService.Application.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Microsoft.EntityFrameworkCore;
 
 namespace AuthService.Application;
 
@@ -52,8 +58,24 @@ public static class DependencyInjection
         return services;
     }
 
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services)
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
     {
+        // Options pattern Configuration
+        services.Configure<ApplicationOptions>(config.GetSection(ApplicationOptions.Application));
+        services.Configure<GoogleOptions>(config.GetSection(GoogleOptions.Google));
+        services.Configure<OAuthClientOptions>(config.GetSection(OAuthClientOptions.Clients));
+
+        // Background Jobs
+        services.AddHostedService<ClientWorker>();
+
+        // Database
+        services.AddDbContext<OpenIdDbContext>((sp, options) =>
+        {
+            var infra = sp.GetRequiredService<IOptions<ApplicationOptions>>().Value;
+            options.UseNpgsql(infra.DatabaseConnection, b => b
+                .MigrationsAssembly(typeof(OpenIdDbContext).Assembly.FullName)
+                .MigrationsHistoryTable(tableName: "__EFMigrationsHistory", schema: "auth"));
+        });
         return services;
     }
 }
