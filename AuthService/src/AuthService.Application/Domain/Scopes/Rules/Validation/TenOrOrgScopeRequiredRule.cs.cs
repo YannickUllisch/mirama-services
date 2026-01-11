@@ -1,5 +1,6 @@
 
-using AuthService.Application.Common.Interfaces;
+using AuthService.Application.Domain.Authorization.Interfaces;
+using AuthService.Application.Domain.Scopes.Interfaces;
 using OpenIddict.Abstractions;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 

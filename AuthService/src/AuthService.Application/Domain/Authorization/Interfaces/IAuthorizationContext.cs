@@ -1,6 +1,7 @@
 using System.Security.Claims;
+using AuthService.Application.Domain.Authentication.Interfaces;
 
-namespace AuthService.Application.Common.Interfaces;
+namespace AuthService.Application.Domain.Authorization.Interfaces;
 
 public interface IAuthorizationContext
 {

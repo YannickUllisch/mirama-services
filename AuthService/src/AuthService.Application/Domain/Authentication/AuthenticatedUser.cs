@@ -1,8 +1,8 @@
 
 
-using AuthService.Application.Common.Interfaces;
+using AuthService.Application.Domain.Authentication.Interfaces;
 
-namespace AuthService.Application.Common;
+namespace AuthService.Application.Domain.Authentication;
 
 public class AuthenticatedUser : IAuthenticatedUser
 {

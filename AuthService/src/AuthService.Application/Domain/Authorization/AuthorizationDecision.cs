@@ -1,7 +1,7 @@
 
-using AuthService.Application.Common.Interfaces;
+using AuthService.Application.Domain.Authorization.Interfaces;
 
-namespace AuthService.Application.Common;
+namespace AuthService.Application.Domain.Authorization;
 
 public sealed class AuthorizationDecision
 {

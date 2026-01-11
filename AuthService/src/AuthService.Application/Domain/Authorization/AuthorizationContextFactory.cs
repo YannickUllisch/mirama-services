@@ -1,5 +1,6 @@
 
-using AuthService.Application.Common.Interfaces;
+using AuthService.Application.Domain.Authentication;
+using AuthService.Application.Domain.Authorization.Interfaces;
 using AuthService.Application.Domain.Claims;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
@@ -7,7 +8,7 @@ using Microsoft.AspNetCore.Http;
 using OpenIddict.Abstractions;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
-namespace AuthService.Application.Common;
+namespace AuthService.Application.Domain.Authorization;
 
 public sealed class AuthorizationContextFactory(IOpenIddictApplicationManager applicationManager) : IAuthorizationContextFactory
 {

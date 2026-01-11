@@ -1,9 +1,12 @@
-using AuthService.Application.Common;
+
 using AuthService.Application.Common.Interfaces;
-using AuthService.Application.Common.Interfaces.Services;
+using AuthService.Application.Domain.Authorization;
+using AuthService.Application.Domain.Authorization.Interfaces;
 using AuthService.Application.Domain.Claims;
 using AuthService.Application.Domain.Claims.Contributors;
+using AuthService.Application.Domain.Claims.Interfaces;
 using AuthService.Application.Domain.Scopes;
+using AuthService.Application.Domain.Scopes.Interfaces;
 using AuthService.Application.Domain.Scopes.Rules.Expansion;
 using AuthService.Application.Domain.Scopes.Rules.Filtering;
 using AuthService.Application.Domain.Scopes.Rules.Validation;
@@ -26,16 +29,16 @@ public static class DependencyInjection
         // Scope Pipeline Registration
         services.AddScoped<IScopePolicyPipeline, ScopePolicyPipeline>();
         // Expansion Rules
-        services.AddScoped<IAuthorizationRule, TenantScopeExpansionRule>();
-        services.AddScoped<IAuthorizationRule, OrganizationScopeExpansionRule>();
+        services.AddScoped<IScopeRule, TenantScopeExpansionRule>();
+        services.AddScoped<IScopeRule, OrganizationScopeExpansionRule>();
         // Filtering Rules
-        services.AddScoped<IAuthorizationRule, ClientCredsScopeFilteringRule>();
-        services.AddScoped<IAuthorizationRule, RoleScopeFilteringRule>();
-        services.AddScoped<IAuthorizationRule, RefreshTokenScopeFilteringRule>();
+        services.AddScoped<IScopeRule, ClientCredsScopeFilteringRule>();
+        services.AddScoped<IScopeRule, RoleScopeFilteringRule>();
+        services.AddScoped<IScopeRule, RefreshTokenScopeFilteringRule>();
         // Validation Rules
-        services.AddScoped<IAuthorizationRule, OpenIdScopeRequiredRule>();
-        services.AddScoped<IAuthorizationRule, OrganizationPrecedenceRule>();
-        services.AddScoped<IAuthorizationRule, TenantOrOrganizationScopeRequiredRule>();
+        services.AddScoped<IScopeRule, OpenIdScopeRequiredRule>();
+        services.AddScoped<IScopeRule, OrganizationPrecedenceRule>();
+        services.AddScoped<IScopeRule, TenantOrOrganizationScopeRequiredRule>();
 
 
         // Claim Building Pipeline Registration
@@ -46,6 +49,11 @@ public static class DependencyInjection
         services.AddScoped<IClaimContributor, SubjectClaimContributor>();
         services.AddScoped<IClaimContributor, ResourcesContributor>();
 
+        return services;
+    }
+
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services)
+    {
         return services;
     }
 }

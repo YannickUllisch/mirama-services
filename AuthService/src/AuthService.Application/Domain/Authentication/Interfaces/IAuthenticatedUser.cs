@@ -1,5 +1,5 @@
 
-namespace AuthService.Application.Common.Interfaces;
+namespace AuthService.Application.Domain.Authentication.Interfaces;
 
 public interface IAuthenticatedUser
 {

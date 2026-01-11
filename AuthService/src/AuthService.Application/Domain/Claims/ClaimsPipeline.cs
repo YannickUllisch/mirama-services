@@ -1,8 +1,9 @@
 
 using System.Security.Claims;
-using AuthService.Application.Common.Interfaces;
 using OpenIddict.Abstractions;
 using Microsoft.IdentityModel.Tokens;
+using AuthService.Application.Domain.Claims.Interfaces;
+using AuthService.Application.Domain.Authorization.Interfaces;
 
 namespace AuthService.Application.Domain.Claims;
 

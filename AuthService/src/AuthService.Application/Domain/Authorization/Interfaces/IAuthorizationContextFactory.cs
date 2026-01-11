@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 
-namespace AuthService.Application.Common.Interfaces;
+namespace AuthService.Application.Domain.Authorization.Interfaces;
 
 public interface IAuthorizationContextFactory
 {

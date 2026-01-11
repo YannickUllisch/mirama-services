@@ -1,15 +1,9 @@
-using System.Security.Claims;
-using AuthService.Application.Common.Interfaces.Services;
-using AuthService.Server.Common.Types;
-using AuthService.Server.Common.Utils;
-using Microsoft.AspNetCore;
+
+using AuthService.Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
-using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace AuthService.Server.Controllers;
 

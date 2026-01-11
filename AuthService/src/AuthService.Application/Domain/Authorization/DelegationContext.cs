@@ -1,5 +1,5 @@
 
-namespace AuthService.Application.Common;
+namespace AuthService.Application.Domain.Authorization;
 
 public sealed record DelegationContext
 {

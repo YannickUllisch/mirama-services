@@ -1,10 +1,9 @@
 
-
-using AuthService.Application.Common;
 using AuthService.Application.Common.Interfaces;
-using AuthService.Application.Common.Interfaces.Services;
-using AuthService.Application.Domain.Claims;
-using AuthService.Application.Domain.Scopes;
+using AuthService.Application.Domain.Authorization;
+using AuthService.Application.Domain.Authorization.Interfaces;
+using AuthService.Application.Domain.Claims.Interfaces;
+using AuthService.Application.Domain.Scopes.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 

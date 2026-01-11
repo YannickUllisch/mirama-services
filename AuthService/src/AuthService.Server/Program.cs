@@ -102,7 +102,7 @@ builder.Services.AddDbContext<OpenIdDbContext>((sp, options) =>
 });
 
 // Application Services DI injection
-builder.Services.AddApplication();
+builder.Services.AddApplication().AddInfrastructure();
 
 var app = builder.Build();
 

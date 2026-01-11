@@ -1,7 +1,7 @@
 
 using System.Security.Claims;
 
-namespace AuthService.Application.Common;
+namespace AuthService.Application.Domain.Authorization;
 
 public sealed class AuthorizationResult
 {

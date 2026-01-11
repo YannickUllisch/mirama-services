@@ -1,13 +1,13 @@
 
-
-using AuthService.Application.Common;
-using AuthService.Application.Common.Interfaces;
+using AuthService.Application.Domain.Authorization;
+using AuthService.Application.Domain.Authorization.Interfaces;
+using AuthService.Application.Domain.Scopes.Interfaces;
 
 namespace AuthService.Application.Domain.Scopes;
 
 public sealed class ScopePolicyPipeline(IEnumerable<IScopeRule> rules) : IScopePolicyPipeline
 {
-    private readonly IEnumerable<IAuthorizationRule> _rules = rules
+    private readonly IEnumerable<IScopeRule> _rules = rules
             .OrderBy(r => r.Phase)
             .ToList();
 

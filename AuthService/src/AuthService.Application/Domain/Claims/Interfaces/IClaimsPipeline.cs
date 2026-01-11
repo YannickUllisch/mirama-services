@@ -1,8 +1,8 @@
 
 using System.Security.Claims;
-using AuthService.Application.Common.Interfaces;
+using AuthService.Application.Domain.Authorization.Interfaces;
 
-namespace AuthService.Application.Domain.Claims;
+namespace AuthService.Application.Domain.Claims.Interfaces;
 
 public interface IClaimsPipeline
 {

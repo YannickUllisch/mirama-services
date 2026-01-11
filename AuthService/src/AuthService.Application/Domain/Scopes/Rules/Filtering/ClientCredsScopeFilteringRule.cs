@@ -1,6 +1,6 @@
 
-
-using AuthService.Application.Common.Interfaces;
+using AuthService.Application.Domain.Authorization.Interfaces;
+using AuthService.Application.Domain.Scopes.Interfaces;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace AuthService.Application.Domain.Scopes.Rules.Filtering;

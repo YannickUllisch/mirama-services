@@ -1,9 +1,8 @@
 using System.Collections.Immutable;
 using System.Security.Claims;
-using AuthService.Application.Common.Interfaces.Services;
+using AuthService.Application.Common.Interfaces;
 using AuthService.Server.Common.Types;
 using AuthService.Server.Common.Utils;
-using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;

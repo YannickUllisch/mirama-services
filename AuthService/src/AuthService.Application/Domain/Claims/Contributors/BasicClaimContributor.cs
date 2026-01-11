@@ -1,7 +1,7 @@
 
-
 using System.Security.Claims;
-using AuthService.Application.Common.Interfaces;
+using AuthService.Application.Domain.Authorization.Interfaces;
+using AuthService.Application.Domain.Claims.Interfaces;
 using AuthService.Application.Domain.Scopes;
 
 namespace AuthService.Application.Domain.Claims.Contributors;
