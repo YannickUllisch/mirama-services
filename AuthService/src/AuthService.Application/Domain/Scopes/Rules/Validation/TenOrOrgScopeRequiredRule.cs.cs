@@ -3,11 +3,13 @@ using AuthService.Application.Common.Interfaces;
 using OpenIddict.Abstractions;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
-namespace AuthService.Application.Domain.Scopes.Rules;
+namespace AuthService.Application.Domain.Scopes.Rules.Validation;
 
 public sealed class TenantOrOrganizationScopeRequiredRule : IScopeRule
 {
     public IEnumerable<string> SupportedGrantTypes => [GrantTypes.AuthorizationCode, GrantTypes.TokenExchange, GrantTypes.RefreshToken];
+
+    public ScopeRulePhase Phase => ScopeRulePhase.Validation;
 
     public bool IsApplicable(IAuthorizationContext context)
         => SupportedGrantTypes.Contains(context.GrantType);

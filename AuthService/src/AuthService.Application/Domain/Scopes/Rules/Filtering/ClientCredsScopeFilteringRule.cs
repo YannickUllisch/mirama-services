@@ -1,14 +1,14 @@
 
 
-using AuthService.Application.Common;
 using AuthService.Application.Common.Interfaces;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
-namespace AuthService.Application.Domain.Scopes.Rules;
+namespace AuthService.Application.Domain.Scopes.Rules.Filtering;
 
-public sealed class ClientCredentialsScopeRule : IScopeRule
+public sealed class ClientCredsScopeFilteringRule : IScopeRule
 {
     public IEnumerable<string> SupportedGrantTypes => [GrantTypes.ClientCredentials];
+    public ScopeRulePhase Phase => ScopeRulePhase.Filtering;
 
     private static readonly HashSet<string> Allowed =
     [

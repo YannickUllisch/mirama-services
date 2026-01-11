@@ -5,9 +5,11 @@ using AuthService.Application.Common.Interfaces;
 
 namespace AuthService.Application.Domain.Scopes;
 
-public sealed class ScopePolicyPipeline(IEnumerable<IAuthorizationRule> rules) : IScopePolicyPipeline
+public sealed class ScopePolicyPipeline(IEnumerable<IScopeRule> rules) : IScopePolicyPipeline
 {
-    private readonly IEnumerable<IAuthorizationRule> _rules = rules;
+    private readonly IEnumerable<IAuthorizationRule> _rules = rules
+            .OrderBy(r => r.Phase)
+            .ToList();
 
     public AuthorizationDecision Evaluate(IAuthorizationContext context)
     {

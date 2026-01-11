@@ -4,7 +4,9 @@ using AuthService.Application.Common.Interfaces.Services;
 using AuthService.Application.Domain.Claims;
 using AuthService.Application.Domain.Claims.Contributors;
 using AuthService.Application.Domain.Scopes;
-using AuthService.Application.Domain.Scopes.Rules;
+using AuthService.Application.Domain.Scopes.Rules.Expansion;
+using AuthService.Application.Domain.Scopes.Rules.Filtering;
+using AuthService.Application.Domain.Scopes.Rules.Validation;
 using AuthService.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -23,11 +25,18 @@ public static class DependencyInjection
 
         // Scope Pipeline Registration
         services.AddScoped<IScopePolicyPipeline, ScopePolicyPipeline>();
-        services.AddScoped<IAuthorizationRule, ClientCredentialsScopeRule>();
-        services.AddScoped<IAuthorizationRule, OrganizationPrecedenceScopeRule>();
-        services.AddScoped<IAuthorizationRule, RefreshTokenScopeRule>();
-        services.AddScoped<IAuthorizationRule, RoleScopeRule>();
+        // Expansion Rules
+        services.AddScoped<IAuthorizationRule, TenantScopeExpansionRule>();
+        services.AddScoped<IAuthorizationRule, OrganizationScopeExpansionRule>();
+        // Filtering Rules
+        services.AddScoped<IAuthorizationRule, ClientCredsScopeFilteringRule>();
+        services.AddScoped<IAuthorizationRule, RoleScopeFilteringRule>();
+        services.AddScoped<IAuthorizationRule, RefreshTokenScopeFilteringRule>();
+        // Validation Rules
+        services.AddScoped<IAuthorizationRule, OpenIdScopeRequiredRule>();
+        services.AddScoped<IAuthorizationRule, OrganizationPrecedenceRule>();
         services.AddScoped<IAuthorizationRule, TenantOrOrganizationScopeRequiredRule>();
+
 
         // Claim Building Pipeline Registration
         services.AddScoped<IClaimsPipeline, ClaimsPipeline>();

@@ -1,15 +1,15 @@
 
-using AuthService.Application.Common;
 using AuthService.Application.Common.Interfaces;
 using OpenIddict.Abstractions;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
-namespace AuthService.Application.Domain.Scopes.Rules;
+namespace AuthService.Application.Domain.Scopes.Rules.Filtering;
 
-public sealed class RefreshTokenScopeRule : IScopeRule
+public sealed class RefreshTokenScopeFilteringRule : IScopeRule
 {
     public IEnumerable<string> SupportedGrantTypes => [GrantTypes.RefreshToken];
 
+    public ScopeRulePhase Phase => ScopeRulePhase.Filtering;
 
     public void Apply(IAuthorizationContext context)
     {

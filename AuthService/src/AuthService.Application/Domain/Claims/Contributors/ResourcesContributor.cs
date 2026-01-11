@@ -2,7 +2,6 @@
 using System.Collections.Immutable;
 using System.Security.Claims;
 using AuthService.Application.Common.Interfaces;
-using AuthService.Application.Domain.Scopes;
 using OpenIddict.Abstractions;
 
 namespace AuthService.Application.Domain.Claims.Contributors;

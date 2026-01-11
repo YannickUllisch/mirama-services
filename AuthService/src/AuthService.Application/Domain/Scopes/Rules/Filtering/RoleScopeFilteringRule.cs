@@ -1,14 +1,14 @@
 
-using System.Security.Claims;
-using AuthService.Application.Common;
 using AuthService.Application.Common.Interfaces;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
-namespace AuthService.Application.Domain.Scopes.Rules;
+namespace AuthService.Application.Domain.Scopes.Rules.Filtering;
 
-public sealed class RoleScopeRule : IScopeRule
+public sealed class RoleScopeFilteringRule : IScopeRule
 {
     public IEnumerable<string> SupportedGrantTypes => [GrantTypes.AuthorizationCode, GrantTypes.RefreshToken, GrantTypes.TokenExchange];
+
+    public ScopeRulePhase Phase => ScopeRulePhase.Filtering;
 
     public static readonly Dictionary<string, string[]> AllowedScopesByRole = new()
     {
