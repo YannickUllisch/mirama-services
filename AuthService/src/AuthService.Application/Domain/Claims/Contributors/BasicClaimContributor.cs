@@ -8,7 +8,7 @@ namespace AuthService.Application.Domain.Claims.Contributors;
 
 public class BasicClaimsContributor : IClaimContributor
 {
-    public bool IsApplicable(IAuthorizationContext context) => true; 
+    public bool IsApplicable(IAuthorizationContext context) => true;
 
     public Task Contribute(IAuthorizationContext context, ClaimsIdentity identity)
     {

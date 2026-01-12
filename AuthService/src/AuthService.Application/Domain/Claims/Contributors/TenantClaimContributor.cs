@@ -15,7 +15,7 @@ public sealed class TenantClaimContributor : IClaimContributor
     public Task Contribute(IAuthorizationContext context, ClaimsIdentity identity)
     {
         identity.SetClaim(ClaimType.Tenant, context.AuthenticatedUser!.TenantId);
-        
+
         return Task.CompletedTask;
     }
 }

@@ -22,7 +22,7 @@ builder.Services.AddAuthentication(options =>
     })
     .AddGoogle(options =>
     {
-        var config = builder.Configuration.GetSection(GoogleOptions.Google).Get<GoogleOptions>() 
+        var config = builder.Configuration.GetSection(GoogleOptions.Google).Get<GoogleOptions>()
             ?? throw new InvalidOperationException("Google authentication configuration is missing or invalid.");
         options.ClientId = config.ClientId;
         options.ClientSecret = config.ClientSecret;
@@ -56,7 +56,7 @@ builder.Services.AddOpenIddict()
                .AllowAuthorizationCodeFlow()
                .AllowRefreshTokenFlow()
                .AllowTokenExchangeFlow();
-        
+
         // TODO: Add Valid Certificate for Production
         if (builder.Environment.IsDevelopment())
         {

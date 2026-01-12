@@ -1,7 +1,9 @@
 
-using AuthService.Application.Domain.Authentication;
+using System.Security.Claims;
+using AuthService.Application.Common.Extension;
 using AuthService.Application.Domain.Authorization.Interfaces;
 using AuthService.Application.Domain.Claims;
+using AuthService.Application.Infrastructure.HttpServices;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
@@ -10,72 +12,69 @@ using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace AuthService.Application.Domain.Authorization;
 
-public sealed class AuthorizationContextFactory(IOpenIddictApplicationManager applicationManager) : IAuthorizationContextFactory
+public sealed class AuthorizationContextFactory(IOpenIddictApplicationManager applicationManager, IAccountHttpClient accountClient) : IAuthorizationContextFactory
 {
     private readonly IOpenIddictApplicationManager _applicationManager = applicationManager;
+    private readonly IAccountHttpClient _accountClient = accountClient;
 
-    public Task<IAuthorizationContext> CreateForAuthorizeAsync(HttpContext httpContext, AuthenticateResult result)
+    public async Task<IAuthorizationContext> CreateForAuthorizeAsync(HttpContext httpContext, AuthenticateResult result)
     {
-        var oidcRequest = httpContext.GetOpenIddictServerRequest() 
-            ?? throw new InvalidOperationException("Invalid OpenID Connect request.");;
+        var oidcRequest = GetOidcRequest(httpContext);
+        var principal = result.Principal!;
 
-        // Trying to extract OrgId if passed as query param
-        Guid? orgId = null;
-        var orgIdString = httpContext.Request.Query["organization_id"].FirstOrDefault();
-        if (Guid.TryParse(orgIdString, out var parsedOrgId))
-        {
-            orgId = parsedOrgId;
-        }
+        var orgId = httpContext.Request.Query["organization_id"].FirstOrDefault();
 
-        // TODO: Fetch properly
-        // var accountId = authPrincipal.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        // var userInfo = await _accountService.GetUserAsync(accountId);
+        var user = await _accountClient.GetOrCreateUserAsync(
+            accountId: principal.GetRequiredClaim(ClaimTypes.NameIdentifier, "sub"),
+            email: principal.GetRequiredClaim(ClaimTypes.Email, "email"),
+            name: principal.GetRequiredClaim(ClaimTypes.Name, "name"),
+            address: "addressString", // TODO
+            image: principal.GetOptionalClaim("picture"),
+            orgId: orgId
+        );
 
-        // Add User Details - fetch from actual HTTPClient later
-        var user = new AuthenticatedUser
-        {
-            UserId = Guid.NewGuid(),
-            TenantId = Guid.NewGuid(),
-            OrganizationId = orgId == null ? orgId : Guid.NewGuid(),
-            Email = "user@example.com",
-            Name = "John Doe",
-            Role = "admin",
-            IsActive = true,
-            Image = "https://example.com/avatar.png"
-        };
+        var scopes = oidcRequest.GetScopes().ToHashSet();
 
-        return Task.FromResult<IAuthorizationContext>(new AuthorizationContext
+        return new AuthorizationContext
         {
             Subject = httpContext.User,
             GrantType = oidcRequest.GrantType!,
-            OrganizationId = orgId,
-            RequestedScopes = oidcRequest.GetScopes().ToHashSet(),
-            GrantedScopes = oidcRequest.GetScopes().ToHashSet(),
+            OrganizationId = user.OrganizationId,
+            TenantId = user.TenantId,
+            RequestedScopes = scopes,
+            GrantedScopes = scopes,
             AuthenticatedUser = user,
-        });
+        };
     }
 
     public async Task<IAuthorizationContext> CreateForTokenAsync(HttpContext httpContext, AuthenticateResult result)
     {
-        var oidcRequest = httpContext.GetOpenIddictServerRequest() 
-            ?? throw new InvalidOperationException("Invalid OpenID Connect request.");;
+        var oidcRequest = GetOidcRequest(httpContext);
+
+        // Values might be set if using Authorization Code, Refresh Token or Exchange Token Grants
+        string? tenantId = result.Principal!.FindFirst(ClaimType.Tenant)?.Value;
+        string? orgId = result.Principal!.FindFirst(ClaimType.Organization)?.Value;
+
+        var scopes = oidcRequest.GetScopes().ToHashSet();
 
         var context = new AuthorizationContext
         {
+            Subject = httpContext.User,
             GrantType = oidcRequest.GrantType!,
-            RequestedScopes = oidcRequest.GetScopes().ToHashSet(),
-            GrantedScopes = oidcRequest.GetScopes().ToHashSet()
+            RequestedScopes = scopes,
+            GrantedScopes = scopes,
+            TenantId = tenantId,
+            OrganizationId = orgId,
         };
 
         switch (oidcRequest.GrantType)
         {
             case GrantTypes.AuthorizationCode:
-                Console.WriteLine("HERE IN CORRECT AUTHCODE FLOW");
-                await PopulateFromAuthorizationCode(context, result);
+                await PopulateFromUserPrincipal(context, result.Principal);
                 break;
 
             case GrantTypes.RefreshToken:
-                PopulateFromRefreshToken(context, result);
+                await PopulateFromUserPrincipal(context, result.Principal);
                 break;
 
             case GrantTypes.ClientCredentials:
@@ -83,7 +82,7 @@ public sealed class AuthorizationContextFactory(IOpenIddictApplicationManager ap
                 break;
 
             case GrantTypes.TokenExchange:
-                PopulateFromTokenExchange(context, result, oidcRequest);
+                await PopulateFromTokenExchange(context, result, oidcRequest);
                 break;
 
             default:
@@ -97,75 +96,66 @@ public sealed class AuthorizationContextFactory(IOpenIddictApplicationManager ap
     }
 
 
-    private Task PopulateFromAuthorizationCode(AuthorizationContext context, AuthenticateResult result)
+    private async Task PopulateFromUserPrincipal(AuthorizationContext context, ClaimsPrincipal principal)
+    {
+        // Set to previously calculated scopes
+        context.GrantedScopes = principal.GetScopes().ToHashSet();
+
+        if (context.TenantId is null)
+        {
+            context.Reject(
+                Errors.InvalidGrant,
+                "TenantId is missing for token generation.");
+            return;
+        }
+
+        var userId = principal.FindFirst(ClaimType.Subject)?.Value;
+        if (userId is null)
+        {
+            context.Reject(
+                Errors.InvalidGrant,
+                "Subject claim is missing.");
+            return;
+        }
+
+        context.AuthenticatedUser = await _accountClient.GetUserAsync(userId, context.OrganizationId);
+    }
+
+    private async Task PopulateFromTokenExchange(AuthorizationContext context, AuthenticateResult result, OpenIddictRequest request)
     {
         var principal = result.Principal!;
         context.GrantedScopes = principal.GetScopes().ToHashSet();
 
-        // Hardcoded user
-        context.AuthenticatedUser = new AuthenticatedUser
+        if (context.TenantId == null && context.ClientId == null)
         {
-            UserId = Guid.NewGuid(),
-            TenantId = Guid.NewGuid(),
-            OrganizationId = principal.FindFirst(ClaimType.Organization)?.Value is string orgStr && Guid.TryParse(orgStr, out var orgId) ? orgId : null,
-            Email = "user@example.com",
-            Name = "John Doe",
-            Role = "admin",
-            IsActive = true,
-            Image = "https://example.com/avatar.png"
-        };
+            context.Reject(
+                Errors.InvalidGrant,
+                "Either tenant or client must be present for token exchange.");
+            return;
+        }
 
-        return Task.CompletedTask;
+
+        string? userId = (result.Principal!.FindFirst(ClaimType.Subject)?.Value)
+            ?? throw new MissingFieldException("UserId is missing for Token generation");
+
+
+        context.AuthenticatedUser = await _accountClient.GetUserAsync(userId, context.OrganizationId);
+
+        // TODO: Write full token exchange handler with delegation logic
     }
-
-    private void PopulateFromRefreshToken(AuthorizationContext context, AuthenticateResult result)
-    {
-        var principal = result.Principal!;
-        context.GrantedScopes = principal.GetScopes().ToHashSet();
-
-        // Hardcoded user
-        context.AuthenticatedUser = new AuthenticatedUser
-        {
-            UserId = Guid.NewGuid(),
-            TenantId = Guid.NewGuid(),
-            OrganizationId = principal.FindFirst(ClaimType.Organization)?.Value is string orgStr && Guid.TryParse(orgStr, out var orgId) ? orgId : null,
-            Email = "user@example.com",
-            Name = "John Doe",
-            Role = "admin",
-            IsActive = true,
-            Image = "https://example.com/avatar.png"
-        };
-    }
-
 
     private async Task PopulateFromClientCredentials(AuthorizationContext context, OpenIddictRequest request)
     {
-        var application = await _applicationManager.FindByClientIdAsync(request.ClientId!) ??
-            throw new InvalidOperationException("The application cannot be found.");
+        // TODO: Write frull ClientCreds handler
+        var application = await _applicationManager.FindByClientIdAsync(request.ClientId!)
+            ?? throw new InvalidOperationException("The application cannot be found.");
 
         context.ClientId = await _applicationManager.GetClientIdAsync(application);
     }
 
 
-    private void PopulateFromTokenExchange(AuthorizationContext context, AuthenticateResult result, OpenIddictRequest request)
-    {
-        var principal = result.Principal!;
-        context.GrantedScopes = principal.GetScopes().ToHashSet();
+    private static OpenIddictRequest GetOidcRequest(HttpContext context) =>
+        context.GetOpenIddictServerRequest()
+        ?? throw new InvalidOperationException("Invalid OpenID Connect request.");
 
-        // Hardcoded delegated user for now
-        context.AuthenticatedUser = new AuthenticatedUser
-        {
-            UserId = Guid.NewGuid(),
-            TenantId = Guid.NewGuid(),
-            OrganizationId = request.GetParameter("organization_id")?.ToString() is string orgStr && Guid.TryParse(orgStr, out var orgId) ? orgId : null,
-            Email = "user@example.com",
-            Name = "John Doe",
-            Role = "admin",
-            IsActive = true,
-            Image = "https://example.com/avatar.png"
-        };
-
-        // context.Delegation = new DelegationContext()... principal.FindFirst(Claims.Subject)?.Value;
-        // context.ClientId = ...
-    }
 }

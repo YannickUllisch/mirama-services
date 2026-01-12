@@ -39,7 +39,7 @@ public static class ClaimDestinations
                     yield return Destinations.IdentityToken;
 
                 yield break;
-            
+
             case ClaimType.Profile:
                 yield return Destinations.AccessToken;
 
@@ -47,7 +47,7 @@ public static class ClaimDestinations
                     yield return Destinations.IdentityToken;
 
                 yield break;
-            
+
             case ClaimType.Organization:
                 yield return Destinations.AccessToken;
 
@@ -55,7 +55,7 @@ public static class ClaimDestinations
                     yield return Destinations.IdentityToken;
 
                 yield break;
-            
+
             case ClaimType.Tenant:
                 yield return Destinations.AccessToken;
 

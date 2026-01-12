@@ -14,6 +14,7 @@ public sealed class OrganizationClaimContributor : IClaimContributor
 
     public Task Contribute(IAuthorizationContext context, ClaimsIdentity identity)
     {
+        Console.WriteLine($"Setting OrgId here: {context.AuthenticatedUser!.OrganizationId}");
         identity.SetClaim(ClaimType.Organization, context.AuthenticatedUser!.OrganizationId);
         identity.SetClaim(ClaimType.Tenant, context.AuthenticatedUser!.TenantId);
 

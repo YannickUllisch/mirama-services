@@ -12,7 +12,7 @@ namespace AuthService.Application.Services;
 public sealed class AuthorizeService(
     IAuthorizationContextFactory contextFactory,
     IScopePolicyPipeline scopePipeline,
-    IClaimsPipeline claimsPipeline) 
+    IClaimsPipeline claimsPipeline)
     : IAuthorizeService
 {
     private readonly IAuthorizationContextFactory _contextFactory = contextFactory;

@@ -6,9 +6,9 @@ namespace AuthService.Application.Domain.Authentication;
 
 public class AuthenticatedUser : IAuthenticatedUser
 {
-    public Guid UserId { get; init; }
-    public Guid TenantId { get; init; }
-    public Guid? OrganizationId { get; init; } = null;
+    public string UserId { get; init; } = string.Empty;
+    public string TenantId { get; init; } = string.Empty;
+    public string? OrganizationId { get; init; } = null;
     public string Email { get; init; } = string.Empty;
     public string Name { get; init; } = string.Empty;
     public string Role { get; init; } = string.Empty;

@@ -18,6 +18,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
+using AuthService.Application.Infrastructure.HttpServices;
 
 namespace AuthService.Application;
 
@@ -76,6 +77,10 @@ public static class DependencyInjection
                 .MigrationsAssembly(typeof(OpenIdDbContext).Assembly.FullName)
                 .MigrationsHistoryTable(tableName: "__EFMigrationsHistory", schema: "auth"));
         });
+
+        // Http Client
+        services.AddScoped<IAccountHttpClient, AccountHttpClient>();
+
         return services;
     }
 }

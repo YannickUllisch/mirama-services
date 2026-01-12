@@ -11,7 +11,8 @@ public sealed record AuthorizationContext : IAuthorizationContext
 {
     public ClaimsPrincipal Subject { get; init; } = default!;
     public string GrantType { get; init; } = string.Empty;
-    public Guid? OrganizationId { get; init; } = null;
+    public string? TenantId { get; init; } = null;
+    public string? OrganizationId { get; init; } = null;
     public ISet<string> RequestedScopes { get; init; } = new HashSet<string>();
     public ISet<string> GrantedScopes { get; set; } = new HashSet<string>();
 

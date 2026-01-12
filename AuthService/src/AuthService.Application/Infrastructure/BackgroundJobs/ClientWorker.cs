@@ -46,7 +46,7 @@ public class ClientWorker(IServiceProvider serviceProvider, IOptions<OAuthClient
                 Name = ScopeType.Organization,
                 DisplayName = "Organization Access",
                 Resources = { ResourceType.Account, ResourceType.Project }
-            }, 
+            },
             new OpenIddictScopeDescriptor
             {
                 Name = ScopeType.Tenant,
@@ -134,7 +134,7 @@ public class ClientWorker(IServiceProvider serviceProvider, IOptions<OAuthClient
                     Permissions.GrantTypes.TokenExchange,
                     Permissions.GrantTypes.AuthorizationCode,
                     Permissions.GrantTypes.RefreshToken,
-                    
+
                     Permissions.Scopes.Profile,
                     Permissions.Scopes.Email,
                     Permissions.Scopes.Roles,

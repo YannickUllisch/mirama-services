@@ -27,8 +27,14 @@ public sealed class TokenService(
     {
         // Build the context based on the flow
         var context = await _contextFactory.CreateForTokenAsync(httpContext, result);
+        if (context.IsRejected)
+        {
+            return AuthorizationResult.Deny(
+                context.Error!,
+                context.ErrorDescription!);
+        }
 
-        // Apply scope rules (permissions)
+        // Apply scope rules
         var decision = _scopePipeline.Evaluate(context);
         if (decision.IsDenied)
         {
@@ -37,7 +43,7 @@ public sealed class TokenService(
                 decision.ErrorDescription!);
         }
 
-        // Build claims principal (includes claims + scopes + resources via contributors)
+        // Build claims principal
         var principal = await _claimsPipeline.BuildAsync(decision.Context);
 
         // Return for OpenIddict to sign

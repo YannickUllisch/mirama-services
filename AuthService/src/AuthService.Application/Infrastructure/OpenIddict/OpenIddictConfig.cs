@@ -15,7 +15,7 @@ public static class OpenIddictConfiguration
     public static OpenIddictServerBuilder ConfigureServer(
         this OpenIddictServerBuilder options, IConfiguration config)
     {
-        var secrets = config.GetSection(ApplicationOptions.Application).Get<ApplicationOptions>() 
+        var secrets = config.GetSection(ApplicationOptions.Application).Get<ApplicationOptions>()
             ?? throw new InvalidOperationException("Application option configuration is missing or invalid.");
 
         // For now we just use JWTs instead of JWEs, maybe in the future we add JWE support
