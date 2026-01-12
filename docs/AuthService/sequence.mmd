@@ -1,0 +1,98 @@
+sequenceDiagram
+title OIDC OAuth2.0 Centralized Authorization Flows
+autonumber
+
+participant User
+participant NextjsBFF as Nextjs BFF
+participant AuthService as Auth Service
+participant AccountService as Account Service
+participant MicroserviceAccount as Microservice Account
+participant MicroserviceProject as Microservice Project
+participant ExternalIdP as External IdP
+
+%% User initiates login via frontend
+User ->> NextjsBFF: Initiate login (PKCE Authorization Code Flow)
+NextjsBFF ->> AuthService: Redirect user to /authorize\n(PKCE, scope: organization)
+activate NextjsBFF
+
+activate AuthService
+
+%% External IdP login
+alt Social Login
+    AuthService ->> ExternalIdP: Redirect for authentication
+    activate ExternalIdP
+    ExternalIdP ->> AuthService: Return authentication result
+end
+deactivate ExternalIdP
+
+
+%% Auth Service validates user credentials
+activate AccountService
+AuthService ->> AccountService: Get or create user info
+AccountService ->> AuthService: Return userId, tenantId,\ndefault orgId (organizationId)
+deactivate AccountService
+
+%% Authorization code issuance
+AuthService ->> NextjsBFF: Return authorization code
+deactivate AuthService
+deactivate NextjsBFF
+
+activate NextjsBFF
+%% Token exchange
+NextjsBFF ->> AuthService: Exchange code for tokens
+activate AuthService
+
+loop Validate PKCE
+    AuthService ->> AuthService: Validate code and PKCE verifier
+end
+
+activate AccountService
+AuthService ->> AccountService: Get user info
+AccountService ->> AuthService: Return userId, tenantId,\ndefault orgId (organizationId)
+deactivate AccountService
+
+%% Token issuance
+par Issue tokens
+    AuthService ->> NextjsBFF: ID Token\n(userId, tenantId, organizationId)
+    AuthService ->> NextjsBFF: Access Token\n(aud, scopes, tenantId, organizationId)
+end
+AuthService ->> NextjsBFF: Refresh Token
+deactivate NextjsBFF
+deactivate AuthService
+
+
+%% Organization change
+User ->> NextjsBFF: Request Organization Change
+activate NextjsBFF
+
+opt User selects organization
+    NextjsBFF ->> AuthService: Request token exchange\n(select organization)
+    AuthService ->> AccountService: Validate organization–tenant relationship
+    AccountService ->> AuthService: Return updated tenantId,\norganizationId
+    AuthService ->> NextjsBFF: Return new token set\n(selected organizationId)
+end
+deactivate NextjsBFF
+
+
+%% Microservices validate tokens
+User ->> NextjsBFF: Requests Organization Data
+activate NextjsBFF
+NextjsBFF ->> MicroserviceAccount: Call API with Access Token
+activate MicroserviceAccount
+MicroserviceAccount ->> AuthService: Validate Access Token\n(aud, scopes, lifetime, signature)
+MicroserviceAccount -> NextjsBFF: Returns Organization Data based on TenantId in Accesstoken
+deactivate MicroserviceAccount
+
+NextjsBFF ->> User: Returns Organization Data
+deactivate NextjsBFF
+
+AuthService ->> MicroserviceAccount: Token valid
+
+%% Client Credentials Flow
+MicroserviceProject ->> AuthService: Request Access Token\n(client credentials)
+AuthService ->> MicroserviceProject: Return Access Token\n(service scopes, tenantId)
+MicroserviceProject ->> MicroserviceAccount: Call API with Access Token
+MicroserviceAccount ->> AuthService: Validate Access Token\n(service-to-service)
+AuthService ->> MicroserviceAccount: Token valid
+
+

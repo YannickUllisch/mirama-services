@@ -1,0 +1,121 @@
+@startuml container
+skinparam linetype default
+skinparam nodesep 60
+skinparam ranksep 70
+skinparam ArrowThickness 1.3
+skinparam ArrowColor #444444
+skinparam ClassBorderColor #333333
+skinparam ClassBackgroundColor #FFFFFF
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
+!include FONTAWESOME/users.puml
+!include FONTAWESOME/python.puml
+!include FONTAWESOME/node.puml
+!include FONTAWESOME/database.puml
+!include FONTAWESOME/server.puml
+!include FONTAWESOME/aws.puml
+!include FONTAWESOME/eye.puml
+!include <tupadr3/devicons/dotnet>
+
+title System Container Diagram
+LAYOUT_TOP_DOWN()
+LAYOUT_WITH_LEGEND()
+SHOW_PERSON_OUTLINE()
+
+
+' Tags
+AddElementTag("backendContainer", $fontColor=$ELEMENT_FONT_COLOR, $bgColor="#335DA5", $shape=EightSidedShape(), $legendText="microservice Container (eight sided)")
+AddRelTag("async", $textColor=$ARROW_FONT_COLOR, $lineColor=$ARROW_COLOR, $lineStyle=DashedLine(), $legendText="async event/message")
+AddRelTag("sync", $legendText="synchronous request/response")
+
+Person(user, "End Users", "Use the web application")
+Person(admin, "System Administrators", "Manages tenants, users, and platform configuration")
+
+System_Boundary(platform, "Mirama Project Management Platform") {
+
+    System_Boundary(nextjs_boundary, "Frontend Application") {
+        Container(ui, "Web Application", "Next.js / React", "Browser-based user interface", $sprite="node")
+        Container(bff, "BFF API", "Next.js API Routes (Node.js)", "Backend for Frontend", $sprite="node")
+    }
+
+    System_Boundary(auth_boundary, "Centralized Auth / OIDC") {
+        Container(auth_api, "Auth Service", ".NET + OpenIddict", "OAuth2 / OIDC authorization server (Client Credential & Code Authorization flows)", $sprite="dotnet", $tags="backendContainer")
+        ContainerDb(auth_db, "Auth Database (Schema)", "PostgreSQL", "Stores clients, grants, tokens, consents")
+    }
+
+    System_Boundary(backend, "Backend Services") {
+        System_Boundary(account_boundary, "Account Service") {
+            Container(account_service, "Account Service", ".NET", "Exposes API endpoints and publishes integration events via internal worker", $sprite="dotnet", $tags="backendContainer")
+            ContainerDb(account_db, "Account Database (Schema)", "PostgreSQL", "Stores tenants, users, memberships")
+        }
+
+        System_Boundary(project_boundary, "Project Service") {
+            Container(project_service, "Project Service", ".NET", "Exposes API endpoints and publishes integration events via internal worker", $sprite="dotnet", $tags="backendContainer")
+            ContainerDb(project_db, "Project Database (Schema)", "PostgreSQL", "Stores projects, tasks, and related data")
+        }
+
+        ' System_Boundary(llm_system, "LLM Service (PLANNED)") {
+        '     Container(mcp_server, "MCP Server", "TypeScript / Node.js", "MCP protocol server exposing tools for LLM agents")
+        '     Container(llm_agent_system, "LLM Agent System", "Python / LangChain", "Handles reasoning, tool orchestration and embeddings", $tags="backendContainer", $sprite="python")
+        '     ContainerDb(vector_db, "Vector Database", "Pinecone", "Stores embeddings for context, memory and tool data")
+        ' }
+
+        Container(notification_api, "Notification Service", "Node.js", "Consumes integration events and sends notifications", $sprite="node", $tags="backendContainer")
+    }
+}
+
+' User to UI relation
+Rel(user, ui, "Visits Mirama", "HTTPS")
+Rel(admin, ui, "Visits Mirama", "HTTPS")
+
+
+' External systems
+System_Ext(idp, "External Identity Providers", "Google & Microsoft")
+System_Ext(messaging, "Cloud Messaging", "AWS SNS + AWS SQS for integration events")
+System_Ext(email, "Email Service", "Amazon SES")
+System_Ext(observability, "Observability Platform", "Prometheus, Grafana, Logs (self-hosted)")
+' System_Ext(external_ai, "External LLM Provider", "OpenAI LLM API")
+
+' Notification relations
+Rel(notification_api, messaging, "Consumes integration events", "SQS")
+Rel_R(notification_api, email, "Sends emails via", "SES / SMTP")
+
+' Service to SNS relations
+BiRel(account_service, messaging, "Publishes & consumes integration events", "SNS / SQS", $tags="async")
+BiRel(project_service, messaging, "Publishes & consumes integration events", "SNS / SQS", $tags="async")
+
+' Nextjs relations
+Rel(ui, bff, "Calls", "HTTPS / JSON")
+Rel(bff, auth_api, "Authenticates users & session logout", "OIDC Authorization Code + PKCE")
+Rel_L(auth_api, idp, "Delegates authentication to", "OIDC")
+
+' Backend internal relations
+Rel_L(account_service, auth_api, "Authenticates or Validates Access", "HTTPS / JWT")
+Rel_L(project_service, auth_api, "Authenticates or Validates Access", "HTTPS / JWT")
+
+Rel_R(auth_api, account_service, "Retrieves tenant & membership data", "HTTPS / JSON")
+Rel(auth_api, auth_db, "Reads/Writes", "EF Core")
+Rel(account_service, account_db, "Reads/Writes", "EF Core", $tags="async")
+Rel(project_service, project_db, "Reads/Writes", "EF Core", $tags="async")
+
+' Forwarding relations
+Rel_D(bff, project_service, "Forwards Request with JWT Accesstoken", "HTTPS / JSON")
+Rel_D(bff, account_service, "Forwards Request with JWT Accesstoken", "HTTPS / JSON")
+
+' OTLP
+Rel(platform, observability, "Exports telemetry", "OTLP", $tags="async")
+
+' Storage
+' System_Ext(storage, "Object Storage", "Amazon S3")
+' Rel(account_service, storage, "Stores files", "HTTPS")
+' Rel(project_service, storage, "Stores files", "HTTPS")
+
+' LLM Service
+' Rel_L(llm_agent_system, auth_api, "Authenticates or Validates Access", "HTTPS / JWT")
+' Rel_D(bff, llm_agent_system, "Forwards Request with JWT Accesstoken", "HTTPS / JSON")
+' Rel(llm_agent_system, mcp_server, "Invokes tools via MCP protocol", "MCP / JSON")
+' Rel(llm_agent_system, vector_db, "Reads/Writes embeddings", "Vector queries", $tags="async")
+' Rel(mcp_server, project_service, "Calls", "HTTPS / JSON")
+
+@enduml

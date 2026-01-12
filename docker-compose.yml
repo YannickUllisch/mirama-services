@@ -1,0 +1,53 @@
+
+
+services:
+  authservice:
+    build:
+      context: ./AuthService
+      dockerfile: Dockerfile
+      target: final
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./AuthService/.env
+    volumes:
+      - ./certs:/https:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # accountservice:
+  #   build:
+  #     context: ./AccountService
+  #     dockerfile: Dockerfile
+  #     target: final
+  #   ports:
+  #     - 8081:8080
+  #   env_file:
+  #     - ./AccountService/.env
+  #   volumes:
+  #     - ./certs:/https:ro
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+
+  db:
+    image: postgres:18
+    restart: always
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql
+      - ./scripts:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db-data:

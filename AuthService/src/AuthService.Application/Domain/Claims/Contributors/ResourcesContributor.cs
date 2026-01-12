@@ -1,0 +1,23 @@
+
+using System.Collections.Immutable;
+using System.Security.Claims;
+using AuthService.Application.Domain.Authorization.Interfaces;
+using AuthService.Application.Domain.Claims.Interfaces;
+using OpenIddict.Abstractions;
+
+namespace AuthService.Application.Domain.Claims.Contributors;
+
+public sealed class ResourcesContributor(IOpenIddictScopeManager scopeManager) : IClaimContributor
+{
+    private readonly IOpenIddictScopeManager _scopeManager = scopeManager;
+
+    public bool IsApplicable(IAuthorizationContext context)
+        => context.GrantedScopes.Any();
+
+    public async Task Contribute(IAuthorizationContext context, ClaimsIdentity identity)
+    {
+        var scopes = context.GrantedScopes.ToImmutableArray();
+        var resources = await _scopeManager.ListResourcesAsync(scopes).ToListAsync();
+        identity.SetResources(resources);
+    }
+}

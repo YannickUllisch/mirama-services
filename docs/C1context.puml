@@ -1,0 +1,40 @@
+@startuml context
+skinparam linetype default
+skinparam nodesep 60
+skinparam ranksep 70
+skinparam ArrowThickness 1.3
+skinparam ArrowColor #444444
+skinparam ClassBorderColor #333333
+skinparam ClassBackgroundColor #FFFFFF
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+SHOW_PERSON_OUTLINE()
+!define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
+!include FONTAWESOME/users.puml
+
+LAYOUT_WITH_LEGEND()
+SHOW_PERSON_OUTLINE()
+
+title System Context Diagram
+
+Person(user, "End Users", "Use the web application")
+Person(admin, "System Administrators", "Manages tenants, users, and platform configuration")
+
+System(platform, "Mirama Project Management Platform", "Multi-tenant SaaS for project and task management", $sprite="system")
+
+System_Ext(idp, "External Identity Providers", "Google, Entra ID")
+System_Ext(email, "Email Service", "Transactional email delivery")
+System_Ext(messaging, "Cloud Messaging", "Asynchronous domain events")
+System_Ext(observability, "Observability Platform", "Logs, metrics and traces")
+' System_Ext(external_ai, "External LLM Provider", "OpenAI LLM API")
+
+Rel(user, platform, "Visits Mirama", "Web HTTPS")
+Rel(admin, platform, "Visits Mirama", "Web HTTPS")
+' Rel(platform, external_ai, "Requests completions or embeddings")
+Rel(platform, idp, "Delegates authentication to")
+Rel(platform, email, "Sends emails via")
+BiRel(platform, messaging, "Publishes & consumes integration events")
+Rel(platform, observability, "Exports telemetry to")
+
+SHOW_LEGEND()
+@enduml
