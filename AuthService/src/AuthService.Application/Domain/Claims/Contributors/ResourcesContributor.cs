@@ -16,7 +16,8 @@ public sealed class ResourcesContributor(IOpenIddictScopeManager scopeManager) :
 
     public async Task Contribute(IAuthorizationContext context, ClaimsIdentity identity)
     {
-        var resources = await _scopeManager.ListResourcesAsync(context.GrantedScopes.ToImmutableArray()).ToListAsync();
+        var scopes = context.GrantedScopes.ToImmutableArray();
+        var resources = await _scopeManager.ListResourcesAsync(scopes).ToListAsync();
         identity.SetResources(resources);
     }
 }

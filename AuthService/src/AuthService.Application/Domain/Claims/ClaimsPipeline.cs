@@ -31,7 +31,6 @@ public sealed class ClaimsPipeline(IEnumerable<IClaimContributor> contributors) 
         var principal = new ClaimsPrincipal(identity);
 
         principal.SetScopes(context.GrantedScopes);
-        principal.SetResources(context.GrantedScopes);
 
         return principal;
     }
