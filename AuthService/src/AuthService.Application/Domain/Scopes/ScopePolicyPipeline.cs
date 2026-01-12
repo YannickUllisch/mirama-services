@@ -33,15 +33,7 @@ public sealed class ScopePolicyPipeline(IEnumerable<IScopeRule> rules) : IScopeP
                 context.Error!,
                 context.ErrorDescription!);
         }
-        foreach (var scope in context.RequestedScopes)
-        {
-            Console.WriteLine($"Requested Scope: {scope}");
-        }
 
-        foreach (var scope in context.GrantedScopes)
-        {
-            Console.WriteLine($"Granted Scope: {scope}");
-        }
         return AuthorizationDecision.Success(context);
     }
 }

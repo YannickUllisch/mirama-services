@@ -1,14 +1,35 @@
-
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using AuthService.Application;
 using AuthService.Application.Infrastructure.OpenIddict;
 using AuthService.Application.Infrastructure.Persistence;
 using AuthService.Application.Common.Options;
+using AuthService.Server.Middleware;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
+
+builder.Host.UseSerilog((context, services, configuration) =>
+{
+    configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .Enrich.FromLogContext();
+});
+
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddProblemDetails();
+builder.Services.AddHealthChecks();
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+builder.Services.AddLogging();
 
 builder.Services.AddAuthentication(options =>
     {
@@ -112,10 +133,19 @@ if (app.Environment.IsDevelopment())
     }
 }
 
-if (!app.Environment.IsDevelopment())
+app.UseMiddleware<ExceptionMiddleware>(); // Handles API errors
+app.UseExceptionHandler("/Home/Error"); 
+
+// Forcing HTTPS
+if (app.Environment.IsProduction())
 {
-    app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
+}
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 // Required for production, since TLS is terminated on proxy
@@ -135,4 +165,18 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
-app.Run();
+app.MapHealthChecks("/health");
+
+try
+{
+    Log.Information("Starting host...");
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Host terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}
