@@ -6,6 +6,7 @@ using AuthService.Application.Infrastructure.Persistence;
 using AuthService.Application.Common.Options;
 using AuthService.Server.Middleware;
 using Serilog;
+using System.Security.Cryptography.X509Certificates;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +31,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddLogging();
+
+// Application Services DI injection
+builder.Services
+    .AddApplication()
+    .AddInfrastructure(builder.Configuration);
 
 builder.Services.AddAuthentication(options =>
     {
@@ -65,7 +71,7 @@ builder.Services.AddOpenIddict()
                .UseDbContext<OpenIdDbContext>();
 
     })
-    .AddServer((options) =>
+    .AddServer(async (options) =>
     {
         options.SetTokenEndpointUris("/connect/token")
                 .SetAuthorizationEndpointUris("/connect/authorize")
@@ -78,19 +84,18 @@ builder.Services.AddOpenIddict()
                .AllowRefreshTokenFlow()
                .AllowTokenExchangeFlow();
 
-        // TODO: Add Valid Certificate for Production
-        if (builder.Environment.IsDevelopment())
-        {
-            options.AddDevelopmentSigningCertificate()
-                .AddDevelopmentEncryptionCertificate();
-        }
+        // Force PKCE for Authorization Code flow even for Explicit Clients
+        options.RequireProofKeyForCodeExchange();
+
+        // For now we just use JWTs instead of JWEs, maybe in the future we add JWE support
+        options.DisableAccessTokenEncryption();
 
         options.UseAspNetCore()
                .EnableTokenEndpointPassthrough()
                .EnableAuthorizationEndpointPassthrough();
 
         // Main configuration of server
-        options.ConfigureServer(builder.Configuration);
+        options.ConfigureServer(builder.Configuration, builder.Environment);
     });
 
 // CORS Policy
@@ -104,11 +109,6 @@ builder.Services.AddCors(options =>
                   .AllowAnyMethod();
         });
 });
-
-// Application Services DI injection
-builder.Services
-    .AddApplication()
-    .AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 

@@ -65,6 +65,7 @@ public static class DependencyInjection
         services.Configure<ApplicationOptions>(config.GetSection(ApplicationOptions.Application));
         services.Configure<GoogleOptions>(config.GetSection(GoogleOptions.Google));
         services.Configure<OAuthClientOptions>(config.GetSection(OAuthClientOptions.Clients));
+        services.Configure<OpenIddictOptions>(config.GetSection(OpenIddictOptions.Key));
 
         // Background Jobs
         services.AddHostedService<ClientWorker>();
