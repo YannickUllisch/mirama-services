@@ -1,28 +1,22 @@
 
 
+using System.Security.Cryptography.X509Certificates;
 using AuthService.Application.Common.Options;
+using AuthService.Application.Common.Types;
 using AuthService.Application.Domain.Scopes;
-using AuthService.Application.Infrastructure.Common;
-using AuthService.Application.Infrastructure.OpenIddict.EventHandlers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using static OpenIddict.Server.OpenIddictServerEvents;
+using Microsoft.Extensions.Hosting;
 
 namespace AuthService.Application.Infrastructure.OpenIddict;
 
 public static class OpenIddictConfiguration
 {
     public static OpenIddictServerBuilder ConfigureServer(
-        this OpenIddictServerBuilder options, IConfiguration config)
+        this OpenIddictServerBuilder options, IConfiguration config, IHostEnvironment environment)
     {
-        var secrets = config.GetSection(ApplicationOptions.Application).Get<ApplicationOptions>()
-            ?? throw new InvalidOperationException("Application option configuration is missing or invalid.");
-
-        // For now we just use JWTs instead of JWEs, maybe in the future we add JWE support
-        options.DisableAccessTokenEncryption();
-
-        // Force PKCE for Authorization Code flow even for Explicit Clients
-        options.RequireProofKeyForCodeExchange();
+        var openidconfig = config.GetSection(OpenIddictOptions.Key).Get<OpenIddictOptions>()
+            ?? throw new InvalidOperationException("OpenIddict option configuration is missing or invalid.");
 
         options.SetAccessTokenLifetime(TimeSpan.FromMinutes(15));
         options.SetRefreshTokenLifetime(TimeSpan.FromDays(30));
@@ -47,15 +41,39 @@ public static class OpenIddictConfiguration
                 ResourceType.Project,
                 ResourceType.LLM);
 
-        // Issuer refers to this Auth Server, hardcoded for testing purposes
-        options.SetIssuer(new Uri(secrets.SelfUrl));
+        // Issuer refers to this Auth Server
+        options.SetIssuer(new Uri(openidconfig.Issuer, UriKind.Absolute));
 
-        // Registering openiddict event handlers
-        options.AddEventHandler<ProcessSignInContext>(builder =>
+        if (environment.IsDevelopment())
         {
-            builder.UseScopedHandler<AccountUserProvisioningHandler>();
-        });
+            CertificateManager.GenerateDevCertificate(
+                openidconfig.SigningCertificatePath,
+                "CN=OpenIddict Signing Dev",
+                X509KeyUsageFlags.DigitalSignature,
+                openidconfig.SigningCertificatePassword);
 
+            CertificateManager.GenerateDevCertificate(
+                openidconfig.EncryptionCertificatePath,
+                "CN=OpenIddict Encryption Dev",
+                X509KeyUsageFlags.KeyEncipherment,
+                openidconfig.EncryptionCertificatePassword);
+
+            var signingCert = CertificateManager.GetCertificateFile(
+                openidconfig.SigningCertificatePath,
+                openidconfig.SigningCertificatePassword);
+
+            var encryptionCert = CertificateManager.GetCertificateFile(
+                openidconfig.EncryptionCertificatePath,
+                openidconfig.EncryptionCertificatePassword);
+                
+            options.AddSigningCertificate(signingCert)
+                    .AddEncryptionCertificate(encryptionCert);
+
+            // options.AddDevelopmentSigningCertificate()
+            //        .AddDevelopmentEncryptionCertificate();
+        }
+        
+        // TODO: Add Certificates for prod environment
         return options;
     }
 }

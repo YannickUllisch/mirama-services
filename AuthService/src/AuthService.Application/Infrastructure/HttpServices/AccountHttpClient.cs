@@ -1,16 +1,40 @@
 
+using System.Net.Http.Headers;
+using AuthService.Application.Common.Interfaces;
+using AuthService.Application.Common.Types;
 using AuthService.Application.Domain.Authentication;
 using AuthService.Application.Domain.Authentication.Interfaces;
+using AuthService.Application.Domain.Scopes;
 
 namespace AuthService.Application.Infrastructure.HttpServices;
 
-public sealed class AccountHttpClient : IAccountHttpClient
+public sealed class AccountHttpClient(HttpClient client, IInternalTokenService tokenService) : IAccountHttpClient
 {
-    // private readonly HttpClient _client = client;
+    private readonly HttpClient _client = client;
+    private readonly IInternalTokenService _tokenService = tokenService;
 
-    public Task<IAuthenticatedUser> GetOrCreateUserAsync(string accountId, string email, string name, string address, string? image, string? orgId)
-    {
-        return Task.FromResult<IAuthenticatedUser>(new AuthenticatedUser
+    public async Task<IAuthenticatedUser> GetOrCreateUserAsync(string accountId, string email, string name, string address, string? image, string? orgId)
+    {   
+        // Generating internal JWT to securely access Account Microservice
+        var accessToken = _tokenService.IssueInternalAccessToken([ScopeType.AccountRead], ResourceType.Account);
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+        var payload = new
+        {
+            AccountId = accountId,
+            Email = email,
+            Name = name,
+            Address = address,
+            Image = image,
+            OrganizationId = orgId
+        };
+        
+        // Generating content
+        var content = System.Net.Http.Json.JsonContent.Create(payload);
+        var response = await _client.PostAsync("/account", content);
+
+        Console.WriteLine(response.StatusCode);
+        return new AuthenticatedUser
         {
             UserId = Guid.NewGuid().ToString(),
             TenantId = Guid.NewGuid().ToString(),
@@ -20,20 +44,23 @@ public sealed class AccountHttpClient : IAccountHttpClient
             Role = "admin",
             IsActive = true,
             Image = image,
-        });
+        };
     }
 
-    public Task<IAuthenticatedUser> GetUserAsync(string userId, string? orgId)
+    public async Task<IAuthenticatedUser> GetUserAsync(string userId, string? orgId)
     {
-        // var accountUri = $"/user?id=${userId}";
+        var accessToken = _tokenService.IssueInternalAccessToken([ScopeType.AccountRead], ResourceType.Account);
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+        
+        // Constructing requestUri
+        var accountUri = $"/user?id=${userId}";
+        if (orgId != null)
+        {
+            accountUri += $"&organizationId={orgId}";
+        }
+        var response = await _client.GetAsync(accountUri);
 
-        // if (orgId != null)
-        // {
-        //     accountUri += $"&organizationId={orgId}";
-        // }
-        // var response = await _client.GetAsync(accountUri);
-
-        return Task.FromResult<IAuthenticatedUser>(new AuthenticatedUser
+        return new AuthenticatedUser
         {
             UserId = Guid.NewGuid().ToString(),
             TenantId = Guid.NewGuid().ToString(),
@@ -43,6 +70,6 @@ public sealed class AccountHttpClient : IAccountHttpClient
             Role = "admin",
             IsActive = true,
             Image = "https://example.com/avatar.png"
-        });
+        };
     }
 }

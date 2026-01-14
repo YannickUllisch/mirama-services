@@ -1,0 +1,9 @@
+title: Authorization Microservice
+arrange:
+  - index.md
+  - requirements.md
+  - module-design.md
+  - domain-design.md
+  - database-design.md
+  - api-design.md
+  - risks-and-mitigations.md

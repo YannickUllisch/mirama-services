@@ -13,6 +13,12 @@ public class AccountConfiguration : IEntityTypeConfiguration<Account>
     {
         builder.HasKey(u => u.Id);
 
+        builder.Property(t => t.Id)
+            .HasConversion(
+                id => id.Value,
+                v => new AccountId(v))
+            .IsRequired();
+
         builder.Property(t => t.UserId)
             .HasConversion(
                 id => id.Value,

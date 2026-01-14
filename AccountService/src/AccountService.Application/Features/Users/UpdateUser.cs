@@ -14,21 +14,19 @@ namespace AccountService.Application.Features.Users;
 
 public class UpdateUserController : ApiControllerBase
 {
-    [HttpPut("use{id:guid}")]
+    [HttpPut("user/{id:guid}")]
     public async Task<IActionResult> Update([FromRoute] Guid id, UpdateUserCommand command)
     {
         var cmd = command with { Id = id };
         var result = await Mediator.Send(command);
 
-        return result.Match(
-            val => Ok(val),
-            err => Problem(err)
-        );
+        return result.Match(Ok, Problem);
     }
 }
 
 public sealed record UpdateUserCommand : IRequest<ErrorOr<UserResponse>>
 {
+    [JsonPropertyName("id")]
     public Guid Id { get; init; }
 
     [JsonPropertyName("name")]
@@ -55,6 +53,8 @@ internal class UpdateUserRequestValidator : AbstractValidator<UpdateUserCommand>
 {
     public UpdateUserRequestValidator(IGlobalRoleProvider roleProvider)
     {
+        RuleFor(req => req.Id).NotEmpty();
+
         RuleFor(req => req.Email)
             .EmailAddress();
 

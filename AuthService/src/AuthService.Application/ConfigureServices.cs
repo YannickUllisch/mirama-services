@@ -29,6 +29,7 @@ public static class DependencyInjection
         // Services
         services.AddScoped<IAuthorizeService, AuthorizeService>();
         services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<IInternalTokenService, InternalTokenService>();
 
         // Factories
         services.AddScoped<IAuthorizationContextFactory, AuthorizationContextFactory>();
@@ -65,6 +66,8 @@ public static class DependencyInjection
         services.Configure<ApplicationOptions>(config.GetSection(ApplicationOptions.Application));
         services.Configure<GoogleOptions>(config.GetSection(GoogleOptions.Google));
         services.Configure<OAuthClientOptions>(config.GetSection(OAuthClientOptions.Clients));
+        services.Configure<OpenIddictOptions>(config.GetSection(OpenIddictOptions.Key));
+        services.Configure<AccountServiceOptions>(config.GetSection(AccountServiceOptions.Key));
 
         // Background Jobs
         services.AddHostedService<ClientWorker>();
@@ -79,8 +82,13 @@ public static class DependencyInjection
         });
 
         // Http Client
-        services.AddScoped<IAccountHttpClient, AccountHttpClient>();
+        services.AddHttpClient<IAccountHttpClient, AccountHttpClient>((provider, client) =>
+        {
+            var options = provider.GetRequiredService<IOptions<AccountServiceOptions>>().Value;
+            client.BaseAddress = new Uri(options.ApiUrl);
+        });
 
+        
         return services;
     }
 }

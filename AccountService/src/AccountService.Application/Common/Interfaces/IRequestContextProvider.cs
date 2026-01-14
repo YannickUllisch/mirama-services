@@ -12,7 +12,7 @@ public interface IRequestContextProvider
     /// Tenant Id extracted from Claims, always has to be part of the JWT. If OrganizationId is defined
     /// then Tenant Id is dependent on what Organization is currently set as active in the JWT. Otherwise the base user TenantId is assumed
     /// </summary>
-    Guid TenantId { get; }
+    Guid? TenantId { get; }
 
     /// <summary>
     /// Organization Id extracted from Claims. Optional since we potentially have endpoints that are purely Tenant based 
