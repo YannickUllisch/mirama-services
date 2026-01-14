@@ -1,0 +1,14 @@
+title: Mirama backend
+arrange:
+  - index.md
+  - requirements.md
+  - system-architecture.md
+  - module-design.md
+  - accountservice
+  - authservice
+  - api-design.md
+  - security-design.md
+  - deployment-architecture.md
+  - testing-strategy.md
+  - maintenance.md
+  - risks-and-mitigations.md

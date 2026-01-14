@@ -1,0 +1,51 @@
+site_name: Yannick Ullisch 
+site_description: Portfolio & Project Documentation Hub
+
+docs_dir: docs
+
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - navigation.sections
+    - navigation.tracking
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.tabs.link
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/weather-night
+        name: Dark mode
+    - scheme: slate
+      toggle:
+        icon: material/weather-sunny
+        name: Light mode
+
+plugins:
+  - search
+  - awesome-pages
+  # - puml:
+  #     server: https://www.plantuml.com/plantuml
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - toc:
+      permalink: true
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+  - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
+
+extra_javascript:
+  - https://unpkg.com/mermaid/dist/mermaid.min.js
