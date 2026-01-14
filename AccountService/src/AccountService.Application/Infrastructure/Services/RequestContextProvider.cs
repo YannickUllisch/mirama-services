@@ -23,18 +23,17 @@ internal class RequestContextProvider(IHttpContextAccessor httpContextAccessor) 
     {
         get
         {
-            var claim = _httpContextAccessor.HttpContext?.User?.FindFirst("org_id")?.Value;
+            var claim = _httpContextAccessor.HttpContext?.User?.FindFirst("oid")?.Value;
             return Guid.TryParse(claim, out var guid) ? guid : (Guid?)null;
         }
     }
 
-    public Guid TenantId
+    public Guid? TenantId
     {
         get
         {
-            var claim = _httpContextAccessor.HttpContext?.User?.FindFirst("tenant_id")?.Value;
-            if (string.IsNullOrEmpty(claim)) throw new UnauthorizedAccessException("TenantId not found");
-            return Guid.Parse(claim);
+            var claim = _httpContextAccessor.HttpContext?.User?.FindFirst("tid")?.Value;
+            return Guid.TryParse(claim, out var guid) ? guid : (Guid?)null;
         }
     }
 }

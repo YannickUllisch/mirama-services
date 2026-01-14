@@ -2,15 +2,30 @@ using Microsoft.OpenApi;
 using AccountService.Application;
 using AccountService.Application.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using AccountService.Api.Middleware;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
 using AccountService.Api.Auth;
+using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
+
+builder.Host.UseSerilog((context, services, configuration) =>
+{
+    configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .Enrich.FromLogContext();
+});
+builder.Services.AddLogging();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddHealthChecks();
 
 builder.Services.AddCors(options => options
     .AddDefaultPolicy(
@@ -28,16 +43,22 @@ builder.Services
     .AddApplication(builder.Configuration)
     .AddInfrastructure(builder.Configuration);
 
-builder.Services.AddLogging();
+
+
+builder.Services.AddApiVersioning(options =>
+{
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.ReportApiVersions = true;
+});
 
 builder.Services.AddHealthChecks();
 builder.Services.AddHttpContextAccessor();
 
-var authSection = builder.Configuration.GetSection("Authentication");
-
 builder.Services.AddAuthentication()
     .AddJwtBearer(options =>
     {
+        var authSection = builder.Configuration.GetSection("Authentication");
         options.Authority = authSection["Authority"];
         options.Audience = authSection["Audience"];     
         options.TokenValidationParameters = new TokenValidationParameters
@@ -84,30 +105,44 @@ if (app.Environment.IsDevelopment())
     }
 }
 
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+        options.RoutePrefix = string.Empty;
+    });
+}
+
 app.UseExceptionHandler();
+app.UseForwardedHeaders();
 
 // Forcing HTTPS
 if (app.Environment.IsProduction())
 {
     app.UseHsts();
-    app.UseHttpsRedirection();
 }
-
-// Swagger Middleware
-app.UseSwagger();
-app.UseSwaggerUI(options =>
-{
-    options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-    options.RoutePrefix = string.Empty;
-});
+app.UseHttpsRedirection();
 
 app.UseRouting();
 app.UseCors();
-app.UseIdempotency();
+// app.UseIdempotency();
+app.UseAuthentication();
+app.UseAuthorization();
 
-
-// app.UseAuthentication();
-// app.UseAuthorization();
 app.MapControllers();
-
-app.Run();
+app.MapHealthChecks("/health");
+try
+{
+    Log.Information("Starting host...");
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Host terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}

@@ -38,22 +38,25 @@ public static class DependencyInjection
         services.AddScoped<ICommandRepository<Organization>, OrganizationCommandRepository>();
         services.AddScoped<ICommandRepository<Tenant>, TenantCommandRepository>();
 
-
-        services.Configure<ApplicationOptions>(config.GetSection(ApplicationOptions.Application));
         return services;
     }
 
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
     {
-        services.AddScoped<IRequestContextProvider, RequestContextProvider>();
-        services.AddScoped(typeof(IReadRepository<,>), typeof(ReadRepository<,>));
-
+        // Configuring Options Pattern
+        services.Configure<ApplicationOptions>(config.GetSection(ApplicationOptions.Key));
+        services.Configure<AuthenticationOptions>(config.GetSection(AuthenticationOptions.Key));
         services
             .AddOptions<InfrastructureOptions>()
-            .Bind(config.GetSection(InfrastructureOptions.Infrastructure))
+            .Bind(config.GetSection(InfrastructureOptions.Key))
             .Validate(o => !string.IsNullOrWhiteSpace(o.DatabaseConnection),
                       "Valid Database Connection string is required.")
             .ValidateOnStart();
+
+
+        // Services
+        services.AddScoped<IRequestContextProvider, RequestContextProvider>();
+        services.AddScoped(typeof(IReadRepository<,>), typeof(ReadRepository<,>));
 
         services.AddDbContext<ApplicationDbContext>((sp, options) =>
         {

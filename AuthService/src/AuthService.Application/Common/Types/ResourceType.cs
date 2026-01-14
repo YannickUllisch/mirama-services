@@ -1,5 +1,5 @@
 
-namespace AuthService.Application.Infrastructure.Common;
+namespace AuthService.Application.Common.Types;
 
 public static class ResourceType
 {

@@ -2,8 +2,8 @@
 
 using System.Security.Cryptography.X509Certificates;
 using AuthService.Application.Common.Options;
+using AuthService.Application.Common.Types;
 using AuthService.Application.Domain.Scopes;
-using AuthService.Application.Infrastructure.Common;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -42,7 +42,7 @@ public static class OpenIddictConfiguration
                 ResourceType.LLM);
 
         // Issuer refers to this Auth Server
-        options.SetIssuer(new Uri(openidconfig.Issuer));
+        options.SetIssuer(new Uri(openidconfig.Issuer, UriKind.Absolute));
 
         if (environment.IsDevelopment())
         {

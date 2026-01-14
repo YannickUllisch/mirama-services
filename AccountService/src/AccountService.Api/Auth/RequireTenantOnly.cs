@@ -19,7 +19,7 @@ public class RequireTenantOnlyHandler : AuthorizationHandler<TenantOnlyRequireme
         }
 
         // Require tenantId for user tokens
-        var tenantId = user.FindFirst("tenantId")?.Value;
+        var tenantId = user.FindFirst("tid")?.Value;
         if (!string.IsNullOrEmpty(tenantId))
         {
             context.Succeed(requirement);

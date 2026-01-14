@@ -11,13 +11,8 @@ using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace AuthService.Application.Services;
 
-public sealed class InternalTokenService(
-    OpenIddictServerDispatcher applicationManager,
-    IOptions<OpenIddictOptions> options) 
-    : IInternalTokenService
+public sealed class InternalTokenService(IOptions<OpenIddictOptions> options) : IInternalTokenService
 {
-    private readonly OpenIddictServerDispatcher _dispatcher = applicationManager;
-
     private readonly IOptions<OpenIddictOptions> _options = options;
 
     public string IssueInternalAccessToken(List<string> scopes, string audience)

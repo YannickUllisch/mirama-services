@@ -6,7 +6,7 @@ using AuthService.Application.Common.Options;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using AuthService.Application.Domain.Scopes;
-using AuthService.Application.Infrastructure.Common;
+using AuthService.Application.Common.Types;
 using AuthService.Application.Infrastructure.Persistence;
 
 namespace AuthService.Application.Infrastructure.BackgroundJobs;

@@ -6,7 +6,6 @@ using AuthService.Application.Infrastructure.Persistence;
 using AuthService.Application.Common.Options;
 using AuthService.Server.Middleware;
 using Serilog;
-using System.Security.Cryptography.X509Certificates;
 
 var builder = WebApplication.CreateBuilder(args);
 

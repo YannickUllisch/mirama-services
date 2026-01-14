@@ -15,13 +15,16 @@ using AccountService.Application.Infrastructure.Messaging.Outbox;
 using AccountService.Application.Infrastructure.Persistence.Idempotency;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace AccountService.Application.Infrastructure.Persistence;
 
 public sealed class ApplicationDbContext : DbContext
 {
-    private readonly IRequestContextProvider _requestContext = default!;
     private readonly IMediator _mediator = default!;
+    private readonly IRequestContextProvider _contextProvider = default!;
+    private Guid? TenantId => _contextProvider?.TenantId;
+    private Guid? OrganizationId => _contextProvider?.OrganizationId;
 
     public DbSet<Organization> Organizations => Set<Organization>();
     public DbSet<User> Users => Set<User>();
@@ -37,8 +40,8 @@ public sealed class ApplicationDbContext : DbContext
         IMediator mediator,
         IRequestContextProvider requestContext) : base(options)
     {
-        _requestContext = requestContext;
         _mediator = mediator;
+        _contextProvider = requestContext;
     }
 
     public ApplicationDbContext() { }
@@ -47,12 +50,9 @@ public sealed class ApplicationDbContext : DbContext
     {
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         builder.HasDefaultSchema("account");
-        builder.ApplyTenantQueryFilter(_requestContext.TenantId);
 
-        if (_requestContext.OrganizationId != null)
-        {
-            builder.ApplyOrganizationQueryFilter(_requestContext.OrganizationId.Value);
-        }
+        builder.ApplyGlobalFilters(TenantId, OrganizationId);
+
 
         base.OnModelCreating(builder);
     }
@@ -67,28 +67,16 @@ public sealed class ApplicationDbContext : DbContext
             switch (entry.State)
             {
                 case EntityState.Added:
-                    entry.Entity.SetCreated(DateTime.UtcNow, _requestContext.UserId.ToString());
+                    entry.Entity.SetCreated(DateTime.UtcNow, _contextProvider.UserId.ToString());
                     break;
                 case EntityState.Modified:
-                    entry.Entity.SetModified(DateTime.UtcNow, _requestContext.UserId.ToString());
+                    entry.Entity.SetModified(DateTime.UtcNow, _contextProvider.UserId.ToString());
                     break;
                 default:
                     break;
             }
 
-            // Set OrganizationId and TenantId for newly added entities if applicable
-            if (entry.State == EntityState.Added)
-            {
-                if (entry.Entity is IOrganizationOwned orgScoped && _requestContext.OrganizationId != null)
-                {
-                    orgScoped.SetOrganizationId(_requestContext.OrganizationId.Value);
-                }
-
-                if (entry.Entity is ITenantOwned tenantScoped)
-                {
-                    tenantScoped.SetTenantId(_requestContext.TenantId);
-                }
-            }
+            HandleEntityOwnership(entry);
         }
 
         // Persisting and Publishing Domain events in current transaction
@@ -123,5 +111,54 @@ public sealed class ApplicationDbContext : DbContext
         }
 
         return await base.SaveChangesAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Validates that ownership properties (<see cref="TenantId"/> and <see cref="OrganizationId"/>) 
+    /// are present and correct for auditable entities before they are persisted.
+    /// Also automatically sets the tenant or organization IDs on newly added entities.
+    /// </summary>
+    /// <param name="entry">The IAuditable entity being validated</param>
+    /// <exception cref="UnauthorizedAccessException">
+    /// Thrown if a required TenantId is missing for a TenantOwned entity.
+    /// </exception>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown if an TenantOwned entity attempts to change its TenantId>,
+    /// or if an OrganizationOwned entity is persisted without a valid OrganizationId/>.
+    /// </exception>
+    /// <remarks>
+    /// This method provides a second layer of security beyond authorization policies that 
+    /// enforce tenant and organization claims in JWTs. It ensures that persisted entities
+    /// cannot be written without valid multi-tenant/organization context.
+    /// </remarks>
+
+    private void HandleEntityOwnership(EntityEntry<IAuditable> entry)
+    {
+        if (entry.Entity is ITenantOwned tenantOwned)
+        {
+            if (TenantId is null)
+            {
+                throw new UnauthorizedAccessException($"TenantId is required to persist {entry.Entity.GetType().Name}");
+            }
+
+            if (entry.State == EntityState.Added)
+            {
+                tenantOwned.SetTenantId(TenantId.Value);
+            }
+            else if (entry.State == EntityState.Modified && tenantOwned.TenantId != TenantId)
+            {
+                throw new InvalidOperationException("Changing TenantId is not allowed");
+            }
+        }
+
+        if (entry.Entity is IOrganizationOwned orgOwned && entry.State is EntityState.Added or EntityState.Modified)
+        {
+            if (OrganizationId is null)
+            {
+                throw new InvalidOperationException($"OrganizationId is required to modify {entry.Entity.GetType().Name}");
+            }
+
+            orgOwned.SetOrganizationId(OrganizationId.Value);
+        }
     }
 }
