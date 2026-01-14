@@ -1,4 +1,6 @@
-# Welcome to My Projects & Documentation
+# Home
+
+## Welcome to My Projects & Documentation
 
 Hi, I’m Yannick. 👋  
 
@@ -37,5 +39,3 @@ The vision is to provide a **comprehensive view of my technical work**, from cod
 ---
 
 Thank you for visiting. I hope this gives you a clear picture of my work, both in depth and breadth.  
-
-Yannick
