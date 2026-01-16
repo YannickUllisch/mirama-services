@@ -19,13 +19,10 @@ public class Organization : AggregateRoot<OrganizationId>, ITenantOwned
 
     public Guid TenantId { get; private set; } = Guid.Empty; // Set in DB Context
 
-    public IReadOnlyList<Member.Member> Members => _members.AsReadOnly();
+    public List<Member.Member> Members = [];
 
-    public IReadOnlyList<Invitation.Invitation> Invitations => _invitations.AsReadOnly();
+    public List<Invitation.Invitation> Invitations = [];
 
-    private readonly List<Member.Member> _members = [];
-
-    private readonly List<Invitation.Invitation> _invitations = [];
 
     private Organization(string name, Address address)
     {
@@ -50,7 +47,7 @@ public class Organization : AggregateRoot<OrganizationId>, ITenantOwned
     {
         var userId = new UserId(uid);
         var member = Member.Member.Create(userId, role);
-        _members.Add(member);
+        Members.Add(member);
 
         return Result.Created;
     }
@@ -58,14 +55,14 @@ public class Organization : AggregateRoot<OrganizationId>, ITenantOwned
     public ErrorOr<Deleted> RemoveMember(Guid mid)
     {
         var memberId = new MemberId(mid);
-        var member = _members.Find(m => m.Id == memberId);
+        var member = Members.Find(m => m.Id == memberId);
 
         if (member == null)
         {
             return Error.NotFound("User not Found");
         }
 
-        _members.Remove(member);
+        Members.Remove(member);
 
         return Result.Deleted;
     }
@@ -87,7 +84,7 @@ public class Organization : AggregateRoot<OrganizationId>, ITenantOwned
     public bool HasMember(Guid mid)
     {
         var memberId = new MemberId(mid);
-        return _members.Any(m => m.Id == memberId);
+        return Members.Any(m => m.Id == memberId);
     }
 
     void ITenantOwned.SetTenantId(Guid tenantId)
