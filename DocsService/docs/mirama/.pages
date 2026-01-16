@@ -1,5 +1,6 @@
 title: Mirama Platform
 arrange:
+  - index.md
   - frontend
   - backend
   - future-enhancements.md
