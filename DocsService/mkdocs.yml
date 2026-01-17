@@ -1,15 +1,21 @@
 site_name: Yannick Ullisch 
 site_description: Portfolio & Project Documentation Hub
+site_url: https://docs.yannickullisch.com
 
 docs_dir: docs
+copyright: Copyright &copy; 2026 Yannick Ullisch
+
+repo_url: https://github.com/yannickullisch
+repo_name: YannickUllisch
 
 theme:
   name: material
+  logo: images/yul-logo-white.png
   features:
     - navigation.instant
     - navigation.sections
     - navigation.tracking
-    # - navigation.footer
+    - navigation.footer
     - navigation.indexes
     - navigation.top
     - navigation.tabs
@@ -22,23 +28,30 @@ theme:
 
   palette:
     - media: "(prefers-color-scheme: light)"
-      scheme: default
-      primary: dark blue
+      scheme: mirama
+      primary: indigo
       accent: red
       toggle:
-        icon: material/brightness-7
+        icon: material/toggle-switch
         name: Switch to dark mode
 
     - media: "(prefers-color-scheme: dark)"
-      scheme: slate
-      primary: dark blue
+      scheme: mirama-dark
+      # primary: black
       accent: red
       toggle:
-        icon: material/brightness-4
+        icon: material/toggle-switch-off-outline
         name: Switch to light mode
+
+extra_css:
+  - stylesheets/extra.css
+
 extra:
   generator: false
-  
+  social:
+    - icon: fontawesome/brands/github 
+      link: https://github.com/yannickullisch
+
 plugins:
   - search
   - awesome-pages
@@ -66,5 +79,3 @@ markdown_extensions:
 extra_javascript:
   - https://unpkg.com/mermaid/dist/mermaid.min.js
 
-repo_url: https://github.com/yannickullisch
-repo_name: YannickUllisch

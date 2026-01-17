@@ -7,7 +7,7 @@ When running the system locally with Docker, you need to create and trust a loca
 
 ## Project Specific Documentation
 
-The project specific documentation can be found here - [Documentation](https://yannickullisch.github.io/mirama-services/).
+The project specific documentation can be found here - [Documentation](https://docs.yannickullisch.com).
 
 ### Prerequisites
 
