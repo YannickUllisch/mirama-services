@@ -1,4 +1,9 @@
-# Home
+---
+title: Welcome
+hide:
+  - navigation
+  - toc
+---
 
 ## Welcome to My Projects & Documentation
 

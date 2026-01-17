@@ -5,6 +5,10 @@
 To meet security standards, the Auth server **must run on HTTPS**, even in development mode.  
 When running the system locally with Docker, you need to create and trust a local development certificate.
 
+## Project Specific Documentation
+
+The project specific documentation can be found here - [Documentation](https://docs.yannickullisch.com).
+
 ### Prerequisites
 
 - **Docker Compose** and the Docker daemon must be installed and running on your machine.
