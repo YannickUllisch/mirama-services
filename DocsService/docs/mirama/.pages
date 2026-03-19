@@ -1,7 +1,7 @@
 title: Mirama Platform
 arrange:
   - index.md
-  - phase1
-  - phase1.5
-  - phase2
+  - "phase1"
+  - "phase1.5"
+  - "phase2"
   - future-enhancements.md
