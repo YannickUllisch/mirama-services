@@ -1,0 +1,8 @@
+title: "Phase 1: Next.js Standalone"
+arrange:
+  - index.md
+  - architecture.md
+  - data-and-caching.md
+  - recursive-task-design.md
+  - security-setup.md
+  - observability.md
