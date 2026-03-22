@@ -29,8 +29,10 @@ AddElementTag("backendContainer", $fontColor=$ELEMENT_FONT_COLOR, $bgColor="#335
 AddRelTag("async", $textColor=$ARROW_FONT_COLOR, $lineColor=$ARROW_COLOR, $lineStyle=DashedLine(), $legendText="async event/message")
 AddRelTag("sync", $legendText="synchronous request/response")
 
-Person(user, "End Users", "Use the web application")
-Person(admin, "System Administrators", "Manages tenants, users, and platform configuration")
+Person(creator, "Creative User / Manager", "Project managers, Designers and Artists managing task trees and mockups")
+Person(client, "Stakeholder / Client", "Reviews visual figures and approves design iterations")
+Person(admin, "Tenant Admin", "Manages own Organizations, teams and global billing/subscriptions")
+
 
 System_Boundary(platform, "Mirama Project Management Platform") {
 
@@ -66,7 +68,8 @@ System_Boundary(platform, "Mirama Project Management Platform") {
 }
 
 ' User to UI relation
-Rel(user, ui, "Visits Mirama", "HTTPS")
+Rel(creator, ui, "Visits Mirama", "HTTPS")
+Rel(client, ui, "Visits Mirama", "HTTPS")
 Rel(admin, ui, "Visits Mirama", "HTTPS")
 
 

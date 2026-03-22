@@ -1,0 +1,47 @@
+@startuml context
+skinparam linetype default
+skinparam nodesep 60
+skinparam ranksep 70
+skinparam ArrowThickness 1.3
+skinparam ArrowColor #444444
+skinparam ClassBorderColor #333333
+skinparam ClassBackgroundColor #FFFFFF
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+SHOW_PERSON_OUTLINE()
+!define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
+!include FONTAWESOME/users.puml
+
+LAYOUT_WITH_LEGEND()
+SHOW_PERSON_OUTLINE()
+
+title System Context Diagram - Mirama Create Project & Task Management Hub
+
+' Actors
+Person(creator, "Creative User / Manager", "Project managers, Designers and Artists managing task trees and mockups")
+Person(client, "Stakeholder / Client", "Reviews visual figures and approves design iterations")
+Person(admin, "Tenant Admin", "Manages own Organizations, teams and global billing/subscriptions")
+
+' System Boundary
+System(platform, "Mirama Platform", "Centralized Hub for Project Management & Creative Lifecycles. Manages projects, tasks, versioned mockups and multi-tenancy securely.")
+
+' External Systems
+System_Ext(idp, "Identity Provider (OIDC)", "AWS Cognito + OpenIddict / External IDPs (Google) for Global Identity")
+System_Ext(storage, "Cloud Storage", "Secure storage for high-res mockups, figures and general assets such as .PDF files")
+System_Ext(email, "Email Service", "Transactional alerts for mentions and approval requests")
+System_Ext(messaging, "Event Bus (SNS/SQS)", "Asynchronous coordination between Microservices (Phase 2)")
+System_Ext(observability, "Observability Stack", "Centralized logs and metrics for distributed services")
+
+' Relationships
+Rel(creator, platform, "Manages tasks and uploads assets", "HTTPS/Web")
+Rel(client, platform, "Reviews and approves mockups", "HTTPS/Web")
+Rel(admin, platform, "Configures Teams and Billing", "HTTPS/Web")
+
+Rel(platform, idp, "Delegates Auth & Tenant Switching to", "OIDC/JWT")
+Rel(platform, storage, "Persists & retrieves visual assets via", "S3 API / Signed URLs")
+Rel(platform, email, "Sends notifications via", "SMTP/API")
+BiRel(platform, messaging, "Publishes & consumes domain events", "Async")
+Rel(platform, observability, "Exports telemetry to")
+
+SHOW_LEGEND()
+@enduml
