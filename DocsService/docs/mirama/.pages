@@ -1,7 +1,9 @@
 title: Mirama Platform
 arrange:
   - index.md
+  - requirements.md
+  - domain-model.md
+  - future-enhancements.md
   - "phase1"
   - "phase1.5"
   - "phase2"
-  - future-enhancements.md

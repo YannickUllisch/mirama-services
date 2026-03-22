@@ -1,4 +1,4 @@
-# Mirama Platform
+# Mirama Platform & System Context
 
 ## Overview
 
