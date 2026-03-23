@@ -1,49 +1,107 @@
-# System Context: Mirama
+# Mirama Platform – System Context
 
-## Centralizing the Creative Lifecycle
+This document provides a high-level overview of the Mirama Platform, outlining its purpose, stakeholders, key assumptions, core use cases and architectural context. It serves as a foundation for understanding how Mirama fits into the broader business and technical landscape.
 
-Mirama is built for the "Visual-First" workflow. While traditional agile tools treat images as secondary attachments, Mirama treats Mockups, Figures, and Illustrations as the core data. Our use cases are designed to guide a creative project from a blurry "Early Concept" to a pixel-perfect "Final Asset" without losing the history of the evolution.
+---
+
+## Purpose
+
+Mirama is a visual-first, high-performance production environment designed for creative teams managing complex projects, assets and workflows. The platform enables seamless collaboration, asset management and project tracking, supporting both structured and creative processes.
+
+---
+
+## Stakeholders
+
+- **Clients:** Creative agencies, design studios, marketing teams and enterprise customers who use Mirama to manage projects and assets.
+- **Developers:** Internal engineering teams responsible for building, maintaining and evolving the platform.
+- **Business Owners:** Product managers, project sponsors, and company leadership overseeing platform direction and ROI.
+- **External Collaborators:** Freelancers, contractors and reviewers who interact with the platform for specific projects or deliverables.
+- **Support & Operations:** Teams responsible for platform uptime, support and customer success.
+
+---
+
+## Key Assumptions
+
+- **Timelines:** The platform will be delivered in iterative phases, with core features prioritized for early releases and advanced features added in later phases.
+- **Milestones:** Major milestones include MVP launch, multi-tenant support and advanced analytics integration.
+- **Cloud-Native:** The platform will make use of cloud infrastructure (AWS) for scalability, reliability and global reach, while adhering to the AWS Well-Architected framework.
+- **Security:** Strict tenant and organization isolation is enforced at all layers.
+- **User Base:** The platform must support both small teams and large enterprises, scaling as adoption grows.
+
+---
+
+## Core Use Cases & Features
+
+### Use Case Diagrams
+
+Below are three primary use case diagrams representing the most important workflows in Mirama. Each diagram is followed by a detailed description of the actors, interactions and system boundaries.
+
+#### 1. Project & Asset Lifecycle Management
+
+![Project and Asset Management Use Case](../images/use_case1.png)
+
+**Description:**  
+This diagram illustrates how users create projects, manage recursive task and asset hierarchies, upload and version assets, and collaborate through comments and approvals. It highlights the core workflow for creative production teams.
+
+#### 2. Multi-Tenant Access & Collaboration
+
+![Multi-tenant and Collaboration Use Case](../images/use_case2.png)
+
+**Description:**  
+This diagram focuses on user authentication, context switching between organizations/tenants, team-based access control, and delegated invitations. It demonstrates how Mirama supports agencies and enterprises working across multiple clients and teams.
+
+#### 3. Review, Approval & Notification Workflow
+
+![Review, Approval and Notification Workflow Use Case](../images/use_case3.png)
+
+**Description:**  
+This diagram shows the review and approval process, including stakeholder review modes, secure asset sharing, annotated notifications, and milestone tracking. It covers the feedback loop between internal teams and external collaborators.
+
+---
+
+### Must-Have Core Features
+
+- **Recursive Project & Task Management:** Support for N-level deep task and asset hierarchies, enabling flexible project structures.
+- **Large Asset Management:** Direct-to-cloud uploads, chunked/resumable transfers, and original format preservation for files up to 1GB.
+- **Asset Versioning:** Fast retrieval, lazy loading, and instant switching between asset versions.
+- **Background Processing:** Asynchronous compression, preview generation, and non-blocking uploads.
+- **Multi-Tenant & Team-Based Access:** Strict data isolation, context switching, team partitioning, and delegated invitations.
+- **Review & Approval Workflow:** Stakeholder review modes, secure asset links, and annotated notifications.
+- **Platform Intelligence:** Favorites, Google integration, and stateless JWT authentication.
+- **Creative Visualization:** Synchronized Kanban, list, table, and Gantt views; contextual mockup visualization; approval dashboards.
+- **Milestone Tracking:** Define, aggregate, and visualize project milestones and timelines.
+
+### Nice-to-Have Features
+
+- **Advanced Analytics:** Usage insights, project health dashboards.
+- **Custom Integrations:** Deeper integrations with third-party tools beyond Google.
+- **Automated Asset Tagging:** AI-driven metadata extraction and search.
+
+---
+
+## System Context Diagram (C4 Model – System Context)
 
 ![C4 System Context Diagram](../images/c4-context-diagram.png)
 
-## Why Mirama Stands Out
+---
 
-Most small creative businesses struggle with "Asset Fragmentation"—briefs in email, mockups in Figma, and feedback in Slack. Mirama centralizes this.
+## External Systems & Integrations
 
-### 1. The "Visual-First" Task Engine
+- **AWS Cloud:** S3 (asset storage), RDS (database), ElastiCache (caching), ECS (compute), SNS/SQS (queues), CloudFront (CDN).
+- **Google IdP & Calendar:** For authentication and calendar synchronization.
+- **Email/SMS Providers:** For notifications, invitations and alerts.
 
-**The Business Goal:** Stop hunting for files. Every task in the hierarchy acts as a container for the evolution of an idea.
+---
 
-**Use Case: Recursive Asset Evolution**
+## Security & Compliance
 
-The Action: A user creates a "Website Redesign" task. They nest a "Homepage Hero" sub-task. Instead of just a status, this task displays the Evolution Gallery: Version 1 (Wireframe), Version 2 (Low-fi Mockup), and Version 3 (High-res Figure).
+- **Tenant & Organization Isolation:** Enforced at all API, storage and UI layers.
+- **Stateless JWT Authentication:** All services validate tokens independently.
+- **Role-Based Access Control:** Fine-grained permissions for teams, projects, and assets.
+- **Encryption:** All data encrypted at rest and in transit.
 
-The Value: Stakeholders see the path of the design, not just the current state.
+---
 
-Technical Shift:
-* Phase 1 (MVP): Basic image uploads linked to tasks.
-* Phase 2 (C#/.NET): Advanced Blob storage integration with automated thumbnail generation and "Version Stacking" logic in the Project Service.
+## Summary
 
-### 2. Multi-Tenant Studio Logic
-
-**The Business Goal:** A single freelancer or agency managing high-res assets for 5+ clients without crossing the streams.
-
-**Use Case: The "Brand-Isolated" Context Switch**
-
-The Action: Switching from "Client A" to "Client B."
-
-The Visual Context: Not only do the tasks change, but the Asset Library and Brand Presets (Figures/Icons) completely reset to the new tenant's boundary.
-
-Security Choice: We use OpenIddict to ensure that a JWT issued for Client A physically cannot be used to fetch a private mockup URL for Client B.
-
-### 3. Stakeholder Review & Visual Approval (The New Focus)
-
-**The Business Goal:** Closing the loop between the designer's "Export" and the client's "Approval."
-
-**Use Case: The "Annotated Review" Flow**
-
-The Action: A client or lead designer opens a "Figure" or "Mockup" within a task and leaves feedback directly on the visual asset.
-
-The Workflow: Marking a task as "Ready for Review" triggers a notification that centers the Latest Figure in the UI, allowing for a side-by-side comparison of the "Brief" vs. the "Execution."
-
-The Impact: Reduces "Feedback Loops" by ensuring the reviewer is looking at the correct iteration of the asset within the context of the task requirements.
+Mirama is architected to deliver a robust, scalable and secure environment for creative production teams. Its modular design, cloud-native infrastructure and focus on visual workflows ensure it can adapt to evolving business needs while maintaining high standards for performance, security and usability.

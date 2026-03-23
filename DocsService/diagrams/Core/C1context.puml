@@ -15,12 +15,16 @@ SHOW_PERSON_OUTLINE()
 LAYOUT_WITH_LEGEND()
 SHOW_PERSON_OUTLINE()
 
-title System Context Diagram - Mirama Create Project & Task Management Hub
+title System Context Diagram - Mirama Platform
 
 ' Actors
 Person(creator, "Creative User / Manager", "Project managers, Designers and Artists managing task trees and mockups")
 Person(client, "Stakeholder / Client", "Reviews visual figures and approves design iterations")
 Person(admin, "Tenant Admin", "Manages own Organizations, teams and global billing/subscriptions")
+Person(dev, "Developer", "Builds, maintains, and operates the Mirama platform")
+Person(owner, "Business Owner", "Oversees platform direction, priorities, and ROI")
+Person(support, "Support & Operations", "Ensures uptime, support, and customer success")
+Person(external, "External Collaborator", "Freelancers, contractors, and reviewers with limited access")
 
 ' System Boundary
 System(platform, "Mirama Platform", "Centralized Hub for Project Management & Creative Lifecycles. Manages projects, tasks, versioned mockups and multi-tenancy securely.")
@@ -36,12 +40,16 @@ System_Ext(observability, "Observability Stack", "Centralized logs and metrics f
 Rel(creator, platform, "Manages tasks and uploads assets", "HTTPS/Web")
 Rel(client, platform, "Reviews and approves mockups", "HTTPS/Web")
 Rel(admin, platform, "Configures Teams and Billing", "HTTPS/Web")
+Rel(dev, platform, "Develops and operates", "DevOps/API")
+Rel(owner, platform, "Sets priorities, reviews analytics", "Reports/Dashboards")
+Rel(support, platform, "Monitors uptime, supports users", "Support/Monitoring")
+Rel(external, platform, "Collaborates on projects, reviews assets", "HTTPS/Web")
 
 Rel(platform, idp, "Delegates Auth & Tenant Switching to", "OIDC/JWT")
 Rel(platform, storage, "Persists & retrieves visual assets via", "S3 API / Signed URLs")
 Rel(platform, email, "Sends notifications via", "SMTP/API")
 BiRel(platform, messaging, "Publishes & consumes domain events", "Async")
-Rel(platform, observability, "Exports telemetry to")
+Rel(platform, observability, "Exports telemetry to", "Logs/Metrics")
 
 SHOW_LEGEND()
 @enduml
