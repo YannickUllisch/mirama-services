@@ -1,4 +1,4 @@
-# Phase 1: The Pragmatic Monolith (Next.js)
+# Phase 1: The Monolith (Next.js)
 
 Welcome to the documentation for the first architectural iteration of the Mirama Platform. This phase represents the foundation of the system, built as a high-performance, standalone Next.js application designed to balance rapid feature delivery with high engineering standards.
 
