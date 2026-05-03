@@ -5,7 +5,7 @@ autonumber
 participant User
 participant NextjsBFF as Nextjs BFF
 participant AuthService as Auth Service
-participant AccountService as Account Service
+participant MiramaService as Account Service
 participant MicroserviceAccount as Microservice Account
 participant MicroserviceProject as Microservice Project
 participant ExternalIdP as External IdP
@@ -27,10 +27,10 @@ deactivate ExternalIdP
 
 
 %% Auth Service validates user credentials
-activate AccountService
-AuthService ->> AccountService: Get or create user info
-AccountService ->> AuthService: Return userId, tenantId,\ndefault orgId (organizationId)
-deactivate AccountService
+activate MiramaService
+AuthService ->> MiramaService: Get or create user info
+MiramaService ->> AuthService: Return userId, tenantId,\ndefault orgId (organizationId)
+deactivate MiramaService
 
 %% Authorization code issuance
 AuthService ->> NextjsBFF: Return authorization code
@@ -46,10 +46,10 @@ loop Validate PKCE
     AuthService ->> AuthService: Validate code and PKCE verifier
 end
 
-activate AccountService
-AuthService ->> AccountService: Get user info
-AccountService ->> AuthService: Return userId, tenantId,\ndefault orgId (organizationId)
-deactivate AccountService
+activate MiramaService
+AuthService ->> MiramaService: Get user info
+MiramaService ->> AuthService: Return userId, tenantId,\ndefault orgId (organizationId)
+deactivate MiramaService
 
 %% Token issuance
 par Issue tokens
@@ -67,8 +67,8 @@ activate NextjsBFF
 
 opt User selects organization
     NextjsBFF ->> AuthService: Request token exchange\n(select organization)
-    AuthService ->> AccountService: Validate organization–tenant relationship
-    AccountService ->> AuthService: Return updated tenantId,\norganizationId
+    AuthService ->> MiramaService: Validate organization–tenant relationship
+    MiramaService ->> AuthService: Return updated tenantId,\norganizationId
     AuthService ->> NextjsBFF: Return new token set\n(selected organizationId)
 end
 deactivate NextjsBFF

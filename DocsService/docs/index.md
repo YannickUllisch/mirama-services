@@ -25,7 +25,7 @@ To understand the platform, you can explore its development through three distin
   
 * **Phase 1.5: Platform & Infrastructure (Terraform & AWS)** The transition from PaaS (Vercel) to managed cloud infrastructure. This phase covers the **Infrastructure as Code (IaC)** used to provision **RDS (Postgres)**, **ElastiCache (Redis)** and **ECS & EC2 Auto-scaling Group**.
 
-* **Phase 2: Microservices Evolution (C#/.NET)** The decoupling of the core logic into independent services. Explore the **AccountService**, **AuthService** and **ProjectService**, built with Clean Architecture, Domain-Driven Design (DDD) and high-performance cross-service security.
+* **Phase 2: Microservices Evolution (C#/.NET)** The decoupling of the core logic into independent services. Explore the **MiramaService**, **AuthService** and **ProjectService**, built with Clean Architecture, Domain-Driven Design (DDD) and high-performance cross-service security.
 
 ---
 

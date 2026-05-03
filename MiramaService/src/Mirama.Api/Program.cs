@@ -1,0 +1,148 @@
+using Microsoft.OpenApi;
+using Mirama.Application;
+using Mirama.Application.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authorization;
+using Mirama.Api.Auth;
+using Microsoft.AspNetCore.Mvc;
+using Serilog;
+
+var builder = WebApplication.CreateBuilder(args);
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
+
+builder.Host.UseSerilog((context, services, configuration) =>
+{
+    configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .Enrich.FromLogContext();
+});
+builder.Services.AddLogging();
+
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddHealthChecks();
+
+builder.Services.AddCors(options => options
+    .AddDefaultPolicy(
+        policy => policy
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod()));
+
+builder.Services.AddSwaggerGen(c => c
+    .SwaggerDoc("v1", new OpenApiInfo { Title = "Mirama Account Service API", Version = "v1" }));
+
+builder.Services.AddProblemDetails();
+
+builder.Services
+    .AddApplication(builder.Configuration)
+    .AddInfrastructure(builder.Configuration);
+
+
+
+builder.Services.AddApiVersioning(options =>
+{
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.ReportApiVersions = true;
+});
+
+builder.Services.AddHealthChecks();
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddAuthentication()
+    .AddJwtBearer(options =>
+    {
+        var authSection = builder.Configuration.GetSection("Authentication");
+        options.Authority = authSection["Authority"];
+        options.Audience = authSection["Audience"];     
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateLifetime = true,
+            ValidateAudience = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = authSection["Authority"],
+            ValidAudience = authSection["Audience"],
+        };
+    });
+
+builder.Services.AddSingleton<IAuthorizationHandler, RequireTenantAndOrgHandler>();
+builder.Services.AddSingleton<IAuthorizationHandler, RequireTenantOnlyHandler>();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireTenantAndOrg", policy =>
+        policy.Requirements.Add(new TenantAndOrgRequirement()));
+
+    options.AddPolicy("RequireTenantOnly", policy =>
+        policy.Requirements.Add(new TenantOnlyRequirement()));
+});
+
+var app = builder.Build();
+
+// Applying migrations immediately in Development, handled in CICD pipeline for production
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        logger.LogInformation("Applying database migrations...");
+        await db.Database.MigrateAsync();
+        logger.LogInformation("Database migrations applied successfully");
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "An error occurred while applying database migrations.");
+        throw;
+    }
+}
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+        options.RoutePrefix = string.Empty;
+    });
+}
+
+app.UseExceptionHandler();
+app.UseForwardedHeaders();
+
+// Forcing HTTPS
+if (app.Environment.IsProduction())
+{
+    app.UseHsts();
+}
+app.UseHttpsRedirection();
+
+app.UseRouting();
+app.UseCors();
+// app.UseIdempotency();
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
+app.MapHealthChecks("/health");
+try
+{
+    Log.Information("Starting host...");
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Host terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}

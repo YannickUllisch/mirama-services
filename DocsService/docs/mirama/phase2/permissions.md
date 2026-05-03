@@ -9,4 +9,4 @@
 - *ASP.NET authorization middleware and policy handlers*
 - *JWT claims structure and scope validation per service*
 - *Inter-service authorization (service-to-service tokens)*
-- *Integration with the AccountService IAM domain*
+- *Integration with the MiramaService IAM domain*

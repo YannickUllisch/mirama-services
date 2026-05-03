@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Mirama.Application/Mirama.Application.csproj" />
+    <Project Path="src/Mirama.Domain/Mirama.Domain.csproj" />
+    <Project Path="src/Mirama.Infrastructure/Mirama.Infrastructure.csproj" />
+    <Project Path="src/mirama.Api/mirama.Api.csproj" />
+  </Folder>
+</Solution>

@@ -16,15 +16,15 @@ services:
       db:
         condition: service_healthy
 
-  accountservice:
+  miramaservice:
     build:
-      context: ./AccountService
+      context: ./MiramaService
       dockerfile: Dockerfile
       target: final
     ports:
       - 8081:8080
     env_file:
-      - ./AccountService/.env
+      - ./MiramaService/.env
     volumes:
       - ./certs:/certificates:ro
     depends_on:

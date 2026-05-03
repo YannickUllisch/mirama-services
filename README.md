@@ -27,7 +27,7 @@ The project specific documentation can be found here - [Documentation](https://d
 2. **Ensure the certificate is in the `./certs` folder.**
    - If you use a different location, update the `volumes` path in your `docker-compose.yml` to match.
 
-3. **For each service, create a new `.env` file in the directory of that service** (e.g., `./AccountService`, `./AuthService`).
+3. **For each service, create a new `.env` file in the directory of that service** (e.g., `./MiramaService`, `./AuthService`).
    - Copy the development setup from the corresponding `.env.example` file's DEV section into your new `.env` file.
    - There might be some secrets that you will have to fill out yourself, e.g. Google ClientId and ClientSecret for the Google IdP.
    - Adjust any other values as needed for your local environment.

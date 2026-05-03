@@ -67,7 +67,7 @@ public static class DependencyInjection
         services.Configure<GoogleOptions>(config.GetSection(GoogleOptions.Google));
         services.Configure<OAuthClientOptions>(config.GetSection(OAuthClientOptions.Clients));
         services.Configure<OpenIddictOptions>(config.GetSection(OpenIddictOptions.Key));
-        services.Configure<AccountServiceOptions>(config.GetSection(AccountServiceOptions.Key));
+        services.Configure<MiramaServiceOptions>(config.GetSection(MiramaServiceOptions.Key));
 
         // Background Jobs
         services.AddHostedService<ClientWorker>();
@@ -84,7 +84,7 @@ public static class DependencyInjection
         // Http Client
         services.AddHttpClient<IAccountHttpClient, AccountHttpClient>((provider, client) =>
         {
-            var options = provider.GetRequiredService<IOptions<AccountServiceOptions>>().Value;
+            var options = provider.GetRequiredService<IOptions<MiramaServiceOptions>>().Value;
             client.BaseAddress = new Uri(options.ApiUrl);
         });
 

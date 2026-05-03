@@ -4,7 +4,7 @@ arrange:
   - requirements.md
   - system-architecture.md
   - module-design.md
-  - accountservice
+  - miramaservice
   - authservice
   - api-design.md
   - security-design.md
