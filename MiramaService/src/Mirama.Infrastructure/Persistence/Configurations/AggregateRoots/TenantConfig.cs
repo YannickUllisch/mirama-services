@@ -26,7 +26,7 @@ public class TenantConfiguration : IEntityTypeConfiguration<Tenant>
             .WithOne()
             .HasForeignKey<Tenant>(t => t.AdminUserId)
             .OnDelete(DeleteBehavior.Restrict);
-        
+
         builder.OwnsOne(a => a.Settings, s =>
         {
             s.Property(x => x.BrandingColor).HasColumnName("BrandingColor");

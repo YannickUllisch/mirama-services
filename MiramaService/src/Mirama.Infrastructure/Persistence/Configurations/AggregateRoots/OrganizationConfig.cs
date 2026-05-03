@@ -15,7 +15,7 @@ public class OrganizationConfiguration : IEntityTypeConfiguration<Organization>
         builder.Property(o => o.Id).HasConversion(
             id => id.Value,
             v => new OrganizationId(v));
-            
+
         builder.Property(o => o.TenantId).IsRequired();
 
         builder.OwnsOne(o => o.Address, a =>

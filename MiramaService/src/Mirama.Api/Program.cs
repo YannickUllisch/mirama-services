@@ -59,7 +59,7 @@ builder.Services.AddAuthentication()
     {
         var authSection = builder.Configuration.GetSection("Authentication");
         options.Authority = authSection["Authority"];
-        options.Audience = authSection["Audience"];     
+        options.Audience = authSection["Audience"];
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,

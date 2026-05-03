@@ -61,6 +61,6 @@ public class Invitation : Entity<InvitationId>, IOrganizationOwned
         {
             throw new InvalidOperationException("OrganizationId already set.");
         }
-        OrganizationId = new OrganizationId(organizationId);;
+        OrganizationId = new OrganizationId(organizationId); ;
     }
 }

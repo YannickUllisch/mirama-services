@@ -10,6 +10,6 @@ public sealed class IdempotencyRecord
     public DateTime CreatedAtUtc { get; init; } = DateTime.UtcNow;
 
     public string? Response { get; set; }
-    
+
     public DateTime? ProcessedAtUtc { get; set; }
 }

@@ -46,7 +46,7 @@ internal class GetUsersQueryHandler(IReadRepository<User, UserId> userRepository
     private readonly IReadRepository<User, UserId> _userRepository = userRepository;
 
     public async Task<ErrorOr<PaginatedList<UserResponse>>> Handle(GetUsersQuery request, CancellationToken cancellationToken)
-    {   
+    {
         var query = _userRepository.Query().OrderBy(user => user.Name).Select(u => u.MapResponse().Value);
 
         if (request.PageNumber != null && request.PageSize != null)

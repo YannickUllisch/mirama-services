@@ -26,7 +26,7 @@ public class IdempotencyMiddleware(RequestDelegate next)
 
         // TODO: Idempotency Handling
         var cache = context.RequestServices.GetRequiredService<IDistributedCache>();
-        
+
         await _next(context);
     }
 

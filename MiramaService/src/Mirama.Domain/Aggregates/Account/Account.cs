@@ -14,7 +14,7 @@ public class Account : AggregateRoot<AccountId>
     public UserId UserId { get; init; } = default!;
     public AuthProvider Provider { get; init; }
     public Guid ProviderUserId { get; init; }
-    
+
     private Account(UserId userId, Guid providerUserId, AuthProvider provider)
     {
         UserId = userId;
@@ -22,7 +22,7 @@ public class Account : AggregateRoot<AccountId>
         Provider = provider;
     }
 
-    private Account () {}
+    private Account() { }
 
     public static ErrorOr<Account> Create(Guid userId, Guid providerUserId, string provider)
     {

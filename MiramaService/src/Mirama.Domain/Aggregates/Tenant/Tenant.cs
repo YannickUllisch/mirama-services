@@ -7,8 +7,8 @@ namespace Mirama.Domain.Aggregates.Tenant;
 
 public sealed class Tenant : AggregateRoot<Guid>
 {
-    public string Name { get; private set;} = string.Empty;
-    
+    public string Name { get; private set; } = string.Empty;
+
     public UserId AdminUserId { get; init; } = default!;
 
     public BillingPlan BillingPlan { get; private set; } = BillingPlan.Free;
@@ -30,7 +30,7 @@ public sealed class Tenant : AggregateRoot<Guid>
     {
         var userId = new UserId(adminUserId);
         var tenant = new Tenant(userId);
-        
+
         var setPlanResult = tenant.SetBillingPlan(planType);
         if (setPlanResult.IsError)
             return setPlanResult.Errors;

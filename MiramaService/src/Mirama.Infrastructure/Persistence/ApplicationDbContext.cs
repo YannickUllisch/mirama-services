@@ -104,7 +104,7 @@ public sealed class ApplicationDbContext : DbContext
                 Content = JsonSerializer.Serialize(domainEvent)
             })
             .ToList();
-        
+
         if (outboxMessages.Count != 0)
         {
             OutboxMessages.AddRange(outboxMessages);

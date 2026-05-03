@@ -11,7 +11,7 @@ public sealed class BillingPlan : ValueObject
     public int QuotaUsers { get; }
     public int QuotaOrganizations { get; }
 
-    private BillingPlan() {}
+    private BillingPlan() { }
 
     private BillingPlan(string planName, int quotaTeams, int quotaUsers, int quotaOrganizations)
     {
