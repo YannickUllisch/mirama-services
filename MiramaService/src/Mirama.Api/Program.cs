@@ -1,12 +1,13 @@
 using Microsoft.OpenApi;
 using Mirama.Application;
-using Mirama.Application.Infrastructure.Persistence;
+using Mirama.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
 using Mirama.Api.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
+using Mirama.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,8 +43,6 @@ builder.Services.AddProblemDetails();
 builder.Services
     .AddApplication(builder.Configuration)
     .AddInfrastructure(builder.Configuration);
-
-
 
 builder.Services.AddApiVersioning(options =>
 {

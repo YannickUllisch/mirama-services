@@ -2,7 +2,7 @@
 
 
 using Mirama.Application.Common.Interfaces;
-using Mirama.Application.Domain.Aggregates.User;
+using Mirama.Domain.Aggregates.User;
 
 namespace Mirama.Application.Common;
 

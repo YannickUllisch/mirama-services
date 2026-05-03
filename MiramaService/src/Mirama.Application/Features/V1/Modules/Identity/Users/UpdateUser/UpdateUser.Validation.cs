@@ -1,0 +1,55 @@
+
+
+using MediatR;
+using ErrorOr;
+using Mirama.Domain.Aggregates.User;
+using Mirama.Application.Common.Interfaces;
+using Mirama.Application.Common;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
+namespace Mirama.Application.Features.V1.Modules.Identity.Users.UpdateUser;
+
+public class UpdateUserController : ApiControllerBase
+{
+    [HttpPut("users/{id:guid}")]
+    public async Task<IActionResult> Update([FromRoute] Guid id, UpdateUserCommand command)
+    {
+        var cmd = command with { Id = id };
+        var result = await Mediator.Send(command);
+
+        return result.Match(Ok, Problem);
+    }
+}
+
+internal class UpdateUserCommandHandler(ICommandRepository<User, UserId> repo) : IRequestHandler<UpdateUserCommand, ErrorOr<UserResponse>>
+{
+    private readonly ICommandRepository<User, UserId> _repo = repo;
+
+    public async Task<ErrorOr<UserResponse>> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
+    {
+        var user = await _repo.Query()
+            .FirstOrDefaultAsync(u => u.Id.Value == request.Id, cancellationToken);
+
+        if (user == null)
+        {
+            return Error.NotFound("User could not be found");
+        }
+
+        if (!Enum.TryParse<GlobalRole>(request.Role, true, out var parsedRole))
+        {
+            return Error.Validation("Invalid role value.");
+        }
+
+        user.Update(
+            request.Name,
+            request.Email,
+            parsedRole,
+            request.ContactEmail,
+            request.ContactPhoneNumber,
+            request.Image
+        );
+
+        return user.MapResponse();
+    }
+}
