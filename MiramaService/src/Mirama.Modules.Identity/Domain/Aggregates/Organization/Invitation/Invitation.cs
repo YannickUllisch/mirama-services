@@ -1,9 +1,9 @@
 
 
-using Mirama.Domain.Abstractions.Core;
-using Mirama.Domain.Aggregates.User;
+using Mirama.Modules.Identity.Domain.Abstractions.Core;
+using Mirama.Modules.Identity.Domain.Aggregates.User;
 
-namespace Mirama.Domain.Aggregates.Organization.Invitation;
+namespace Mirama.Modules.Identity.Domain.Aggregates.Organization.Invitation;
 
 public class Invitation : Entity<InvitationId>, IOrganizationOwned
 {

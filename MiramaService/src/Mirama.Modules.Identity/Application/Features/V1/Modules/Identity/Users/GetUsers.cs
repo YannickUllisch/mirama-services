@@ -1,6 +1,5 @@
 
 using System.Text.Json.Serialization;
-using Mirama.Domain.Aggregates.User;
 using ErrorOr;
 using FluentValidation;
 using MediatR;
@@ -10,6 +9,7 @@ using Mirama.Modules.Identity.Application.Common;
 using Mirama.Modules.Identity.Application.Common.Models;
 using Mirama.Modules.Identity.Application.Common.Interfaces;
 using Mirama.Modules.Identity.Application.Common.Extensions;
+using Mirama.Modules.Identity.Domain.Aggregates.User;
 
 namespace Mirama.Modules.Identity.Application.Features.V1.Modules.Identity.Users;
 

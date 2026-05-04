@@ -1,6 +1,6 @@
 
 
-namespace Mirama.Domain.Aggregates.Organization.Invitation;
+namespace Mirama.Modules.Identity.Domain.Aggregates.Organization.Invitation;
 
 public enum InvitationStatus
 {

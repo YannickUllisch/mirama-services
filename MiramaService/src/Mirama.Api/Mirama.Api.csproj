@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Mirama.Application\Mirama.Application.csproj" />
-    <ProjectReference Include="..\Mirama.Infrastructure\Mirama.Infrastructure.csproj" />
+    <ProjectReference Include="..\Mirama.Modules.Identity\Mirama.Modules.Identity.csproj" />
+    <ProjectReference Include="..\Mirama.Modules.Projects\Mirama.Modules.Projects.csproj" />
   </ItemGroup>
 </Project>

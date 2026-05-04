@@ -1,6 +1,5 @@
-
-using Mirama.Domain.Aggregates.User;
 using ErrorOr;
+using Mirama.Modules.Identity.Domain.Aggregates.User;
 
 namespace Mirama.Modules.Identity.Application.Features.V1.Modules.Identity.Users;
 

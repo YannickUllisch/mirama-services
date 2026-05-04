@@ -1,7 +1,8 @@
 
-using Mirama.Domain.Abstractions.Events;
 
-namespace Mirama.Domain.Abstractions.Core;
+using Mirama.Modules.Identity.Domain.Abstractions.Events;
+
+namespace Mirama.Modules.Identity.Domain.Abstractions.Core;
 
 public abstract class AggregateRoot<TID> : Entity<TID>, IDomainEventEntity
 {

@@ -1,7 +1,8 @@
 
-using Mirama.Domain.Abstractions.Core;
 
-namespace Mirama.Domain.Aggregates.User;
+using Mirama.Modules.Identity.Domain.Abstractions.Core;
+
+namespace Mirama.Modules.Identity.Domain.Aggregates.User;
 
 public class User : AggregateRoot<UserId>
 {

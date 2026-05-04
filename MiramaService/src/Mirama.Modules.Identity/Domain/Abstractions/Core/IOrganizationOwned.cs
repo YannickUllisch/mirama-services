@@ -1,7 +1,8 @@
 
-using Mirama.Domain.Aggregates.Organization;
 
-namespace Mirama.Domain.Abstractions.Core;
+using Mirama.Modules.Identity.Domain.Aggregates.Organization;
+
+namespace Mirama.Modules.Identity.Domain.Abstractions.Core;
 
 public interface IOrganizationOwned
 {

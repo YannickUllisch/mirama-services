@@ -1,9 +1,9 @@
 
-using Mirama.Domain.Abstractions.Core;
-using Mirama.Domain.Aggregates.User;
 using ErrorOr;
+using Mirama.Modules.Identity.Domain.Abstractions.Core;
+using Mirama.Modules.Identity.Domain.Aggregates.User;
 
-namespace Mirama.Domain.Aggregates.Account;
+namespace Mirama.Modules.Identity.Domain.Aggregates.Account;
 
 /// <summary>
 /// An Account represents one login method connected to a User. A User can have many accounts that all link to the 

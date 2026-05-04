@@ -1,7 +1,6 @@
-
-using Mirama.Domain.Abstractions.Core;
 using Microsoft.EntityFrameworkCore;
 using Mirama.Modules.Identity.Application.Common.Interfaces;
+using Mirama.Modules.Identity.Domain.Abstractions.Core;
 
 namespace Mirama.Modules.Identity.Infrastructure.Persistence.Repositories;
 

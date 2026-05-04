@@ -2,11 +2,11 @@
 
 using MediatR;
 using ErrorOr;
-using Mirama.Domain.Aggregates.User;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Mirama.Modules.Identity.Application.Common;
 using Mirama.Modules.Identity.Application.Common.Interfaces;
+using Mirama.Modules.Identity.Domain.Aggregates.User;
 
 namespace Mirama.Modules.Identity.Application.Features.V1.Modules.Identity.Users.UpdateUser;
 

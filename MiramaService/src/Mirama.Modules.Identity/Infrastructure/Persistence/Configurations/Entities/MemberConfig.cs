@@ -1,9 +1,9 @@
 
-using Mirama.Domain.Aggregates.Organization;
-using Mirama.Domain.Aggregates.Organization.Member;
-using Mirama.Domain.Aggregates.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Mirama.Modules.Identity.Domain.Aggregates.Organization;
+using Mirama.Modules.Identity.Domain.Aggregates.Organization.Member;
+using Mirama.Modules.Identity.Domain.Aggregates.User;
 
 namespace Mirama.Modules.Identity.Infrastructure.Persistence.Configurations.Entities;
 

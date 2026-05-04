@@ -1,7 +1,7 @@
 
-using Mirama.Domain.Aggregates.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Mirama.Modules.Identity.Domain.Aggregates.User;
 
 namespace Mirama.Modules.Identity.Infrastructure.Persistence.Configurations.AggregateRoots;
 

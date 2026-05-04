@@ -1,14 +1,6 @@
 
 using System.Reflection;
 using System.Text.Json;
-using Mirama.Domain.Abstractions.Core;
-using Mirama.Domain.Abstractions.Events;
-using Mirama.Domain.Aggregates.Account;
-using Mirama.Domain.Aggregates.Organization;
-using Mirama.Domain.Aggregates.Organization.Invitation;
-using Mirama.Domain.Aggregates.Organization.Member;
-using Mirama.Domain.Aggregates.Tenant;
-using Mirama.Domain.Aggregates.User;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -16,6 +8,14 @@ using Mirama.Modules.Identity.Application.Common.Interfaces;
 using Mirama.Modules.Identity.Infrastructure.Messaging.Outbox;
 using Mirama.Modules.Identity.Infrastructure.Persistence.Idempotency;
 using Mirama.Modules.Identity.Infrastructure.Common.Extensions;
+using Mirama.Modules.Identity.Domain.Aggregates.Organization;
+using Mirama.Modules.Identity.Domain.Aggregates.User;
+using Mirama.Modules.Identity.Domain.Aggregates.Tenant;
+using Mirama.Modules.Identity.Domain.Aggregates.Organization.Invitation;
+using Mirama.Modules.Identity.Domain.Aggregates.Organization.Member;
+using Mirama.Modules.Identity.Domain.Aggregates.Account;
+using Mirama.Modules.Identity.Domain.Abstractions.Core;
+using Mirama.Modules.Identity.Domain.Abstractions.Events;
 
 namespace Mirama.Modules.Identity.Infrastructure.Persistence;
 

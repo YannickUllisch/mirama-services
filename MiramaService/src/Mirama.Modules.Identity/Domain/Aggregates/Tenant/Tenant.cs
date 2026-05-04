@@ -1,9 +1,9 @@
 
-using Mirama.Domain.Abstractions.Core;
-using Mirama.Domain.Aggregates.User;
 using ErrorOr;
+using Mirama.Modules.Identity.Domain.Abstractions.Core;
+using Mirama.Modules.Identity.Domain.Aggregates.User;
 
-namespace Mirama.Domain.Aggregates.Tenant;
+namespace Mirama.Modules.Identity.Domain.Aggregates.Tenant;
 
 public sealed class Tenant : AggregateRoot<Guid>
 {

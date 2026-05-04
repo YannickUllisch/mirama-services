@@ -1,5 +1,5 @@
 
-using Mirama.Domain.Abstractions.Core;
+using Mirama.Modules.Identity.Domain.Abstractions.Core;
 
 namespace Mirama.Modules.Identity.Application.Common.Interfaces;
 

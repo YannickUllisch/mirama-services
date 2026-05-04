@@ -1,8 +1,8 @@
 
 using System.Linq.Expressions;
-using Mirama.Domain.Abstractions.Core;
-using Mirama.Domain.Aggregates.Organization;
 using Microsoft.EntityFrameworkCore;
+using Mirama.Modules.Identity.Domain.Abstractions.Core;
+using Mirama.Modules.Identity.Domain.Aggregates.Organization;
 
 namespace Mirama.Modules.Identity.Infrastructure.Common.Extensions;
 

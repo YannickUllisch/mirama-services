@@ -11,6 +11,7 @@ using Mirama.Modules.Identity.Infrastructure.Persistence;
 using Mirama.Modules.Identity.Infrastructure.Persistence.Repositories;
 using Mirama.Modules.Identity.Infrastructure.Services;
 using Npgsql;
+using Microsoft.EntityFrameworkCore;
 
 namespace Mirama.Modules.Identity;
 

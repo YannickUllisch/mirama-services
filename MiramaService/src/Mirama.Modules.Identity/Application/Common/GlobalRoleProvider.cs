@@ -1,8 +1,5 @@
-
-
-
-using Mirama.Domain.Aggregates.User;
 using Mirama.Modules.Identity.Application.Common.Interfaces;
+using Mirama.Modules.Identity.Domain.Aggregates.User;
 
 namespace Mirama.Modules.Identity.Application.Common;
 

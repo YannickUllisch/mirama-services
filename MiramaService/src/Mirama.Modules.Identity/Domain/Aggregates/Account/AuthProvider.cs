@@ -1,5 +1,5 @@
 
-namespace Mirama.Domain.Aggregates.Account;
+namespace Mirama.Modules.Identity.Domain.Aggregates.Account;
 
 public enum AuthProvider
 {

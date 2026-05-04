@@ -1,5 +1,5 @@
 
-namespace Mirama.Domain.Abstractions.Events;
+namespace Mirama.Modules.Identity.Domain.Abstractions.Events;
 
 public interface IDomainEventEntity
 {

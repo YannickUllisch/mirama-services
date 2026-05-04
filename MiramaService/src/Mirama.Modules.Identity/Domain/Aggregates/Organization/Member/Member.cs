@@ -1,8 +1,8 @@
 
-using Mirama.Domain.Abstractions.Core;
-using Mirama.Domain.Aggregates.User;
+using Mirama.Modules.Identity.Domain.Abstractions.Core;
+using Mirama.Modules.Identity.Domain.Aggregates.User;
 
-namespace Mirama.Domain.Aggregates.Organization.Member;
+namespace Mirama.Modules.Identity.Domain.Aggregates.Organization.Member;
 
 public class Member : Entity<MemberId>, IOrganizationOwned
 {

@@ -1,7 +1,6 @@
 
-
-using Mirama.Domain.Aggregates.Organization;
-using Mirama.Domain.Aggregates.Tenant;
+using Mirama.Modules.Identity.Domain.Aggregates.Organization;
+using Mirama.Modules.Identity.Domain.Aggregates.Tenant;
 using Mirama.Modules.Identity.Infrastructure.Persistence;
 
 namespace Mirama.Modules.Identity.Infrastructure.Seeding;

@@ -1,7 +1,7 @@
 
 using ErrorOr;
 
-namespace Mirama.Domain.Aggregates.Tenant;
+namespace Mirama.Modules.Identity.Domain.Aggregates.Tenant;
 
 public static class BillingPlanFactory
 {

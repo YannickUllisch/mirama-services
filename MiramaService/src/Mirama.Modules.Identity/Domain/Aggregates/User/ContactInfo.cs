@@ -1,5 +1,5 @@
 
-namespace Mirama.Domain.Aggregates.User;
+namespace Mirama.Modules.Identity.Domain.Aggregates.User;
 
 public sealed record ContactInfo(string ContactEmail, string ContactPhoneNumber)
 {

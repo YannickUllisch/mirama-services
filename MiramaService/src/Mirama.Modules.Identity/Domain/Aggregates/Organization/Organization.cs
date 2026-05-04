@@ -1,11 +1,13 @@
 
-using Mirama.Domain.Abstractions.Core;
-using Mirama.Domain.Aggregates.Organization.Member;
-using Mirama.Domain.Aggregates.User;
-using Mirama.Domain.ValueObjects;
 using ErrorOr;
+using Mirama.Modules.Identity.Domain.Abstractions.Core;
+using Mirama.Modules.Identity.Domain.ValueObjects;
+using Mirama.Modules.Identity.Domain.Aggregates.Organization.Member;
+using Mirama.Modules.Identity.Domain.Aggregates.User;
+using MemberEntity = Mirama.Modules.Identity.Domain.Aggregates.Organization.Member.Member;
 
-namespace Mirama.Domain.Aggregates.Organization;
+
+namespace Mirama.Modules.Identity.Domain.Aggregates.Organization;
 
 public class Organization : AggregateRoot<OrganizationId>, ITenantOwned
 {
@@ -19,7 +21,7 @@ public class Organization : AggregateRoot<OrganizationId>, ITenantOwned
 
     public Guid TenantId { get; private set; } = Guid.Empty; // Set in DB Context
 
-    public List<Member.Member> Members = [];
+    public List<MemberEntity> Members = [];
 
     public List<Invitation.Invitation> Invitations = [];
 
@@ -46,7 +48,7 @@ public class Organization : AggregateRoot<OrganizationId>, ITenantOwned
     public ErrorOr<Created> AddMember(Guid uid, OrganizationRole role)
     {
         var userId = new UserId(uid);
-        var member = Member.Member.Create(userId, role);
+        var member = MemberEntity.Create(userId, role);
         Members.Add(member);
 
         return Result.Created;

@@ -1,5 +1,5 @@
 
-namespace Mirama.Domain.Abstractions.Core;
+namespace Mirama.Modules.Identity.Domain.Abstractions.Core;
 
 public interface ITenantOwned
 {

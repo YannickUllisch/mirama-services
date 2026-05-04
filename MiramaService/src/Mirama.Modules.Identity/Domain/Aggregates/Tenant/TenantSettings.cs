@@ -1,8 +1,8 @@
 
-using Mirama.Domain.Abstractions.Core;
 using ErrorOr;
+using Mirama.Modules.Identity.Domain.Abstractions.Core;
 
-namespace Mirama.Domain.Aggregates.Tenant;
+namespace Mirama.Modules.Identity.Domain.Aggregates.Tenant;
 
 public class TenantSettings : ValueObject
 {

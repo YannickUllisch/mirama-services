@@ -1,7 +1,7 @@
 
 using ErrorOr;
 
-namespace Mirama.Domain.ValueObjects;
+namespace Mirama.Modules.Identity.Domain.ValueObjects;
 
 public sealed record Address
 {

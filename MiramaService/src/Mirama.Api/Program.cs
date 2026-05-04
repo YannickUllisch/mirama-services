@@ -1,13 +1,12 @@
 using Microsoft.OpenApi;
-using Mirama.Application;
-using Mirama.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
 using Mirama.Api.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
-using Mirama.Infrastructure;
+using Mirama.Modules.Identity;
+using Mirama.Modules.Identity.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 

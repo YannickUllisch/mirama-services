@@ -1,8 +1,7 @@
 
+using Mirama.Modules.Identity.Domain.Abstractions.Core;
 
-using Mirama.Domain.Abstractions.Core;
-
-namespace Mirama.Domain.Aggregates.Tenant;
+namespace Mirama.Modules.Identity.Domain.Aggregates.Tenant;
 
 public sealed class BillingPlan : ValueObject
 {
