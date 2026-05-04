@@ -1,17 +1,13 @@
-
-using Mirama.Modules.Identity.Domain.Abstractions.Core;
 using Mirama.Modules.Identity.Domain.Aggregates.User;
+using Mirama.SharedKernel.Abstractions.Domain.Core;
 
 namespace Mirama.Modules.Identity.Domain.Aggregates.Organization.Member;
 
-public class Member : Entity<MemberId>, IOrganizationOwned
+public class Member : OrganizationEntity<MemberId>
 {
     public UserId UserId { get; private set; } = default!;
 
     public OrganizationRole Role { get; private set; }
-
-    public OrganizationId OrganizationId { get; private set; } = default!;
-
     private Member(UserId userId, OrganizationRole role)
     {
         UserId = userId;
@@ -28,14 +24,5 @@ public class Member : Entity<MemberId>, IOrganizationOwned
     public void SetRole(OrganizationRole role)
     {
         Role = role;
-    }
-
-    void IOrganizationOwned.SetOrganizationId(Guid organizationId)
-    {
-        if (OrganizationId.Value != Guid.Empty)
-        {
-            throw new InvalidOperationException("OrganizationId already set.");
-        }
-        OrganizationId = new OrganizationId(organizationId);
     }
 }

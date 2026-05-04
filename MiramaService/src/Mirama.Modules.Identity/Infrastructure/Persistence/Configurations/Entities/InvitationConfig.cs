@@ -1,7 +1,6 @@
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Mirama.Modules.Identity.Domain.Aggregates.Organization;
 using Mirama.Modules.Identity.Domain.Aggregates.Organization.Invitation;
 using Mirama.Modules.Identity.Domain.Aggregates.User;
 
@@ -17,8 +16,8 @@ public class InvitationConfiguration : IEntityTypeConfiguration<Invitation>
         builder.Property(m => m.InviterId).IsRequired();
 
         builder.Property(i => i.OrganizationId).HasConversion(
-                orgId => orgId.Value,
-                val => new OrganizationId(val));
+                orgId => orgId,
+                val => val);
 
         builder.Property(m => m.Id).HasConversion(
             invId => invId.Value,

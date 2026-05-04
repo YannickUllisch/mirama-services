@@ -1,10 +1,10 @@
 
 using ErrorOr;
-using Mirama.Modules.Identity.Domain.Abstractions.Core;
 using Mirama.Modules.Identity.Domain.ValueObjects;
 using Mirama.Modules.Identity.Domain.Aggregates.Organization.Member;
 using Mirama.Modules.Identity.Domain.Aggregates.User;
 using MemberEntity = Mirama.Modules.Identity.Domain.Aggregates.Organization.Member.Member;
+using Mirama.SharedKernel.Abstractions.Domain.Core;
 
 
 namespace Mirama.Modules.Identity.Domain.Aggregates.Organization;

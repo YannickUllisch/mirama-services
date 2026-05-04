@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Mirama.Modules.Identity;
 using Mirama.Modules.Identity.Infrastructure.Persistence;
+using Mirama.SharedKernel;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,8 +41,8 @@ builder.Services.AddSwaggerGen(c => c
 builder.Services.AddProblemDetails();
 
 builder.Services
-    .AddApplication(builder.Configuration)
-    .AddInfrastructure(builder.Configuration);
+    .AddIdentityModule(builder.Configuration)
+    .AddSharedServices(builder.Configuration);
 
 builder.Services.AddApiVersioning(options =>
 {

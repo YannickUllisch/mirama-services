@@ -1,11 +1,10 @@
 
-
-using Mirama.Modules.Identity.Domain.Abstractions.Core;
 using Mirama.Modules.Identity.Domain.Aggregates.User;
+using Mirama.SharedKernel.Abstractions.Domain.Core;
 
 namespace Mirama.Modules.Identity.Domain.Aggregates.Organization.Invitation;
 
-public class Invitation : Entity<InvitationId>, IOrganizationOwned
+public class Invitation : OrganizationEntity<InvitationId>
 {
     public string Email { get; private set; } = string.Empty;
 
@@ -18,9 +17,6 @@ public class Invitation : Entity<InvitationId>, IOrganizationOwned
     public UserId InviterId { get; set; } = default!;
 
     public UserId? AcceptedBy = null;
-
-    public OrganizationId OrganizationId { get; private set; } = default!;
-
 
     private Invitation(string email, OrganizationRole role, UserId inviterId)
     {
@@ -53,14 +49,5 @@ public class Invitation : Entity<InvitationId>, IOrganizationOwned
     public void ExtendFromToday()
     {
         ExpiresAt = DateTime.Today.AddDays(7);
-    }
-
-    void IOrganizationOwned.SetOrganizationId(Guid organizationId)
-    {
-        if (OrganizationId.Value != Guid.Empty)
-        {
-            throw new InvalidOperationException("OrganizationId already set.");
-        }
-        OrganizationId = new OrganizationId(organizationId); ;
     }
 }

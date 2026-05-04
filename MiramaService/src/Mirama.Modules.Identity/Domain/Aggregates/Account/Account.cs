@@ -1,7 +1,7 @@
 
 using ErrorOr;
-using Mirama.Modules.Identity.Domain.Abstractions.Core;
 using Mirama.Modules.Identity.Domain.Aggregates.User;
+using Mirama.SharedKernel.Abstractions.Domain.Core;
 
 namespace Mirama.Modules.Identity.Domain.Aggregates.Account;
 

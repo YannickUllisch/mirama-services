@@ -1,6 +1,5 @@
 
-
-using Mirama.Modules.Identity.Domain.Abstractions.Core;
+using Mirama.SharedKernel.Abstractions.Domain.Core;
 
 namespace Mirama.Modules.Identity.Domain.Aggregates.User;
 

@@ -19,5 +19,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Mirama.Modules.Identity\Mirama.Modules.Identity.csproj" />
     <ProjectReference Include="..\Mirama.Modules.Projects\Mirama.Modules.Projects.csproj" />
+    <ProjectReference Include="..\Mirama.SharedKernel\Mirama.SharedKernel.csproj" />
   </ItemGroup>
 </Project>

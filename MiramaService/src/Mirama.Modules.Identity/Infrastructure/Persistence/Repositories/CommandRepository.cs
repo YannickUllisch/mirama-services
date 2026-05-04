@@ -1,5 +1,6 @@
-using Mirama.Modules.Identity.Application.Common.Interfaces;
-using Mirama.Modules.Identity.Domain.Abstractions.Core;
+
+using Mirama.SharedKernel.Abstractions.Domain.Core;
+using Mirama.SharedKernel.Abstractions.Persistence;
 
 namespace Mirama.Modules.Identity.Infrastructure.Persistence.Repositories;
 

@@ -3,21 +3,28 @@ using FluentValidation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Mirama.Modules.Identity.Application.Common;
-using Mirama.Modules.Identity.Application.Common.Behaviours;
-using Mirama.Modules.Identity.Application.Common.Interfaces;
 using Mirama.Modules.Identity.Infrastructure.Common.Options;
 using Mirama.Modules.Identity.Infrastructure.Persistence;
 using Mirama.Modules.Identity.Infrastructure.Persistence.Repositories;
-using Mirama.Modules.Identity.Infrastructure.Services;
-using Npgsql;
 using Microsoft.EntityFrameworkCore;
+using Mirama.SharedKernel.Infrastructure.Behaviours;
+using Mirama.SharedKernel.Abstractions.Persistence;
+using Mirama.Modules.Identity.Application.Common.Models;
+using Mirama.SharedKernel.Infrastructure.Options;
 
 namespace Mirama.Modules.Identity;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration config)
+    public static IServiceCollection AddIdentityModule(this IServiceCollection services, IConfiguration config)
+    {
+        services.AddApplication(config);
+        services.AddInfrastructure(config);
+
+        return services;
+    }
+
+    private static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration config)
     {
         var applicationAssembly = typeof(DependencyInjection).Assembly;
 
@@ -34,7 +41,7 @@ public static class DependencyInjection
         return services;
     }
 
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
+    private static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
     {
         // Configuring Options Pattern
         services.Configure<ApplicationOptions>(config.GetSection(ApplicationOptions.Key));
@@ -48,7 +55,7 @@ public static class DependencyInjection
 
 
         // Services
-        services.AddScoped<IRequestContextProvider, RequestContextProvider>();
+        services.AddScoped<IRequestContextProvider, IRequestContextProvider>();
         services.AddScoped(typeof(IReadRepository<,>), typeof(ReadRepository<,>));
         services.AddScoped(typeof(ICommandRepository<,>), typeof(CommandRepository<,>));
 

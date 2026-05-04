@@ -19,8 +19,8 @@ public class MemberConfiguration : IEntityTypeConfiguration<Member>
         builder.Property(m => m.Role).IsRequired();
 
         builder.Property(i => i.OrganizationId).HasConversion(
-            orgId => orgId.Value,
-            val => new OrganizationId(val));
+            orgId => orgId,
+            val => val);
 
         builder.Property(m => m.Id).HasConversion(
             uid => uid.Value,
