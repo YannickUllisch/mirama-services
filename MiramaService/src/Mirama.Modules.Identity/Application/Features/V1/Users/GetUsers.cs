@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Mirama.Modules.Identity.Domain.Aggregates.User;
+using Mirama.Modules.Identity.Infrastructure.Common.Interfaces;
 using Mirama.SharedKernel.Abstractions.Persistence;
 using Mirama.SharedKernel.Extensions;
 using Mirama.SharedKernel.Models;
@@ -40,9 +41,9 @@ internal class GetUsersQueryValidator : AbstractValidator<GetUsersQuery>
     }
 }
 
-internal class GetUsersQueryHandler(IReadRepository<User, UserId> userRepository) : IRequestHandler<GetUsersQuery, ErrorOr<PaginatedList<UserResponse>>>
+internal class GetUsersQueryHandler(IIdentityQueryRepository<User, UserId> userRepository) : IRequestHandler<GetUsersQuery, ErrorOr<PaginatedList<UserResponse>>>
 {
-    private readonly IReadRepository<User, UserId> _userRepository = userRepository;
+    private readonly IIdentityQueryRepository<User, UserId> _userRepository = userRepository;
 
     public async Task<ErrorOr<PaginatedList<UserResponse>>> Handle(GetUsersQuery request, CancellationToken cancellationToken)
     {

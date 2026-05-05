@@ -1,6 +1,5 @@
 
-namespace Mirama.Modules.Identity.Infrastructure.Persistence.Idempotency;
-
+namespace Mirama.SharedKernel.Infrastructure.Idempotency;
 
 public sealed class IdempotencyRecord
 {

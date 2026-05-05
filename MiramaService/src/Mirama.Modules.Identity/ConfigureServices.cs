@@ -11,6 +11,7 @@ using Mirama.SharedKernel.Infrastructure.Behaviours;
 using Mirama.SharedKernel.Abstractions.Persistence;
 using Mirama.Modules.Identity.Application.Common.Models;
 using Mirama.SharedKernel.Infrastructure.Options;
+using Mirama.Modules.Identity.Infrastructure.Common.Interfaces;
 
 namespace Mirama.Modules.Identity;
 
@@ -56,8 +57,8 @@ public static class DependencyInjection
 
         // Services
         services.AddScoped<IRequestContextProvider, IRequestContextProvider>();
-        services.AddScoped(typeof(IReadRepository<,>), typeof(ReadRepository<,>));
-        services.AddScoped(typeof(ICommandRepository<,>), typeof(CommandRepository<,>));
+        services.AddScoped(typeof(IIdentityQueryRepository<,>), typeof(IdentityQueryRepository<,>));
+        services.AddScoped(typeof(IIdentityCommandRepository<,>), typeof(IdentityCommandRepository<,>));
 
         services.AddDbContext<ApplicationDbContext>(static (sp, options) =>
         {

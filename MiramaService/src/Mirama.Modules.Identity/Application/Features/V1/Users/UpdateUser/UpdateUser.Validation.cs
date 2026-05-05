@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Mirama.Modules.Identity.Domain.Aggregates.User;
 using Mirama.SharedKernel.Models;
-using Mirama.SharedKernel.Abstractions.Persistence;
+using Mirama.Modules.Identity.Infrastructure.Common.Interfaces;
 
 namespace Mirama.Modules.Identity.Application.Features.V1.Users.UpdateUser;
 
@@ -22,9 +22,9 @@ public class UpdateUserController : ApiControllerBase
     }
 }
 
-internal class UpdateUserCommandHandler(ICommandRepository<User, UserId> repo) : IRequestHandler<UpdateUserCommand, ErrorOr<UserResponse>>
+internal class UpdateUserCommandHandler(IIdentityCommandRepository<User, UserId> repo) : IRequestHandler<UpdateUserCommand, ErrorOr<UserResponse>>
 {
-    private readonly ICommandRepository<User, UserId> _repo = repo;
+    private readonly IIdentityCommandRepository<User, UserId> _repo = repo;
 
     public async Task<ErrorOr<UserResponse>> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
     {
