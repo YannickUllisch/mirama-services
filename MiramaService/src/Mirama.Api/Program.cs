@@ -9,6 +9,7 @@ using Mirama.SharedKernel;
 using System.Text;
 using Mirama.Modules.Identity;
 using Mirama.Modules.Identity.Infrastructure.Persistence;
+using Mirama.Modules.Identity.Infrastructure.Persistence.Seeding;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -99,6 +100,11 @@ if (app.Environment.IsDevelopment())
         logger.LogInformation("Applying database migrations...");
         await db.Database.MigrateAsync();
         logger.LogInformation("Database migrations applied successfully");
+
+        logger.LogInformation("Seeding database...");
+        await PolicySeed.SeedDataAsync(db);
+        await RoleSeed.SeedDataAsync(db);
+        logger.LogInformation("Database seeding complete");
     }
     catch (Exception ex)
     {

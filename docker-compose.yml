@@ -1,20 +1,20 @@
 
 
 services:
-  authservice:
-    build:
-      context: ./AuthService
-      dockerfile: Dockerfile
-      target: final
-    ports:
-      - "8080:8080"
-    env_file:
-      - ./AuthService/.env
-    volumes:
-      - ./certs:/certificates
-    depends_on:
-      db:
-        condition: service_healthy
+  # authservice:
+  #   build:
+  #     context: ./AuthService
+  #     dockerfile: Dockerfile
+  #     target: final
+  #   ports:
+  #     - "8080:8080"
+  #   env_file:
+  #     - ./AuthService/.env
+  #   volumes:
+  #     - ./certs:/certificates
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
 
   miramaservice:
     build:

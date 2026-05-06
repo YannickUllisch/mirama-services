@@ -19,6 +19,7 @@ using Mirama.SharedKernel.Abstractions.Domain.Events;
 using Mirama.SharedKernel.Infrastructure.Extensions;
 using Mirama.SharedKernel.Infrastructure.Idempotency;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Mirama.Modules.Identity.Infrastructure.Persistence;
 
@@ -26,7 +27,7 @@ public sealed class IdentityDbContext : DbContext, IUnitOfWork
 {
     private readonly IDispatcher _dispatcher = default!;
     private readonly IRequestContextProvider _contextProvider = default!;
-    private Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction? _currentTransaction;
+    private IDbContextTransaction? _currentTransaction;
     private Guid? TenantId => _contextProvider?.TenantId;
     private Guid? OrganizationId => _contextProvider?.OrganizationId;
 
@@ -79,7 +80,7 @@ public sealed class IdentityDbContext : DbContext, IUnitOfWork
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-        builder.HasDefaultSchema("account");
+        builder.HasDefaultSchema("identity");
 
         builder.ApplyGlobalFilters(TenantId, OrganizationId);
 
