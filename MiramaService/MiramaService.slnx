@@ -1,8 +1,18 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="src/Mirama.Modules.Identity/Mirama.Modules.Identity.csproj" />
-    <Project Path="src/Mirama.Modules.Projects/Mirama.Modules.Projects.csproj" />
+    <Project Path="src/Mirama.Api/Mirama.Api.csproj" />
     <Project Path="src/Mirama.SharedKernel/Mirama.SharedKernel.csproj" />
-    <Project Path="src/mirama.Api/mirama.Api.csproj" />
+  </Folder>
+  <Folder Name="/Modules/Identity/">
+    <Project Path="src/Modules/Mirama.Modules.Identity/Mirama.Modules.Identity.Contracts/Mirama.Modules.Identity.Contracts.csproj" />
+    <Project Path="src/Modules/Mirama.Modules.Identity/Mirama.Modules.Identity.Domain/Mirama.Modules.Identity.Domain.csproj" />
+    <Project Path="src/Modules/Mirama.Modules.Identity/Mirama.Modules.Identity.Application/Mirama.Modules.Identity.Application.csproj" />
+    <Project Path="src/Modules/Mirama.Modules.Identity/Mirama.Modules.Identity.Infrastructure/Mirama.Modules.Identity.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/Modules/Projects/">
+    <Project Path="src/Modules/Mirama.Modules.Projects/Mirama.Modules.Projects.Contracts/Mirama.Modules.Projects.Contracts.csproj" />
+    <Project Path="src/Modules/Mirama.Modules.Projects/Mirama.Modules.Projects.Domain/Mirama.Modules.Projects.Domain.csproj" />
+    <Project Path="src/Modules/Mirama.Modules.Projects/Mirama.Modules.Projects.Application/Mirama.Modules.Projects.Application.csproj" />
+    <Project Path="src/Modules/Mirama.Modules.Projects/Mirama.Modules.Projects.Infrastructure/Mirama.Modules.Projects.Infrastructure.csproj" />
   </Folder>
 </Solution>

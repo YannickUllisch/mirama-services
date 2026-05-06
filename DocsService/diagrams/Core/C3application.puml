@@ -1,0 +1,78 @@
+@startuml C3MiramaService
+skinparam linetype ortho
+skinparam nodesep 40
+skinparam ranksep 50
+skinparam ArrowThickness 1.2
+skinparam ArrowColor #555555
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+LAYOUT_TOP_DOWN()
+LAYOUT_WITH_LEGEND()
+
+title MiramaService — Modular Monolith Component Structure
+
+' ── External ───────────────────────────────────────────────────────────────────
+Person_Ext(client, "Client", "BFF or browser. Sends HTTP requests.")
+
+' ── SharedKernel — every project in the solution depends on this ───────────────
+Component(sk, "Mirama.SharedKernel", "Shared Project", "Foundation for all modules.\nAggregateRoot, IDomainEvent, ICommand, IQuery,\nIDispatcher, IUnitOfWork, Decorators, OutboxMessage.")
+
+' ── API Host ───────────────────────────────────────────────────────────────────
+System_Boundary(host, "MiramaService — .NET Host (Mirama.Api)") {
+
+    Component(api, "Endpoints & Middleware", "ASP.NET Core Minimal API", "HTTP entry point. Idempotency middleware.\nEach module registers its own endpoint group here.")
+
+    Component(disp, "Dispatcher & Pipeline", "IDispatcher + Decorator chain", "Routes ICommand / IQuery to a single handler.\nDecorators applied in order: Exception → Auth → Validation → Transaction.\nPublishes IDomainEvent to all INotificationHandlers.")
+
+    Component(relay, "Outbox Relay", "BackgroundService", "Polls each module's OutboxMessages table.\nDeserializes and re-publishes events via Dispatcher.\nAt-least-once delivery guarantee.")
+
+    ' ── Identity Module ──────────────────────────────────────────────────────
+    Boundary(id_mod, "Modules / Identity") {
+        Component(id_con, "Identity.Contracts", "Public API surface", "Integration events and shared DTOs.\nThe only Identity project other modules may reference.")
+        Component(id_dom, "Identity.Domain", "Domain layer", "Aggregates: User, Organisation, Tenant, Account.\nRaises domain events via AddDomainEvent().")
+        Component(id_app, "Identity.Application", "Application layer", "Commands, queries, handlers, validators.\nDefines repository interfaces (IIdentityQueryRepository…).")
+        Component(id_inf, "Identity.Infrastructure", "Infrastructure layer", "IdentityDbContext implements IUnitOfWork.\nRepositories, seeding, endpoint registration.\nSaveChangesAsync publishes + persists OutboxMessages atomically.")
+    }
+
+    ' ── Projects Module ──────────────────────────────────────────────────────
+    Boundary(pr_mod, "Modules / Projects") {
+        Component(pr_con, "Projects.Contracts", "Public API surface", "Integration events and shared DTOs.\nThe only Projects project other modules may reference.")
+        Component(pr_dom, "Projects.Domain", "Domain layer", "Aggregates: Project, Task, Asset.\nRaises domain events via AddDomainEvent().")
+        Component(pr_app, "Projects.Application", "Application layer", "Commands, queries, handlers, validators.\nDefines repository interfaces.")
+        Component(pr_inf, "Projects.Infrastructure", "Infrastructure layer", "ProjectsDbContext implements IUnitOfWork.\nRepositories, endpoint registration.\nSaveChangesAsync publishes + persists OutboxMessages atomically.")
+    }
+}
+
+' ── Database ───────────────────────────────────────────────────────────────────
+ContainerDb(db, "PostgreSQL", "Database", "Schema [account]  — Identity tables + OutboxMessages\nSchema [projects] — Projects tables + OutboxMessages")
+
+' ── Request flow ───────────────────────────────────────────────────────────────
+Rel(client, api,  "HTTPS")
+Rel(api,   disp,  "Send ICommand / IQuery")
+Rel(disp,  id_app, "Route to handler")
+Rel(disp,  pr_app, "Route to handler")
+
+' ── Clean architecture — Identity (Infra → App → Domain) ───────────────────────
+Rel(id_inf, id_app, "Implements interfaces from")
+Rel(id_app, id_dom, "Uses aggregates in")
+Rel(id_inf, db,     "Read / Write", "[account]")
+
+' ── Clean architecture — Projects (Infra → App → Domain) ───────────────────────
+Rel(pr_inf, pr_app, "Implements interfaces from")
+Rel(pr_app, pr_dom, "Uses aggregates in")
+Rel(pr_inf, db,     "Read / Write", "[projects]")
+
+' ── Async cross-module messaging ───────────────────────────────────────────────
+Rel(relay, db,   "Poll OutboxMessages")
+Rel(relay, disp, "Re-publish domain event")
+
+' ── Cross-module boundary — Contracts only ─────────────────────────────────────
+Rel(id_app, pr_con, "References (compile-time)")
+Rel(pr_app, id_con, "References (compile-time)")
+
+' ── SharedKernel — shown once per module via outermost layer ───────────────────
+Rel(id_inf, sk, "Depends on")
+Rel(pr_inf, sk, "Depends on")
+
+@enduml

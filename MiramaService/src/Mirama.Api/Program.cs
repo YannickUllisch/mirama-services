@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.Authorization;
 using Mirama.Api.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
-using Mirama.Modules.Identity;
-using Mirama.Modules.Identity.Infrastructure.Persistence;
 using Mirama.SharedKernel;
 using System.Text;
+using Mirama.Modules.Identity;
+using Mirama.Modules.Identity.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
