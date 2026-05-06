@@ -7,7 +7,7 @@ namespace Mirama.Modules.Identity.Infrastructure.Seeding;
 
 public static class OrganizationSeed
 {
-    public static async Task SeedDataAsync(ApplicationDbContext dbContext)
+    public static async Task SeedDataAsync(IdentityDbContext dbContext)
     {
         if (!dbContext.Tenants.Any())
         {

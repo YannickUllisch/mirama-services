@@ -1,21 +1,20 @@
 using ErrorOr;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.DependencyInjection;
+using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 
 namespace Mirama.SharedKernel.Models;
 
 [ApiController]
 [Route("api/v{version:apiVersion}")]
-[Authorize(Policy = "RequireTenantOnly")]
 public abstract class ApiControllerBase : ControllerBase
 {
-    private ISender? _mediator;
+    private IDispatcher? _dispatcher;
 
-    protected ISender Mediator => _mediator ??= HttpContext.RequestServices.GetService<ISender>()!;
+    protected IDispatcher Dispatcher => this._dispatcher ??= this.HttpContext.RequestServices.GetService<IDispatcher>()!;
 
     protected ActionResult Problem(List<Error> errors)
     {

@@ -1,10 +1,8 @@
 
 using System.Reflection;
 using System.Text.Json;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Mirama.Modules.Identity.Infrastructure.Persistence.Idempotency;
 using Mirama.Modules.Identity.Domain.Aggregates.Organization;
 using Mirama.Modules.Identity.Domain.Aggregates.User;
 using Mirama.Modules.Identity.Domain.Aggregates.Tenant;
@@ -16,13 +14,16 @@ using Mirama.SharedKernel.Infrastructure.Messaging.Outbox;
 using Mirama.SharedKernel.Abstractions.Domain.Core;
 using Mirama.SharedKernel.Abstractions.Domain.Events;
 using Mirama.SharedKernel.Infrastructure.Extensions;
+using Mirama.SharedKernel.Infrastructure.Idempotency;
+using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 
 namespace Mirama.Modules.Identity.Infrastructure.Persistence;
 
-public sealed class ApplicationDbContext : DbContext
+public sealed class IdentityDbContext : DbContext, IUnitOfWork
 {
-    private readonly IMediator _mediator = default!;
+    private readonly IDispatcher _dispatcher = default!;
     private readonly IRequestContextProvider _contextProvider = default!;
+    private Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction? _currentTransaction;
     private Guid? TenantId => _contextProvider?.TenantId;
     private Guid? OrganizationId => _contextProvider?.OrganizationId;
 
@@ -35,16 +36,37 @@ public sealed class ApplicationDbContext : DbContext
     public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
     public DbSet<IdempotencyRecord> IdempotencyRecords => Set<IdempotencyRecord>();
 
-    public ApplicationDbContext(
-        DbContextOptions<ApplicationDbContext> options,
-        IMediator mediator,
+    public IdentityDbContext(
+        DbContextOptions<IdentityDbContext> options,
+        IDispatcher dispatcher,
         IRequestContextProvider requestContext) : base(options)
     {
-        _mediator = mediator;
+        _dispatcher = dispatcher;
         _contextProvider = requestContext;
     }
 
-    public ApplicationDbContext() { }
+    public IdentityDbContext() { }
+
+    public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        _currentTransaction ??= await Database.BeginTransactionAsync(cancellationToken);
+    }
+
+    public async Task CommitTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        if (_currentTransaction is null) return;
+        await _currentTransaction.CommitAsync(cancellationToken);
+        await _currentTransaction.DisposeAsync();
+        _currentTransaction = null;
+    }
+
+    public async Task RollbackTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        if (_currentTransaction is null) return;
+        await _currentTransaction.RollbackAsync(cancellationToken);
+        await _currentTransaction.DisposeAsync();
+        _currentTransaction = null;
+    }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -92,7 +114,7 @@ public sealed class ApplicationDbContext : DbContext
 
         foreach (var domainEvent in domainEvents)
         {
-            await _mediator.Publish(domainEvent, cancellationToken);
+            await _dispatcher.Publish(domainEvent, cancellationToken);
         }
 
         var outboxMessages = domainEvents

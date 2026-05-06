@@ -5,12 +5,12 @@ using DotNetEnv;
 
 namespace Mirama.Modules.Identity.Infrastructure.Persistence;
 
-public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<ApplicationDbContext>
+public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<IdentityDbContext>
 {
-    public ApplicationDbContext CreateDbContext(string[] args)
+    public IdentityDbContext CreateDbContext(string[] args)
     {
         Env.TraversePath().Load();
-        var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+        var optionsBuilder = new DbContextOptionsBuilder<IdentityDbContext>();
         var connection = Environment.GetEnvironmentVariable("Infrastructure__DatabaseConnection");
 
         if (string.IsNullOrWhiteSpace(connection))
@@ -19,9 +19,9 @@ public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<Applicati
         optionsBuilder.UseNpgsql(
             connection,
             b => b
-                .MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)
+                .MigrationsAssembly(typeof(IdentityDbContext).Assembly.FullName)
                 .MigrationsHistoryTable("__EFMigrationsHistory", "account"));
 
-        return new ApplicationDbContext(optionsBuilder.Options, null!, null!);
+        return new IdentityDbContext(optionsBuilder.Options, null!, null!);
     }
 }

@@ -1,11 +1,11 @@
 
 using System.Text.Json.Serialization;
-using MediatR;
 using ErrorOr;
+using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 
 namespace Mirama.Modules.Identity.Application.Features.V1.Users.UpdateUser;
 
-public sealed record UpdateUserCommand : IRequest<ErrorOr<UserResponse>>
+public sealed record UpdateUserCommand : ICommand<ErrorOr<UserResponse>>
 {
     [JsonPropertyName("id")]
     public Guid Id { get; init; }

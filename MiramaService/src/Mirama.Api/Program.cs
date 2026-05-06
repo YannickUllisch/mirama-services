@@ -8,6 +8,7 @@ using Serilog;
 using Mirama.Modules.Identity;
 using Mirama.Modules.Identity.Infrastructure.Persistence;
 using Mirama.SharedKernel;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -58,33 +59,35 @@ builder.Services.AddAuthentication()
     .AddJwtBearer(options =>
     {
         var authSection = builder.Configuration.GetSection("Authentication");
-        options.Authority = authSection["Authority"];
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authSection["NextAuthSecret"] ?? "SECRET_NOT_SET"));
+        // options.Authority = authSection["Authority"]; Only used when using AuthService
         options.Audience = authSection["Audience"];
         options.TokenValidationParameters = new TokenValidationParameters
         {
+            TokenDecryptionKey = securityKey,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = securityKey,
             ValidateIssuer = true,
             ValidateLifetime = true,
             ValidateAudience = true,
-            ValidateIssuerSigningKey = true,
             ValidIssuer = authSection["Authority"],
             ValidAudience = authSection["Audience"],
+            ClockSkew = TimeSpan.Zero,
         };
     });
 
 builder.Services.AddSingleton<IAuthorizationHandler, RequireTenantAndOrgHandler>();
 builder.Services.AddSingleton<IAuthorizationHandler, RequireTenantOnlyHandler>();
 
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("RequireTenantAndOrg", policy =>
-        policy.Requirements.Add(new TenantAndOrgRequirement()));
-
-    options.AddPolicy("RequireTenantOnly", policy =>
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("RequireTenantAndOrg", policy =>
+        policy.Requirements.Add(new TenantAndOrgRequirement()))
+    .AddPolicy("RequireTenantOnly", policy =>
         policy.Requirements.Add(new TenantOnlyRequirement()));
-});
 
 var app = builder.Build();
 
+// TODO: Make this work for all modules
 // Applying migrations immediately in Development, handled in CICD pipeline for production
 if (app.Environment.IsDevelopment())
 {
@@ -92,7 +95,7 @@ if (app.Environment.IsDevelopment())
     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
     try
     {
-        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var db = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
         logger.LogInformation("Applying database migrations...");
         await db.Database.MigrateAsync();
         logger.LogInformation("Database migrations applied successfully");

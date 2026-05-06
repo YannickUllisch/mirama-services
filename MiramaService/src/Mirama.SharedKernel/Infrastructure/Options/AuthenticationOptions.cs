@@ -7,4 +7,5 @@ public class AuthenticationOptions
 
     public string Audience { get; set; } = string.Empty;
     public string Authority { get; set; } = string.Empty;
+    public string NextAuthSecret { get; set; } = string.Empty;
 }

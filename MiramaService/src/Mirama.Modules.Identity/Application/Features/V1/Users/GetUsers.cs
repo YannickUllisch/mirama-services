@@ -2,28 +2,27 @@
 using System.Text.Json.Serialization;
 using ErrorOr;
 using FluentValidation;
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Mirama.Modules.Identity.Domain.Aggregates.User;
 using Mirama.Modules.Identity.Infrastructure.Common.Interfaces;
-using Mirama.SharedKernel.Abstractions.Persistence;
+using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.SharedKernel.Extensions;
 using Mirama.SharedKernel.Models;
 
 namespace Mirama.Modules.Identity.Application.Features.V1.Users;
 
-public class GetUsersController : ApiControllerBase
+public class GetUsersController : TenantControllerBase
 {
     [HttpGet("users")]
     public async Task<ActionResult<PaginatedList<UserResponse>>> Get([FromQuery] GetUsersQuery query)
     {
-        var res = await Mediator.Send(query);
+        var res = await this.Dispatcher.Send(query);
         return res.Match(Ok, Problem);
     }
 }
 
-public sealed record GetUsersQuery : IRequest<ErrorOr<PaginatedList<UserResponse>>>
+public sealed record GetUsersQuery : IQuery<ErrorOr<PaginatedList<UserResponse>>>
 {
     [JsonPropertyName("pageSize")]
     public int? PageSize { get; init; } = null;
@@ -34,10 +33,10 @@ public sealed record GetUsersQuery : IRequest<ErrorOr<PaginatedList<UserResponse
 
 internal class GetUsersQueryValidator : AbstractValidator<GetUsersQuery>
 {
-    public GetUsersQueryValidator(IGlobalRoleProvider roleProvider)
+    public GetUsersQueryValidator()
     {
-        // RuleFor(req => req.PageSize)
-        //     .LessThanOrEqualTo(50);
+        RuleFor(req => req.PageSize)
+            .LessThanOrEqualTo(50);
     }
 }
 
@@ -45,7 +44,7 @@ internal class GetUsersQueryHandler(IIdentityQueryRepository<User, UserId> userR
 {
     private readonly IIdentityQueryRepository<User, UserId> _userRepository = userRepository;
 
-    public async Task<ErrorOr<PaginatedList<UserResponse>>> Handle(GetUsersQuery request, CancellationToken cancellationToken)
+    public async Task<ErrorOr<PaginatedList<UserResponse>>> HandleAsync(GetUsersQuery request, CancellationToken cancellationToken)
     {
         var query = _userRepository.Query().OrderBy(user => user.Name).Select(u => u.MapResponse().Value);
 
