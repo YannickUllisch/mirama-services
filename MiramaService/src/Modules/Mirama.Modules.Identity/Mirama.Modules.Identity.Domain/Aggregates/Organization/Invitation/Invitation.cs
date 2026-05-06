@@ -12,21 +12,21 @@ public class Invitation : OrganizationEntity<InvitationId>
     public DateTime ExpiresAt { get; private set; }
     public RoleId IamRoleId { get; private set; } = default!;
 
-    private Invitation(string email, string name, Guid inviterId, RoleId iamRoleId)
+    private Invitation(InvitationDetails details)
     {
-        Email = email;
-        Name = name;
-        InviterId = inviterId;
-        IamRoleId = iamRoleId;
+        Email = details.Email.Trim();
+        Name = details.Name.Trim();
+        InviterId = details.InviterId;
+        IamRoleId = details.IamRoleId;
         Status = InvitationStatus.Pending;
         ExpiresAt = DateTime.UtcNow.AddDays(7);
     }
 
     private Invitation() { }
 
-    public static Invitation Create(string email, string name, Guid inviterId, RoleId iamRoleId)
+    public static Invitation Create(InvitationDetails details)
     {
-        return new Invitation(email, name, inviterId, iamRoleId);
+        return new Invitation(details) { Id = new InvitationId(Guid.NewGuid()) };
     }
 
     public void Accept()

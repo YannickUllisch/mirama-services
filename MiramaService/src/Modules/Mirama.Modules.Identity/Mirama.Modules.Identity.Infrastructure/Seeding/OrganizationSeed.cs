@@ -10,13 +10,10 @@ public static class OrganizationSeed
     {
         if (!dbContext.Tenants.Any())
         {
-            dbContext.Tenants.Add(Tenant.Create(Guid.NewGuid()));
+            var seedSettings = new TenantSettingsDetails("Mirama", true, null, null);
+            dbContext.Tenants.Add(Tenant.Create(Guid.NewGuid(), seedSettings));
             dbContext.Organizations.Add(Organization.Create(
-                "Mirama",
-                "Street1",
-                "Copenhagen",
-                "Denmark",
-                "24000"));
+                new OrganizationDetails("Mirama", "Street1", "Copenhagen", "Denmark", "24000")));
 
             await dbContext.SaveChangesAsync();
         }

@@ -88,7 +88,6 @@ Request
   → ExceptionToErrorOrDecorator
   → LoggingDecorator
   → PerformanceDecorator
-  → AuthorizationDecorator
   → ValidationDecorator
   → TransactionDecorator       ← opens DB transaction
   → Handler                    ← mutates Aggregate Root, raises Domain Events

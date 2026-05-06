@@ -16,41 +16,38 @@ public sealed class Role : AggregateRoot<RoleId>
 
     public List<PolicyId> Policies { get; private set; } = [];
 
+    private Role(RoleDetails details)
+    {
+        Name = details.Name.Trim();
+        Description = details.Description?.Trim();
+        TenantId = details.TenantId;
+        Scope = details.Scope;
+    }
+
     private Role() { }
 
-    public static Role Create(string name, string? description, Guid? tenantId, AccessScope scope)
+    public static Role Create(RoleDetails details)
     {
-        return new Role
-        {
-            Id = new RoleId(Guid.NewGuid()),
-            Name = name.Trim(),
-            Description = description?.Trim(),
-            TenantId = tenantId,
-            Scope = scope
-        };
+        return new Role(details) { Id = new RoleId(Guid.NewGuid()) };
+    }
+
+    public void Update(RoleDetails details)
+    {
+        Name = details.Name.Trim();
+        Description = details.Description?.Trim();
     }
 
     public void AttachPolicy(PolicyId policyId)
     {
-        if (!this.Policies.Contains(policyId))
-        {
-            this.Policies.Add(policyId);
-        }
+        if (!Policies.Contains(policyId))
+            Policies.Add(policyId);
     }
 
     public ErrorOr<Deleted> DetachPolicy(PolicyId policyId)
     {
-        if (!this.Policies.Remove(policyId))
-        {
+        if (!Policies.Remove(policyId))
             return Error.NotFound("Role.Policy.NotFound", "Policy not attached to this role.");
-        }
 
         return Result.Deleted;
-    }
-
-    public void Update(string name, string? description)
-    {
-        this.Name = name.Trim();
-        this.Description = description?.Trim();
     }
 }

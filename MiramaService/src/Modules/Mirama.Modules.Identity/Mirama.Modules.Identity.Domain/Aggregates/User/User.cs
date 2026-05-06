@@ -10,27 +10,27 @@ public class User : AggregateRoot<UserId>
     public DateTime? EmailVerified { get; private set; }
     public TenantRole Role { get; private set; }
 
-    private User(string name, string email, TenantRole role, string? image)
+    private User(UserDetails details)
     {
-        Name = name;
-        Email = email;
-        Role = role;
-        Image = image;
+        Name = details.Name.Trim();
+        Email = details.Email.Trim();
+        Role = details.Role;
+        Image = details.Image;
     }
 
     private User() { }
 
-    public static User Create(string name, string email, TenantRole role = TenantRole.User, string? image = null)
+    public static User Create(UserDetails details)
     {
-        return new User(name, email, role, image);
+        return new User(details) { Id = new UserId(Guid.NewGuid()) };
     }
 
-    public void Update(string name, string email, TenantRole role, string? image)
+    public void Update(UserDetails details)
     {
-        Name = name;
-        Email = email;
-        Role = role;
-        Image = image;
+        Name = details.Name.Trim();
+        Email = details.Email.Trim();
+        Role = details.Role;
+        Image = details.Image;
     }
 
     public void VerifyEmail()

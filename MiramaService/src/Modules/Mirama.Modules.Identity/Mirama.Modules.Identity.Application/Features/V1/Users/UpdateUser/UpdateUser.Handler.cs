@@ -39,7 +39,7 @@ internal class UpdateUserCommandHandler(IIdentityCommandRepository<User, UserId>
             return Error.Validation("Invalid role value.");
         }
 
-        user.Update(request.Name, request.Email, parsedRole, request.Image);
+        user.Update(new UserDetails(request.Name, request.Email, parsedRole, request.Image));
 
         return user.MapResponse();
     }

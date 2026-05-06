@@ -1,7 +1,6 @@
 using ErrorOr;
 using Mirama.Modules.Identity.Domain.Aggregates.Organization.Member;
-using Mirama.Modules.Identity.Domain.Aggregates.Role;
-using Mirama.Modules.Identity.Domain.Aggregates.User;
+using InvitationEntity = Mirama.Modules.Identity.Domain.Aggregates.Organization.Invitation.Invitation;
 using Mirama.SharedKernel.Abstractions.Domain.Core;
 using MemberEntity = Mirama.Modules.Identity.Domain.Aggregates.Organization.Member.Member;
 
@@ -20,29 +19,30 @@ public class Organization : AggregateRoot<OrganizationId>, ITenantOwned
     public Guid TenantId { get; private set; } = Guid.Empty;
 
     public List<MemberEntity> Members = [];
-    public List<Invitation.Invitation> Invitations = [];
+    public List<InvitationEntity> Invitations = [];
+
+    private Organization(OrganizationDetails details)
+    {
+        Name = details.Name.Trim();
+        Slug = GenerateSlug(details.Name);
+        Logo = details.Logo;
+        Street = details.Street.Trim();
+        City = details.City.Trim();
+        Country = details.Country.Trim();
+        ZipCode = details.ZipCode.Trim();
+        DateCreated = DateTime.UtcNow;
+    }
 
     private Organization() { }
 
-    public static Organization Create(string name, string street, string city, string country, string zipCode)
+    public static Organization Create(OrganizationDetails details)
     {
-        return new Organization
-        {
-            Id = new OrganizationId(Guid.NewGuid()),
-            Name = name.Trim(),
-            Slug = GenerateSlug(name),
-            Street = street.Trim(),
-            City = city.Trim(),
-            Country = country.Trim(),
-            ZipCode = zipCode.Trim(),
-            DateCreated = DateTime.UtcNow
-        };
+        return new Organization(details) { Id = new OrganizationId(Guid.NewGuid()) };
     }
 
-    public ErrorOr<Created> AddMember(string name, string email, RoleId iamRoleId, UserId? userId = null)
+    public ErrorOr<Created> AddMember(MemberDetails details)
     {
-        var member = MemberEntity.Create(name, email, iamRoleId, userId);
-        Members.Add(member);
+        Members.Add(MemberEntity.Create(details));
         return Result.Created;
     }
 

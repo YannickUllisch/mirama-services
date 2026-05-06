@@ -1,3 +1,4 @@
+using ErrorOr;
 using Mirama.SharedKernel.Abstractions.Domain.Core;
 
 namespace Mirama.Modules.Identity.Domain.Aggregates.Tenant;
@@ -14,28 +15,49 @@ public sealed class TenantSettings : Entity<TenantSettingsId>
 
     private TenantSettings() { }
 
-    internal static TenantSettings Create(Guid tenantId, string name, string? brandingColor, string? logoUrl, bool receiveNotifications, string timezone = "UTC")
+    private TenantSettings(
+        string name, 
+        string timezone, 
+        string? brandingColor, 
+        string? logoUrl, 
+        bool receiveNotifications)
     {
-        return new TenantSettings
-        {
-            Id = new TenantSettingsId(Guid.NewGuid()),
-            TenantId = tenantId,
-            Name = name.Trim(),
-            IsActive = true,
-            Timezone = timezone,
-            BrandingColor = brandingColor,
-            LogoUrl = logoUrl,
-            ReceiveNotifications = receiveNotifications
-        };
+        this.Name = name;
+        this.Timezone = timezone;
+        this.BrandingColor = brandingColor;
+        this.LogoUrl = logoUrl;
+        this.ReceiveNotifications = receiveNotifications;
+        this.IsActive = true;
     }
 
-    public void Update(string name, string? brandingColor, string? logoUrl, bool receiveNotifications, string timezone)
+    internal static TenantSettings Create(TenantSettingsDetails details)
     {
-        Name = name.Trim();
-        BrandingColor = brandingColor;
-        LogoUrl = logoUrl;
-        ReceiveNotifications = receiveNotifications;
-        Timezone = timezone;
+        if (string.IsNullOrWhiteSpace(details.Name))
+        {
+            throw new ArgumentException("Tenant Name cannot be empty.", nameof(details));
+        }
+
+        return new TenantSettings(
+            details.Name.Trim(),
+            details.Timezone ?? "UTC",
+            details.BrandingColor,
+            details.LogoUrl,
+            details.ReceiveNotifications
+        );
+    }
+
+    public void Update(TenantSettingsDetails details)
+    {
+        if (string.IsNullOrWhiteSpace(details.Name))
+        {
+            throw new ArgumentException("Name is required.");
+        }
+
+        this.Name = details.Name.Trim();
+        this.BrandingColor = details.BrandingColor;
+        this.LogoUrl = details.LogoUrl;
+        this.ReceiveNotifications = details.ReceiveNotifications;
+        this.Timezone = details.Timezone;
     }
 
     public void SetActive(bool isActive)

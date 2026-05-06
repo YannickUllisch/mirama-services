@@ -1,4 +1,5 @@
-namespace Mirama.Modules.Identity.Domain.Aggregates.Subscription;
+
+namespace Mirama.Modules.Identity.Domain.Aggregates.Tenant.Subscription;
 
 public enum SubscriptionStatus
 {

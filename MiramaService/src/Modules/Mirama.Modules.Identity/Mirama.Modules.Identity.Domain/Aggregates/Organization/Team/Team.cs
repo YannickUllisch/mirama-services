@@ -13,18 +13,19 @@ public sealed class Team : AggregateRoot<TeamId>
 
     public List<TeamMember> Members { get; private set; } = [];
 
+    private Team(TeamDetails details)
+    {
+        Name = details.Name.Trim();
+        Slug = GenerateSlug(details.Name);
+        OrganizationId = details.OrganizationId;
+        DateCreated = DateTime.UtcNow;
+    }
+
     private Team() { }
 
-    public static Team Create(string name, Guid organizationId)
+    public static Team Create(TeamDetails details)
     {
-        return new Team
-        {
-            Id = new TeamId(Guid.NewGuid()),
-            Name = name.Trim(),
-            Slug = GenerateSlug(name),
-            DateCreated = DateTime.UtcNow,
-            OrganizationId = organizationId
-        };
+        return new Team(details) { Id = new TeamId(Guid.NewGuid()) };
     }
 
     public void AddMember(MemberId memberId)

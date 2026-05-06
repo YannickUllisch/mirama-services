@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Mirama.Modules.Identity.Domain.Aggregates.Subscription;
+using Mirama.Modules.Identity.Domain.Aggregates.Plan;
+using Mirama.Modules.Identity.Domain.Aggregates.Tenant.Subscription;
 using Mirama.Modules.Identity.Domain.Aggregates.Tenant;
 using Mirama.Modules.Identity.Domain.Aggregates.User;
 
@@ -25,10 +26,46 @@ public class TenantConfiguration : IEntityTypeConfiguration<Tenant>
             .HasForeignKey<Tenant>(t => t.AdminUserId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.Property(t => t.SubscriptionId)
-            .HasConversion(
-                id => id != null ? id.Value : (Guid?)null,
-                v => v.HasValue ? new SubscriptionId(v.Value) : null);
+        builder.OwnsOne(t => t.Subscription, sub =>
+        {
+            sub.Property(s => s.Id)
+                .HasConversion(id => id.Value, v => new SubscriptionId(v))
+                .HasColumnName("SubscriptionId");
+
+            sub.Property(s => s.PlanId)
+                .HasConversion(id => id.Value, v => new PlanId(v))
+                .HasColumnName("SubscriptionPlanId")
+                .IsRequired();
+
+            sub.HasOne<Plan>()
+                .WithMany()
+                .HasForeignKey("SubscriptionPlanId")
+                .OnDelete(DeleteBehavior.Restrict);
+
+            sub.Property(s => s.Status)
+                .HasColumnName("SubscriptionStatus")
+                .IsRequired();
+
+            sub.Property(s => s.StripeSubscriptionId)
+                .HasColumnName("StripeSubscriptionId")
+                .HasMaxLength(200);
+
+            sub.HasIndex("StripeSubscriptionId")
+                .IsUnique()
+                .HasFilter("\"StripeSubscriptionId\" IS NOT NULL");
+
+            sub.Property(s => s.PeriodStart)
+                .HasColumnName("SubscriptionPeriodStart")
+                .IsRequired();
+
+            sub.Property(s => s.PeriodEnd)
+                .HasColumnName("SubscriptionPeriodEnd")
+                .IsRequired();
+
+            sub.Property(s => s.CancelAtPeriodEnd)
+                .HasColumnName("SubscriptionCancelAtPeriodEnd")
+                .IsRequired();
+        });
 
         builder.OwnsOne(t => t.Settings, s =>
         {

@@ -11,19 +11,19 @@ public class Member : OrganizationEntity<MemberId>
     public UserId? UserId { get; private set; }
     public RoleId IamRoleId { get; private set; } = default!;
 
-    private Member(string name, string email, RoleId iamRoleId, UserId? userId)
+    private Member(MemberDetails details)
     {
-        Name = name;
-        Email = email;
-        IamRoleId = iamRoleId;
-        UserId = userId;
+        Name = details.Name.Trim();
+        Email = details.Email.Trim();
+        IamRoleId = details.IamRoleId;
+        UserId = details.UserId;
     }
 
     private Member() { }
 
-    public static Member Create(string name, string email, RoleId iamRoleId, UserId? userId = null)
+    public static Member Create(MemberDetails details)
     {
-        return new Member(name, email, iamRoleId, userId);
+        return new Member(details) { Id = new MemberId(Guid.NewGuid()) };
     }
 
     public void SetRole(RoleId iamRoleId)

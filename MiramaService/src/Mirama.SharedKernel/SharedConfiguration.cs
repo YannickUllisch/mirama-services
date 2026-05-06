@@ -39,13 +39,7 @@ public static class DependencyInjection
             .AsImplementedInterfaces()
             .WithScopedLifetime());
 
-        // Decorator pipeline — Scrutor wraps in registration order, so execution order is inverted.
-        // Execution order: Logging → Performance → Authorization → ExceptionToError → Validation → [module TransactionDecorator] → Handler
-        // TransactionDecorator is intentionally absent here — each module applies it locally
-        // against its own IUnitOfWork so transactions never cross module boundaries.
         services.Decorate(typeof(IRequestHandler<,>), typeof(ValidationDecorator<,>));
-        services.Decorate(typeof(IRequestHandler<,>), typeof(ExceptionToErrorOrDecorator<,>));
-        services.Decorate(typeof(IRequestHandler<,>), typeof(AuthorizationDecorator<,>));
         services.Decorate(typeof(IRequestHandler<,>), typeof(PerformanceDecorator<,>));
         services.Decorate(typeof(IRequestHandler<,>), typeof(LoggingDecorator<,>));
 

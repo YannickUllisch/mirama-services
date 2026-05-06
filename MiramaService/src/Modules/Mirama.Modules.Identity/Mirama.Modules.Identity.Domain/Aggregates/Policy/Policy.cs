@@ -14,19 +14,26 @@ public sealed class Policy : AggregateRoot<PolicyId>
 
     public List<PolicyStatement> Statements { get; private set; } = [];
 
+    private Policy(PolicyDetails details)
+    {
+        Name = details.Name.Trim();
+        Description = details.Description?.Trim();
+        TenantId = details.TenantId;
+        Scope = details.Scope;
+        IsManaged = details.IsManaged;
+    }
+
     private Policy() { }
 
-    public static Policy Create(string name, string? description, Guid? tenantId, AccessScope scope, bool isManaged = false)
+    public static Policy Create(PolicyDetails details)
     {
-        return new Policy
-        {
-            Id = new PolicyId(Guid.NewGuid()),
-            Name = name.Trim(),
-            Description = description?.Trim(),
-            TenantId = tenantId,
-            Scope = scope,
-            IsManaged = isManaged
-        };
+        return new Policy(details) { Id = new PolicyId(Guid.NewGuid()) };
+    }
+
+    public void Update(PolicyDetails details)
+    {
+        Name = details.Name.Trim();
+        Description = details.Description?.Trim();
     }
 
     public ErrorOr<PolicyStatement> AddStatement(string action, string resource = "*", Effect effect = Effect.Allow)
@@ -35,25 +42,17 @@ public sealed class Policy : AggregateRoot<PolicyId>
             return Error.Validation("Policy.Statement.Action", "Action cannot be empty.");
 
         var statement = PolicyStatement.Create(Id, action.Trim(), resource.Trim(), effect);
-        this.Statements.Add(statement);
+        Statements.Add(statement);
         return statement;
     }
 
     public ErrorOr<Deleted> RemoveStatement(PolicyStatementId statementId)
     {
-        var statement = this.Statements.Find(s => s.Id == statementId);
+        var statement = Statements.Find(s => s.Id == statementId);
         if (statement is null)
-        {
             return Error.NotFound("Policy.Statement.NotFound", "Statement not found.");
-        }
 
-        this.Statements.Remove(statement);
+        Statements.Remove(statement);
         return Result.Deleted;
-    }
-
-    public void Update(string name, string? description)
-    {
-        this.Name = name.Trim();
-        this.Description = description?.Trim();
     }
 }

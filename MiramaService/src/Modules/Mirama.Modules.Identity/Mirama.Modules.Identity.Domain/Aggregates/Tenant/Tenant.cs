@@ -1,4 +1,6 @@
-using Mirama.Modules.Identity.Domain.Aggregates.Subscription;
+
+using Mirama.Modules.Identity.Domain.Aggregates.Tenant.Subscription;
+using SubscriptionEntity = Mirama.Modules.Identity.Domain.Aggregates.Tenant.Subscription.Subscription;
 using Mirama.Modules.Identity.Domain.Aggregates.User;
 using Mirama.SharedKernel.Abstractions.Domain.Core;
 
@@ -6,28 +8,39 @@ namespace Mirama.Modules.Identity.Domain.Aggregates.Tenant;
 
 public sealed class Tenant : AggregateRoot<Guid>
 {
-    public UserId AdminUserId { get; private set; } = default!;
-    public SubscriptionId? SubscriptionId { get; private set; }
-    public TenantSettings? Settings { get; private set; }
+    public UserId AdminUserId { get; init; } = default!;
+    public SubscriptionEntity Subscription { get; private set; } = default!;
+    public TenantSettings Settings { get; private set; } = default!;
 
     private Tenant() { }
 
-    public static Tenant Create(Guid adminUserId)
+    private Tenant(UserId adminUserId, TenantSettings settings, SubscriptionEntity subscription)
     {
-        return new Tenant
+        this.AdminUserId = adminUserId;
+        this.Settings = settings;
+        this.Subscription = subscription;
+    }
+
+    public static Tenant Create(Guid adminUserId, TenantSettingsDetails settings, SubscriptionDetails details)
+    {
+        if (adminUserId == Guid.Empty)
         {
-            Id = Guid.NewGuid(),
-            AdminUserId = new UserId(adminUserId)
-        };
+            throw new ArgumentException("Admin required");
+        }
+
+        var settingsObj = TenantSettings.Create(settings);
+        var subscription = SubscriptionEntity.Create(details);
+
+        return new Tenant(new UserId(adminUserId), settingsObj, subscription);
     }
 
-    public void SetSubscription(SubscriptionId subscriptionId)
+    public void SetSubscription(SubscriptionDetails details)
     {
-        SubscriptionId = subscriptionId;
+        this.Subscription = SubscriptionEntity.Create(details); 
     }
 
-    public void ConfigureSettings(string name, string? brandingColor, string? logoUrl, bool receiveNotifications, string timezone = "UTC")
+    public void UpdateSettings(TenantSettingsDetails details)
     {
-        Settings = TenantSettings.Create(Id, name, brandingColor, logoUrl, receiveNotifications, timezone);
+        this.Settings.Update(details);
     }
 }
