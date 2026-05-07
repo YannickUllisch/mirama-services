@@ -38,7 +38,7 @@ builder.Services.AddCors(options => options
             .AllowAnyMethod()));
 
 builder.Services.AddSwaggerGen(c => c
-    .SwaggerDoc("v1", new OpenApiInfo { Title = "Mirama Account Service API", Version = "v1" }));
+    .SwaggerDoc("v1", new OpenApiInfo { Title = "Mirama API", Version = "v1" }));
 
 builder.Services.AddProblemDetails();
 

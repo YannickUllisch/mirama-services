@@ -5,9 +5,7 @@
   </Folder>
   <Folder Name="/Modules/Identity/">
     <Project Path="src/Modules/Mirama.Modules.Identity/Mirama.Modules.Identity.Contracts/Mirama.Modules.Identity.Contracts.csproj" />
-    <Project Path="src/Modules/Mirama.Modules.Identity/Mirama.Modules.Identity.Domain/Mirama.Modules.Identity.Domain.csproj" />
-    <Project Path="src/Modules/Mirama.Modules.Identity/Mirama.Modules.Identity.Application/Mirama.Modules.Identity.Application.csproj" />
-    <Project Path="src/Modules/Mirama.Modules.Identity/Mirama.Modules.Identity.Infrastructure/Mirama.Modules.Identity.Infrastructure.csproj" />
+    <Project Path="src/Modules/Mirama.Modules.Identity/Mirama.Modules.Identity/Mirama.Modules.Identity.csproj" />
   </Folder>
   <Folder Name="/Modules/Projects/">
     <Project Path="src/Modules/Mirama.Modules.Projects/Mirama.Modules.Projects.Contracts/Mirama.Modules.Projects.Contracts.csproj" />
