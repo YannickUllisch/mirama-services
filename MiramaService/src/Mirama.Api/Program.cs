@@ -1,11 +1,13 @@
 using Microsoft.OpenApi;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Mirama.Api.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using Mirama.SharedKernel;
+using System.Security.Cryptography;
 using System.Text;
 using Mirama.Modules.Identity;
 using Mirama.Modules.Identity.Infrastructure.Persistence;
@@ -60,14 +62,39 @@ builder.Services.AddAuthentication()
     .AddJwtBearer(options =>
     {
         var authSection = builder.Configuration.GetSection("Authentication");
-        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authSection["NextAuthSecret"] ?? "SECRET_NOT_SET"));
-        // options.Authority = authSection["Authority"]; Only used when using AuthService
+        var rawSecret = authSection["NextAuthSecret"] ?? throw new InvalidOperationException("Authentication:NextAuthSecret is not configured.");
+
+        // Derive 32-byte AES-GCM key from NEXTAUTH_SECRET via HKDF — must match NextAuth's deriveEncryptionKey.
+        var derivedKeyBytes = HKDF.DeriveKey(
+            HashAlgorithmName.SHA256,
+            ikm: Encoding.UTF8.GetBytes(rawSecret),
+            outputLength: 32,
+            salt: [],
+            info: Encoding.UTF8.GetBytes("NextAuth.js Generated Encryption Key")
+        );
+        var tokenDecryptionKey = new SymmetricSecurityKey(derivedKeyBytes);
+
+        // Inner JWS is signed with raw secret (HS256).
+        var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(rawSecret));
+
         options.Audience = authSection["Audience"];
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                // Read JWT from NextAuth session cookie (prod uses __Secure- prefix).
+                var cookie = context.Request.Cookies["__Secure-authjs.session-token"]
+                    ?? context.Request.Cookies["authjs.session-token"];
+                if (!string.IsNullOrEmpty(cookie))
+                    context.Token = cookie;
+                return Task.CompletedTask;
+            }
+        };
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            TokenDecryptionKey = securityKey,
+            TokenDecryptionKey = tokenDecryptionKey,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = securityKey,
+            IssuerSigningKey = signingKey,
             ValidateIssuer = true,
             ValidateLifetime = true,
             ValidateAudience = true,

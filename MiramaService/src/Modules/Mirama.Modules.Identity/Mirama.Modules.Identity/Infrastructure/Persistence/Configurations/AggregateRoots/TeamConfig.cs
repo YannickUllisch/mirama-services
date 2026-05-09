@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Mirama.Modules.Identity.Domain.Aggregates.Organization;
 using Mirama.Modules.Identity.Domain.Aggregates.Organization.Team;
 
 namespace Mirama.Modules.Identity.Infrastructure.Persistence.Configurations.AggregateRoots;
@@ -23,10 +22,6 @@ public class TeamConfiguration : IEntityTypeConfiguration<Team>
         builder.Property(t => t.OrganizationId).IsRequired();
         builder.HasIndex(t => t.OrganizationId);
 
-        builder.HasOne<Organization>()
-            .WithMany()
-            .HasForeignKey(t => t.OrganizationId)
-            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(t => t.Members)
             .WithOne()

@@ -24,14 +24,5 @@ public class OrganizationConfiguration : IEntityTypeConfiguration<Organization>
         builder.Property(o => o.ZipCode).IsRequired();
         builder.Property(o => o.DateCreated).IsRequired();
 
-        builder.HasMany(o => o.Invitations)
-            .WithOne()
-            .HasForeignKey(i => i.OrganizationId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasMany(o => o.Members)
-            .WithOne()
-            .HasForeignKey(m => m.OrganizationId)
-            .OnDelete(DeleteBehavior.Cascade);
     }
 }

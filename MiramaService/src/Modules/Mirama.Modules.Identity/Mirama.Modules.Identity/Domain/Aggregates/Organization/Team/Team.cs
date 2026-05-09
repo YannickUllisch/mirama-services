@@ -4,12 +4,11 @@ using Mirama.SharedKernel.Abstractions.Domain.Core;
 
 namespace Mirama.Modules.Identity.Domain.Aggregates.Organization.Team;
 
-public sealed class Team : AggregateRoot<TeamId>
+public sealed class Team : OrganizationAggregateRoot<TeamId>
 {
     public string Name { get; private set; } = string.Empty;
     public string Slug { get; private set; } = string.Empty;
     public DateTime DateCreated { get; private set; }
-    public Guid OrganizationId { get; private set; }
 
     public List<TeamMember> Members { get; private set; } = [];
 
@@ -17,7 +16,6 @@ public sealed class Team : AggregateRoot<TeamId>
     {
         Name = details.Name.Trim();
         Slug = GenerateSlug(details.Name);
-        OrganizationId = details.OrganizationId;
         DateCreated = DateTime.UtcNow;
     }
 

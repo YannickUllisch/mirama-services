@@ -43,7 +43,6 @@ public sealed class IdentityDbContext : DbContext, IUnitOfWork
     public DbSet<PolicyStatement> PolicyStatements => Set<PolicyStatement>();
     public DbSet<Plan> Plans => Set<Plan>();
     public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
-    public DbSet<IdempotencyRecord> IdempotencyRecords => Set<IdempotencyRecord>();
 
     public IdentityDbContext(
         DbContextOptions<IdentityDbContext> options,
@@ -91,16 +90,20 @@ public sealed class IdentityDbContext : DbContext, IUnitOfWork
     {
         var entries = ChangeTracker.Entries<IAuditable>();
 
+        string actorId;
+        try { actorId = _contextProvider.UserId.ToString(); }
+        catch { actorId = "system"; }
+
         // Handling Auditable Entities
         foreach (var entry in entries)
         {
             switch (entry.State)
             {
                 case EntityState.Added:
-                    entry.Entity.SetCreated(DateTime.UtcNow, _contextProvider.UserId.ToString());
+                    entry.Entity.SetCreated(DateTime.UtcNow, actorId);
                     break;
                 case EntityState.Modified:
-                    entry.Entity.SetModified(DateTime.UtcNow, _contextProvider.UserId.ToString());
+                    entry.Entity.SetModified(DateTime.UtcNow, actorId);
                     break;
                 default:
                     break;

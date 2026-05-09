@@ -10,7 +10,7 @@ public class ProjectsDbContextFactory : IDesignTimeDbContextFactory<ProjectsDbCo
     {
         Env.TraversePath().Load();
         var optionsBuilder = new DbContextOptionsBuilder<ProjectsDbContext>();
-        var connection = Environment.GetEnvironmentVariable("Projects__Infrastructure__DatabaseConnection");
+        var connection = Environment.GetEnvironmentVariable("Infrastructure__DatabaseConnection");
 
         if (string.IsNullOrWhiteSpace(connection))
             throw new InvalidOperationException("Database connection string is not set.");

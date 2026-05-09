@@ -1,5 +1,5 @@
 
-namespace Mirama.Modules.Identity.Infrastructure.Common.Options;
+namespace Mirama.SharedKernel.Infrastructure.Options;
 
 public class InfrastructureOptions
 {

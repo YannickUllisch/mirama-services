@@ -21,10 +21,6 @@ public class InvitationConfiguration : IEntityTypeConfiguration<Invitation>
             val => new RoleId(val))
             .IsRequired();
 
-        builder.Property(i => i.OrganizationId).HasConversion(
-            orgId => orgId,
-            val => val);
-
         builder.Property(i => i.InviterId).IsRequired();
         builder.Property(i => i.Email).IsRequired();
         builder.Property(i => i.Name).IsRequired();

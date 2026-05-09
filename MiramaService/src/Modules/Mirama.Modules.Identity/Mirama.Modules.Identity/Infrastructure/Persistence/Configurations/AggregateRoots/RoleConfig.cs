@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Mirama.Modules.Identity.Domain.Aggregates.Policy;
 using Mirama.Modules.Identity.Domain.Aggregates.Role;
@@ -33,6 +34,10 @@ public class RoleConfiguration : IEntityTypeConfiguration<Role>
                 v => JsonSerializer.Deserialize<List<Guid>>(v, (JsonSerializerOptions?)null)!
                                    .Select(g => new PolicyId(g)).ToList())
             .HasColumnType("jsonb")
-            .HasColumnName("PolicyIds");
+            .HasColumnName("PolicyIds")
+            .Metadata.SetValueComparer(new ValueComparer<List<PolicyId>>(
+                (a, b) => a != null && b != null && a.Select(p => p.Value).SequenceEqual(b.Select(p => p.Value)),
+                v => v.Aggregate(0, (h, p) => HashCode.Combine(h, p.Value.GetHashCode())),
+                v => v.ToList()));
     }
 }

@@ -12,7 +12,7 @@ using Mirama.SharedKernel.Models;
 
 namespace Mirama.Modules.Identity.Application.Features.V1.Users;
 
-public class GetUsersController : TenantControllerBase
+public class GetUserByIdController : TenantControllerBase
 {
     [HttpGet("users")]
     public async Task<ActionResult<PaginatedList<UserResponse>>> Get([FromQuery] GetUsersQuery query)

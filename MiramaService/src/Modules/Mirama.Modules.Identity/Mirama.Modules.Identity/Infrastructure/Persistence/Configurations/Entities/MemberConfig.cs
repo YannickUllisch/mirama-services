@@ -29,8 +29,5 @@ public class MemberConfiguration : IEntityTypeConfiguration<Member>
         builder.Property(m => m.Name).IsRequired();
         builder.Property(m => m.Email).IsRequired();
 
-        builder.Property(m => m.OrganizationId).HasConversion(
-            orgId => orgId,
-            val => val);
     }
 }

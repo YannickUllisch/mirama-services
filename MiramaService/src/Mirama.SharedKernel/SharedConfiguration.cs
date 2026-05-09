@@ -25,6 +25,12 @@ public static class DependencyInjection
 
         services.Configure<ApplicationOptions>(config.GetSection(ApplicationOptions.Key));
         services.Configure<AuthenticationOptions>(config.GetSection(AuthenticationOptions.Key));
+        services
+            .AddOptions<InfrastructureOptions>()
+            .Bind(config.GetSection(InfrastructureOptions.Key))
+            .Validate(o => !string.IsNullOrWhiteSpace(o.DatabaseConnection),
+                      "Valid Database Connection string is required.")
+            .ValidateOnStart();
 
         services.AddScoped<IRequestContextProvider, RequestContextProvider>();
         services.AddScoped<IDispatcher, Dispatcher>();
