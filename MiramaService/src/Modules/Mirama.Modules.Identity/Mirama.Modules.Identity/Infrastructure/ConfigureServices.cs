@@ -6,8 +6,10 @@ using Microsoft.Extensions.Options;
 using Mirama.Modules.Identity.Infrastructure.Common.Options;
 using Mirama.Modules.Identity.Infrastructure.Persistence;
 using Mirama.Modules.Identity.Infrastructure.Persistence.Repositories;
+using Mirama.Modules.Identity.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
+using Mirama.SharedKernel.Abstractions.Permissions;
 using Mirama.SharedKernel.Abstractions.Persistence;
 using Mirama.SharedKernel.Models.Decorators;
 using Mirama.Modules.Identity.Application.Common.Models;
@@ -61,6 +63,7 @@ public static class DependencyInjection
             .ValidateOnStart();
 
         // Services
+        services.AddScoped<IPermissionService, PermissionService>();
         services.AddScoped(typeof(IIdentityQueryRepository<,>), typeof(IdentityQueryRepository<,>));
         services.AddScoped(typeof(IIdentityCommandRepository<,>), typeof(IdentityCommandRepository<,>));
 

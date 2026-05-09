@@ -3,20 +3,20 @@ namespace Mirama.SharedKernel.Abstractions.Persistence;
 
 public interface IRequestContextProvider
 {
-    /// <summary>
-    /// UserId of authenticated user
-    /// </summary>
     Guid UserId { get; }
 
     /// <summary>
-    /// Tenant Id extracted from Claims, always has to be part of the JWT. If OrganizationId is defined
-    /// then Tenant Id is dependent on what Organization is currently set as active in the JWT. Otherwise the base user TenantId is assumed
+    /// Tenant Id from "tid" claim. If OrganizationId is set, reflects the org's tenant.
     /// </summary>
     Guid? TenantId { get; }
 
     /// <summary>
-    /// Organization Id extracted from Claims. Optional since we potentially have endpoints that are purely Tenant based 
-    /// and not related to Organization
+    /// Organization Id from "oid" claim. Null for purely tenant-scoped endpoints.
     /// </summary>
     Guid? OrganizationId { get; }
+
+    /// <summary>
+    /// Project Id from "projectId" route value. Null when not on a project-scoped route.
+    /// </summary>
+    Guid? ProjectId { get; }
 }

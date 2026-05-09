@@ -84,7 +84,6 @@ public sealed class IdentityDbContext : DbContext, IUnitOfWork
 
         builder.ApplyGlobalFilters(TenantId, OrganizationId);
 
-
         base.OnModelCreating(builder);
     }
 
@@ -182,14 +181,14 @@ public sealed class IdentityDbContext : DbContext, IUnitOfWork
             }
         }
 
-        if (entry.Entity is IOrganizationOwned orgOwned && entry.State is EntityState.Added or EntityState.Modified)
+        if (entry.Entity is IOrganizationOwned orgOwned && entry.State == EntityState.Added)
         {
-            if (OrganizationId is null)
+            if (orgOwned.OrganizationId == Guid.Empty)
             {
-                throw new InvalidOperationException($"OrganizationId is required to modify {entry.Entity.GetType().Name}");
+                if (OrganizationId is null)
+                    throw new InvalidOperationException($"OrganizationId is required to add {entry.Entity.GetType().Name}");
+                orgOwned.SetOrganizationId(OrganizationId.Value);
             }
-
-            orgOwned.SetOrganizationId(OrganizationId.Value);
         }
     }
 }

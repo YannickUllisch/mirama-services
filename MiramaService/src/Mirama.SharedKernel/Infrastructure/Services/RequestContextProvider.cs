@@ -19,6 +19,15 @@ internal class RequestContextProvider(IHttpContextAccessor httpContextAccessor) 
         }
     }
 
+    public Guid? TenantId
+    {
+        get
+        {
+            var claim = _httpContextAccessor.HttpContext?.User?.FindFirst("tid")?.Value;
+            return Guid.TryParse(claim, out var guid) ? guid : (Guid?)null;
+        }
+    }
+
     public Guid? OrganizationId
     {
         get
@@ -28,12 +37,12 @@ internal class RequestContextProvider(IHttpContextAccessor httpContextAccessor) 
         }
     }
 
-    public Guid? TenantId
+    public Guid? ProjectId
     {
         get
         {
-            var claim = _httpContextAccessor.HttpContext?.User?.FindFirst("tid")?.Value;
-            return Guid.TryParse(claim, out var guid) ? guid : (Guid?)null;
+            var raw = _httpContextAccessor.HttpContext?.Request.RouteValues["projectId"] as string;
+            return Guid.TryParse(raw, out var guid) ? guid : (Guid?)null;
         }
     }
 }
