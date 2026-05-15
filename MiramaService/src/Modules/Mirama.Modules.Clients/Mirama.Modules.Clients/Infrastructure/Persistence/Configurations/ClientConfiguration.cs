@@ -20,10 +20,8 @@ internal class ClientConfiguration : IEntityTypeConfiguration<Client>
         builder.Property(c => c.Website).HasMaxLength(500);
         builder.Property(c => c.Industry).HasMaxLength(100);
         builder.Property(c => c.Notes).HasMaxLength(2000);
-        builder.Property(c => c.TenantId).IsRequired();
         builder.Property(c => c.OrganizationId).IsRequired();
 
-        builder.HasIndex(c => c.TenantId);
         builder.HasIndex(c => c.OrganizationId);
 
         builder.HasMany(c => c.Contacts)

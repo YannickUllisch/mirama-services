@@ -8,11 +8,9 @@ using Mirama.SharedKernel.Models;
 
 namespace Mirama.Modules.Clients.Application.Features.V1.Portal.InviteContact;
 
-[ApiController]
-[Route("api/v{version:apiVersion}/clients/{clientId:guid}/portal/invitations")]
-public class InviteContactController : ApiControllerBase
+public class InviteContactController : OrganizationControllerBase
 {
-    [HttpPost]
+    [HttpPost("/clients/{clientId:guid}/portal/invitations")]
     public async Task<IActionResult> Invite(
         [FromRoute] Guid clientId,
         [FromBody] InviteContactCommand command,

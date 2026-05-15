@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Mirama.Modules.Clients.Domain.Entities.Contact;
+using Mirama.Modules.Clients.Domain.Aggregates.Client.Contact;
 
 namespace Mirama.Modules.Clients.Infrastructure.Persistence.Configurations;
 

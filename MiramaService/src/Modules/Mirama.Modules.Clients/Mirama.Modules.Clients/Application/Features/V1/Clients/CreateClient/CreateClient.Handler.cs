@@ -7,11 +7,9 @@ using Mirama.SharedKernel.Models;
 
 namespace Mirama.Modules.Clients.Application.Features.V1.Clients.CreateClient;
 
-[ApiController]
-[Route("api/v{version:apiVersion}/clients")]
-public class CreateClientController : ApiControllerBase
+public class CreateClientController : OrganizationControllerBase
 {
-    [HttpPost]
+    [HttpPost("/clients")]
     public async Task<IActionResult> Create([FromBody] CreateClientCommand command, CancellationToken ct)
     {
         var result = await Dispatcher.Send(command, ct);

@@ -9,11 +9,9 @@ using Mirama.SharedKernel.Models;
 
 namespace Mirama.Modules.Clients.Application.Features.V1.Clients.GetClients;
 
-[ApiController]
-[Route("api/v{version:apiVersion}/clients")]
-public class GetClientsController : ApiControllerBase
+public class GetClientsController : OrganizationControllerBase
 {
-    [HttpGet]
+    [HttpGet("clients")]
     public async Task<IActionResult> Get(CancellationToken ct)
     {
         var result = await Dispatcher.Send(new GetClientsQuery(), ct);

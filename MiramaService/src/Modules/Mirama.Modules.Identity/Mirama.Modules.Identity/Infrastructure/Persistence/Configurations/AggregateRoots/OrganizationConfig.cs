@@ -23,6 +23,5 @@ public class OrganizationConfiguration : IEntityTypeConfiguration<Organization>
         builder.Property(o => o.Country).IsRequired();
         builder.Property(o => o.ZipCode).IsRequired();
         builder.Property(o => o.DateCreated).IsRequired();
-
     }
 }

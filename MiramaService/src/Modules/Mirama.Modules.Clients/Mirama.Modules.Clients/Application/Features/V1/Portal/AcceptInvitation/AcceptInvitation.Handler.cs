@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Mirama.Modules.Clients.Domain.Aggregates.Client;
-using Mirama.Modules.Clients.Infrastructure.Auth;
 using Mirama.Modules.Clients.Infrastructure.Persistence.Repositories;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.SharedKernel.Models;
@@ -25,8 +24,7 @@ public class AcceptInvitationController : ApiControllerBase
 
 internal class AcceptInvitationCommandHandler(
     IClientsCommandRepository<Client, ClientId> commandRepo,
-    IClientsQueryRepository<Client, ClientId> queryRepo,
-    IClientPortalTokenService tokenService)
+    IClientsQueryRepository<Client, ClientId> queryRepo)
     : IRequestHandler<AcceptInvitationCommand, ErrorOr<PortalSessionResponse>>
 {
     public async Task<ErrorOr<PortalSessionResponse>> HandleAsync(AcceptInvitationCommand request, CancellationToken cancellationToken)
@@ -47,13 +45,7 @@ internal class AcceptInvitationCommandHandler(
             var portalUser = client.AcceptInvitation(request.Token);
             commandRepo.Update(client);
 
-            var token = tokenService.GenerateSessionToken(
-                portalUser.Id.Value,
-                client.Id.Value,
-                portalUser.ContactId,
-                client.TenantId);
-
-            return new PortalSessionResponse(portalUser.Id.Value, client.Id.Value, token);
+            return new PortalSessionResponse(portalUser.Id.Value, client.Id.Value);
         }
         catch (InvalidOperationException ex)
         {

@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Mirama.Modules.Clients.Domain.Entities.ClientPortalUser;
+using Mirama.Modules.Clients.Domain.Aggregates.Client.ClientPortalUser;
 
 namespace Mirama.Modules.Clients.Infrastructure.Persistence.Configurations;
 

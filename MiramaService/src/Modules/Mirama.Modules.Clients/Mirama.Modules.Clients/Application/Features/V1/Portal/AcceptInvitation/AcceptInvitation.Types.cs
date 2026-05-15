@@ -7,5 +7,4 @@ public sealed record AcceptInvitationCommand(Guid Token) : ICommand<ErrorOr<Port
 
 public sealed record PortalSessionResponse(
     Guid ClientPortalUserId,
-    Guid ClientId,
-    string AccessToken);
+    Guid ClientId);

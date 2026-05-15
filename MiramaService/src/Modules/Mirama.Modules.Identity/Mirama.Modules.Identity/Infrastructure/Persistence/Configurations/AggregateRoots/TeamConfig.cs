@@ -22,7 +22,6 @@ public class TeamConfiguration : IEntityTypeConfiguration<Team>
         builder.Property(t => t.OrganizationId).IsRequired();
         builder.HasIndex(t => t.OrganizationId);
 
-
         builder.HasMany(t => t.Members)
             .WithOne()
             .HasForeignKey(tm => tm.TeamId)

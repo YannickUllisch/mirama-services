@@ -2,18 +2,16 @@ using ErrorOr;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Mirama.Modules.Clients.Domain.Aggregates.Client;
-using Mirama.Modules.Clients.Domain.Entities.Contact;
+using Mirama.Modules.Clients.Domain.Aggregates.Client.Contact;
 using Mirama.Modules.Clients.Infrastructure.Persistence.Repositories;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.SharedKernel.Models;
 
 namespace Mirama.Modules.Clients.Application.Features.V1.Contacts.AddContact;
 
-[ApiController]
-[Route("api/v{version:apiVersion}/clients/{clientId:guid}/contacts")]
 public class AddContactController : ApiControllerBase
 {
-    [HttpPost]
+    [HttpPost("/clients/{clientId:guid}/contacts")]
     public async Task<IActionResult> Add(
         [FromRoute] Guid clientId,
         [FromBody] AddContactCommand command,
