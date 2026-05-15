@@ -9,6 +9,7 @@ using Serilog;
 using Mirama.SharedKernel;
 using System.Security.Cryptography;
 using System.Text;
+using Mirama.Modules.Clients.Infrastructure;
 using Mirama.Modules.Identity;
 using Mirama.Modules.Identity.Infrastructure.Persistence;
 using Mirama.Modules.Identity.Infrastructure.Persistence.Seeding;
@@ -32,12 +33,16 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddHealthChecks();
 
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+    ?? throw new InvalidOperationException("Cors:AllowedOrigins is not configured.");
+
 builder.Services.AddCors(options => options
     .AddDefaultPolicy(
         policy => policy
-            .AllowAnyOrigin()
+            .WithOrigins(allowedOrigins)
             .AllowAnyHeader()
-            .AllowAnyMethod()));
+            .AllowAnyMethod()
+            .AllowCredentials()));
 
 builder.Services.AddSwaggerGen(c => c
     .SwaggerDoc("v1", new OpenApiInfo { Title = "Mirama API", Version = "v1" }));
@@ -46,6 +51,7 @@ builder.Services.AddProblemDetails();
 
 builder.Services
     .AddIdentityModule(builder.Configuration)
+    .AddClientsModule(builder.Configuration)
     .AddSharedServices(builder.Configuration);
 
 builder.Services.AddApiVersioning(options =>
@@ -64,7 +70,6 @@ builder.Services.AddAuthentication()
         var authSection = builder.Configuration.GetSection("Authentication");
         var rawSecret = authSection["NextAuthSecret"] ?? throw new InvalidOperationException("Authentication:NextAuthSecret is not configured.");
 
-        // Derive 32-byte AES-GCM key from NEXTAUTH_SECRET via HKDF — must match NextAuth's deriveEncryptionKey.
         var derivedKeyBytes = HKDF.DeriveKey(
             HashAlgorithmName.SHA256,
             ikm: Encoding.UTF8.GetBytes(rawSecret),
@@ -90,6 +95,7 @@ builder.Services.AddAuthentication()
                 return Task.CompletedTask;
             }
         };
+        options.MapInboundClaims = false;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             TokenDecryptionKey = tokenDecryptionKey,
@@ -101,6 +107,7 @@ builder.Services.AddAuthentication()
             ValidIssuer = authSection["Authority"],
             ValidAudience = authSection["Audience"],
             ClockSkew = TimeSpan.Zero,
+            NameClaimType = "name",
         };
     });
 

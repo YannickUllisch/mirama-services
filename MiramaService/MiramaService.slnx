@@ -13,4 +13,8 @@
     <Project Path="src/Modules/Mirama.Modules.Projects/Mirama.Modules.Projects.Application/Mirama.Modules.Projects.Application.csproj" />
     <Project Path="src/Modules/Mirama.Modules.Projects/Mirama.Modules.Projects.Infrastructure/Mirama.Modules.Projects.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/Modules/Clients/">
+    <Project Path="src/Modules/Mirama.Modules.Clients/Mirama.Modules.Clients.Contracts/Mirama.Modules.Clients.Contracts.csproj" />
+    <Project Path="src/Modules/Mirama.Modules.Clients/Mirama.Modules.Clients/Mirama.Modules.Clients.csproj" />
+  </Folder>
 </Solution>

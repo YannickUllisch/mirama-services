@@ -1,5 +1,3 @@
-
-using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Mirama.SharedKernel.Abstractions.Persistence;
 
@@ -13,7 +11,7 @@ internal class RequestContextProvider(IHttpContextAccessor httpContextAccessor) 
     {
         get
         {
-            var claim = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var claim = _httpContextAccessor.HttpContext?.User?.FindFirst("sub")?.Value;
             if (string.IsNullOrEmpty(claim)) throw new UnauthorizedAccessException("UserId not found");
             return Guid.Parse(claim);
         }
@@ -23,7 +21,7 @@ internal class RequestContextProvider(IHttpContextAccessor httpContextAccessor) 
     {
         get
         {
-            var claim = _httpContextAccessor.HttpContext?.User?.FindFirst("tid")?.Value;
+            var claim = _httpContextAccessor.HttpContext?.User?.FindFirst("tenantId")?.Value;
             return Guid.TryParse(claim, out var guid) ? guid : (Guid?)null;
         }
     }
@@ -32,7 +30,7 @@ internal class RequestContextProvider(IHttpContextAccessor httpContextAccessor) 
     {
         get
         {
-            var claim = _httpContextAccessor.HttpContext?.User?.FindFirst("oid")?.Value;
+            var claim = _httpContextAccessor.HttpContext?.User?.FindFirst("organizationId")?.Value;
             return Guid.TryParse(claim, out var guid) ? guid : (Guid?)null;
         }
     }

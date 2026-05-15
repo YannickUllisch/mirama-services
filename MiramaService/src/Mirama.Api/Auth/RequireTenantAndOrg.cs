@@ -19,8 +19,8 @@ public class RequireTenantAndOrgHandler : AuthorizationHandler<TenantAndOrgRequi
         }
 
         // Require both tenantId and orgId for user tokens
-        var tenantId = user.FindFirst("tid")?.Value;
-        var orgId = user.FindFirst("oid")?.Value;
+        var tenantId = user.FindFirst("tenantId")?.Value;
+        var orgId = user.FindFirst("organizationId")?.Value;
         if (!string.IsNullOrEmpty(tenantId) && !string.IsNullOrEmpty(orgId))
         {
             context.Succeed(requirement);

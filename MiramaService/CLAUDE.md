@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Notes 
+
+- In the domain layer when refering to a field of that class or inherited field, ensure it is prefixed by 'this.' for readability
+
 ## Commands
 
 ```bash
@@ -54,7 +58,7 @@ Each module registers itself via `AddXxxModule(config)` called from `Program.cs`
 
 | Concept | Location |
 |---|---|
-| `AggregateRoot<TID>`, `Entity<TID>`, `ValueObject` | `Abstractions/Domain/Core/` |
+| `OrganizationAggregateRoot<TID>`, `OrganizationEntity<TID>`, `ValueObject` | `Abstractions/Domain/Core/` |
 | `ICommand<T>` / `IQuery<T>` | `Abstractions/Common/Interfaces/ICQRSRequests.cs` |
 | `IRequestHandler<,>` / `INotificationHandler<>` | `Abstractions/Common/Interfaces/` |
 | `IDispatcher` → `Dispatcher` | Custom mediator (replaced MediatR) |
@@ -78,7 +82,7 @@ All handlers return `ErrorOr<T>`. `ApiControllerBase.Problem(errors)` maps error
 
 ### Multi-tenancy
 
-Resources implement `ITenantOwned` and/or `IOrganizationOwned`. Auth policies `RequireTenantAndOrg` / `RequireTenantOnly` enforce presence of tenant/org claims. `IRequestContextProvider` gives handlers access to the current tenant/org context.
+Resources implement `ITenantOwned` and/or `IOrganizationOwned`, `OrganizationAggregateRoot` and `OrganizationEntity` implement this, unless its specifically asked to be a TenantOwned entity prefer these ofer using the base AggregateRoot or Entity classes. Auth policies `RequireTenantAndOrg` / `RequireTenantOnly` enforce presence of tenant/org claims. `IRequestContextProvider` gives handlers access to the current tenant/org context.
 
 ### Outbox / Inbox
 
