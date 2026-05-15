@@ -69,47 +69,38 @@ builder.Services.AddAuthentication()
     {
         var authSection = builder.Configuration.GetSection("Authentication");
         var rawSecret = authSection["NextAuthSecret"] ?? throw new InvalidOperationException("Authentication:NextAuthSecret is not configured.");
+        const string devCookie = "authjs.session-token";
+        const string prodCookie = "__Secure-authjs.session-token";
 
-        var derivedKeyBytes = HKDF.DeriveKey(
-            HashAlgorithmName.SHA256,
-            ikm: Encoding.UTF8.GetBytes(rawSecret),
-            outputLength: 32,
-            salt: [],
-            info: Encoding.UTF8.GetBytes("NextAuth.js Generated Encryption Key")
+        var handler = new AuthJsTokenHandler(
+            devKey: DeriveAuthJsKey(rawSecret, devCookie),
+            prodKey: DeriveAuthJsKey(rawSecret, prodCookie),
+            issuer: authSection["Authority"],
+            audience: authSection["Audience"]
         );
-        var tokenDecryptionKey = new SymmetricSecurityKey(derivedKeyBytes);
 
-        // Inner JWS is signed with raw secret (HS256).
-        var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(rawSecret));
-
-        options.Audience = authSection["Audience"];
+        options.TokenHandlers.Clear();
+        options.TokenHandlers.Add(handler);
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = false,
+            ValidateIssuerSigningKey = false,
+        };
         options.Events = new JwtBearerEvents
         {
             OnMessageReceived = context =>
             {
-                // Read JWT from NextAuth session cookie (prod uses __Secure- prefix).
-                var cookie = context.Request.Cookies["__Secure-authjs.session-token"]
-                    ?? context.Request.Cookies["authjs.session-token"];
+                var isProd = context.Request.Cookies.ContainsKey(prodCookie);
+                var cookie = context.Request.Cookies[isProd ? prodCookie : devCookie];
                 if (!string.IsNullOrEmpty(cookie))
-                    context.Token = cookie;
+                    context.Token = AuthJsTokenHandler.TagToken(isProd, cookie);
                 return Task.CompletedTask;
-            }
-        };
-        options.MapInboundClaims = false;
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            TokenDecryptionKey = tokenDecryptionKey,
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = signingKey,
-            ValidateIssuer = true,
-            ValidateLifetime = true,
-            ValidateAudience = true,
-            ValidIssuer = authSection["Authority"],
-            ValidAudience = authSection["Audience"],
-            ClockSkew = TimeSpan.Zero,
-            NameClaimType = "name",
+            },
         };
     });
+
 
 builder.Services.AddSingleton<IAuthorizationHandler, RequireTenantAndOrgHandler>();
 builder.Services.AddSingleton<IAuthorizationHandler, RequireTenantOnlyHandler>();
@@ -138,6 +129,7 @@ if (app.Environment.IsDevelopment())
         logger.LogInformation("Seeding database...");
         await PolicySeed.SeedDataAsync(db);
         await RoleSeed.SeedDataAsync(db);
+        await PlanSeed.SeedDataAsync(db);
         logger.LogInformation("Database seeding complete");
     }
     catch (Exception ex)
@@ -188,3 +180,12 @@ finally
 {
     Log.CloseAndFlush();
 }
+
+static byte[] DeriveAuthJsKey(string secret, string cookieName) =>
+    HKDF.DeriveKey(
+        HashAlgorithmName.SHA256,
+        ikm: Encoding.UTF8.GetBytes(secret),
+        outputLength: 64,
+        salt: Encoding.UTF8.GetBytes(cookieName),
+        info: Encoding.UTF8.GetBytes($"Auth.js Generated Encryption Key ({cookieName})")
+    );
