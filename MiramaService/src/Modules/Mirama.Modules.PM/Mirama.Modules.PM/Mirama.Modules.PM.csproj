@@ -17,8 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Mirama.Modules.Projects.Contracts\Mirama.Modules.Projects.Contracts.csproj" />
-    <ProjectReference Include="..\Mirama.Modules.Projects.Domain\Mirama.Modules.Projects.Domain.csproj" />
     <ProjectReference Include="..\..\..\Mirama.SharedKernel\Mirama.SharedKernel.csproj" />
   </ItemGroup>
 

@@ -9,7 +9,7 @@ using Mirama.SharedKernel.Abstractions.Persistence;
 using Mirama.SharedKernel.Infrastructure.Options;
 using Mirama.SharedKernel.Models.Decorators;
 
-namespace Mirama.Modules.Projects;
+namespace Mirama.Modules.PM.Infrastructure;
 
 public static class DependencyInjection
 {

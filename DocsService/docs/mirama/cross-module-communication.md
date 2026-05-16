@@ -46,7 +46,7 @@ When Module A needs something from Module B, it takes a project reference on Mod
   └── IdentityService.cs           ← implementation, invisible to callers
   └── registered in DI at startup
 
-[Mirama.Modules.Projects.Application]
+[Mirama.Modules.PM.Application]
   └── SomeHandler.cs               ← injects IIdentityService via constructor
 ```
 

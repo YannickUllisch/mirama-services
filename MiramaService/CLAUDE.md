@@ -45,11 +45,12 @@ src/
     Mirama.Modules.Identity/
       Mirama.Modules.Identity/               # Application + Infrastructure
       Mirama.Modules.Identity.Contracts/     # Public events/DTOs for other modules
-    Mirama.Modules.Projects/
-      Mirama.Modules.Projects.Application/
-      Mirama.Modules.Projects.Domain/
-      Mirama.Modules.Projects.Infrastructure/
-      Mirama.Modules.Projects.Contracts/
+    Mirama.Modules.PM/
+      Mirama.Modules.PM/                     # Application + Infrastructure
+      Mirama.Modules.PM.Contracts/           # Public events/DTOs for other modules
+    Mirama.Modules.Clients/
+      Mirama.Modules.Clients/                     # Application + Infrastructure
+      Mirama.Modules.Clients.Contracts/           # Public events/DTOs for other modules
 ```
 
 Each module registers itself via `AddXxxModule(config)` called from `Program.cs`. Modules own their own `DbContext`, EF migrations (separate schema per module), and repository implementations.

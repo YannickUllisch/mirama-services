@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Mirama.SharedKernel\Mirama.SharedKernel.csproj" />
+    <ProjectReference Include="../Mirama.Modules.PM/Mirama.Modules.PM.csproj" />
   </ItemGroup>
 
 </Project>

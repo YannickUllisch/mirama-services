@@ -1,6 +1,6 @@
 using Mirama.SharedKernel.Abstractions.Domain.Events;
 
-namespace Mirama.Modules.Projects.Contracts.Events;
+namespace Mirama.Modules.PM.Contracts.Events;
 
 public sealed record ProjectCreatedEvent(
     Guid ProjectId,

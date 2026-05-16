@@ -8,10 +8,8 @@
     <Project Path="src/Modules/Mirama.Modules.Identity/Mirama.Modules.Identity/Mirama.Modules.Identity.csproj" />
   </Folder>
   <Folder Name="/Modules/Projects/">
-    <Project Path="src/Modules/Mirama.Modules.Projects/Mirama.Modules.Projects.Contracts/Mirama.Modules.Projects.Contracts.csproj" />
-    <Project Path="src/Modules/Mirama.Modules.Projects/Mirama.Modules.Projects.Domain/Mirama.Modules.Projects.Domain.csproj" />
-    <Project Path="src/Modules/Mirama.Modules.Projects/Mirama.Modules.Projects.Application/Mirama.Modules.Projects.Application.csproj" />
-    <Project Path="src/Modules/Mirama.Modules.Projects/Mirama.Modules.Projects.Infrastructure/Mirama.Modules.Projects.Infrastructure.csproj" />
+    <Project Path="src/Modules/Mirama.Modules.PM/Mirama.Modules.PM.Contracts/Mirama.Modules.PM.Contracts.csproj" />
+    <Project Path="src/Modules/Mirama.Modules.PM/Mirama.Modules.PM/Mirama.Modules.PM.csproj" />
   </Folder>
   <Folder Name="/Modules/Clients/">
     <Project Path="src/Modules/Mirama.Modules.Clients/Mirama.Modules.Clients.Contracts/Mirama.Modules.Clients.Contracts.csproj" />
