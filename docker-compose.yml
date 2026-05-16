@@ -25,8 +25,8 @@ services:
       - 8080:8080
     env_file:
       - ./MiramaService/.env
-    volumes:
-      - ./certs:/certificates:ro
+    # volumes:
+    #   - ./certs:/certificates:ro
     depends_on:
       db:
         condition: service_healthy

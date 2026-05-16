@@ -25,6 +25,11 @@ public class User : AggregateRoot<UserId>
         return new User(details) { Id = new UserId(Guid.NewGuid()) };
     }
 
+    public static User CreateWithId(UserDetails details, Guid externalId)
+    {
+        return new User(details) { Id = new UserId(externalId) };
+    }
+
     public void Update(UserDetails details)
     {
         Name = details.Name.Trim();
