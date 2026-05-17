@@ -10,7 +10,7 @@ public class User : AggregateRoot<UserId>
     public DateTime? EmailVerified { get; private set; }
     public TenantRole Role { get; private set; }
 
-    public bool IsOnboarded { get; private set; }
+    public bool IsOnboarded { get; private set; } = false;
 
     private User(UserDetails details)
     {

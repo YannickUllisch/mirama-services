@@ -149,6 +149,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseMiddleware<Mirama.Api.Middleware.ExceptionMiddleware>();
 app.UseExceptionHandler();
 app.UseForwardedHeaders();
 

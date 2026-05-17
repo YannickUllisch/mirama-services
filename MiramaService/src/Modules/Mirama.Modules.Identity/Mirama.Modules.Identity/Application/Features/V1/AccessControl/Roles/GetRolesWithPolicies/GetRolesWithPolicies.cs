@@ -72,10 +72,10 @@ internal class GetRolesWithPoliciesQueryHandler(
             .Take(request.PageSize)
             .ToListAsync(ct);
 
-        var allPolicyGuids = roles.SelectMany(r => r.Policies).Select(p => p.Value).Distinct().ToList();
+        var allPolicyIds = roles.SelectMany(r => r.Policies).Distinct().ToList();
 
         var policies = await policyRepository.Query()
-            .Where(p => allPolicyGuids.Contains(p.Id.Value))
+            .Where(p => allPolicyIds.Contains(p.Id))
             .Include(x => x.Statements)
             .ToListAsync(ct);
 
