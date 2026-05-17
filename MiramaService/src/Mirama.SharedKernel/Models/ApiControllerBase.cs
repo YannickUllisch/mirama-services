@@ -46,6 +46,14 @@ public abstract class ApiControllerBase : ControllerBase
         return Problem(statusCode: statusCode, title: error.Description);
     }
 
+    protected ActionResult ToOk(Success _) => Ok();
+
+    protected ActionResult ToCreated(Created _) => StatusCode(StatusCodes.Status201Created);
+
+    protected ActionResult ToNoContent(Deleted _) => NoContent();
+
+    protected ActionResult ToNoContent(Updated _) => NoContent();
+
     private ActionResult ValidationProblem(List<Error> errors)
     {
         var modelStateDictionary = new ModelStateDictionary();

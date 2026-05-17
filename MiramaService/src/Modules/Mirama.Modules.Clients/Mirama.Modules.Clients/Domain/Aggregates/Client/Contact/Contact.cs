@@ -1,10 +1,11 @@
+using Mirama.Modules.Clients.Domain.Aggregates.Client;
 using Mirama.SharedKernel.Abstractions.Domain.Core;
 
 namespace Mirama.Modules.Clients.Domain.Aggregates.Client.Contact;
 
 public class Contact : OrganizationEntity<ContactId>
 {
-    public Guid ClientId { get; init; }
+    public ClientId ClientId { get; init; } = null!;
     public string FirstName { get; private set; } = string.Empty;
     public string LastName { get; private set; } = string.Empty;
     public string Email { get; private set; } = string.Empty;

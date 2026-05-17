@@ -10,12 +10,15 @@ public class User : AggregateRoot<UserId>
     public DateTime? EmailVerified { get; private set; }
     public TenantRole Role { get; private set; }
 
+    public bool IsOnboarded { get; private set; }
+
     private User(UserDetails details)
     {
-        Name = details.Name.Trim();
-        Email = details.Email.Trim();
-        Role = details.Role;
-        Image = details.Image;
+        this.Name = details.Name.Trim();
+        this.Email = details.Email.Trim();
+        this.Role = details.Role;
+        this.Image = details.Image;
+        this.IsOnboarded = false;
     }
 
     private User() { }
@@ -32,14 +35,19 @@ public class User : AggregateRoot<UserId>
 
     public void Update(UserDetails details)
     {
-        Name = details.Name.Trim();
-        Email = details.Email.Trim();
-        Role = details.Role;
-        Image = details.Image;
+        this.Name = details.Name.Trim();
+        this.Email = details.Email.Trim();
+        this.Role = details.Role;
+        this.Image = details.Image;
     }
 
     public void VerifyEmail()
     {
-        EmailVerified = DateTime.UtcNow;
+        this.EmailVerified = DateTime.UtcNow;
+    }
+
+    public void HasBeenOnboarded()
+    {
+        this.IsOnboarded = true;
     }
 }

@@ -1,10 +1,11 @@
+using Mirama.Modules.Clients.Domain.Aggregates.Client;
 using Mirama.SharedKernel.Abstractions.Domain.Core;
 
 namespace Mirama.Modules.Clients.Domain.Aggregates.Client.ClientPortalUser;
 
 public class ClientPortalUser : OrganizationEntity<ClientPortalUserId>
 {
-    public Guid ClientId { get; init; }
+    public ClientId ClientId { get; init; } = null!;
     public Guid ContactId { get; init; }
     public bool IsActive { get; private set; }
     public DateTime? LastLogin { get; private set; }

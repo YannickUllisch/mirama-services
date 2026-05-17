@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Mirama.Modules.Clients.Domain.Aggregates.Client;
 using Mirama.Modules.Clients.Domain.Aggregates.Client.ClientPortalInvitation;
 
 namespace Mirama.Modules.Clients.Infrastructure.Persistence.Configurations;
@@ -14,7 +15,9 @@ internal class ClientPortalInvitationConfiguration : IEntityTypeConfiguration<Cl
             .HasConversion(id => id.Value, v => new ClientPortalInvitationId(v))
             .IsRequired();
 
-        builder.Property(i => i.ClientId).IsRequired();
+        builder.Property(i => i.ClientId)
+            .HasConversion(id => id.Value, v => new ClientId(v))
+            .IsRequired();
         builder.Property(i => i.ContactId).IsRequired();
         builder.Property(i => i.Token).IsRequired();
         builder.Property(i => i.Status).IsRequired();

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Mirama.Modules.Clients.Domain.Aggregates.Client;
 using Mirama.Modules.Clients.Domain.Aggregates.Client.Contact;
 
 namespace Mirama.Modules.Clients.Infrastructure.Persistence.Configurations;
@@ -14,7 +15,9 @@ internal class ContactConfiguration : IEntityTypeConfiguration<Contact>
             .HasConversion(id => id.Value, v => new ContactId(v))
             .IsRequired();
 
-        builder.Property(c => c.ClientId).IsRequired();
+        builder.Property(c => c.ClientId)
+            .HasConversion(id => id.Value, v => new ClientId(v))
+            .IsRequired();
         builder.Property(c => c.FirstName).IsRequired().HasMaxLength(100);
         builder.Property(c => c.LastName).IsRequired().HasMaxLength(100);
         builder.Property(c => c.Email).IsRequired().HasMaxLength(254);

@@ -1,3 +1,4 @@
+using Mirama.Modules.Clients.Domain.Aggregates.Client;
 using Mirama.Modules.Clients.Domain.Enums;
 using Mirama.SharedKernel.Abstractions.Domain.Core;
 
@@ -5,7 +6,7 @@ namespace Mirama.Modules.Clients.Domain.Aggregates.Client.ClientPortalInvitation
 
 public class ClientPortalInvitation : OrganizationEntity<ClientPortalInvitationId>
 {
-    public Guid ClientId { get; init; }
+    public ClientId ClientId { get; init; } = null!;
     public Guid ContactId { get; init; }
     public Guid Token { get; private set; }
     public PortalInvitationStatus Status { get; private set; }
