@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Mirama.Modules.Identity.Application.Features.V1.AccessControl.Policies;
+namespace Mirama.Modules.Identity.Application.Features.V1.AccessControl;
 
 public sealed record AvailablePermissionsResponse
 {

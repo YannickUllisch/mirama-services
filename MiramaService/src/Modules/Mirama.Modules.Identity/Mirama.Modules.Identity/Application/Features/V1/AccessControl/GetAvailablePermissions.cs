@@ -4,11 +4,11 @@ using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.SharedKernel.Models;
 using Mirama.SharedKernel.Models.Permissions;
 
-namespace Mirama.Modules.Identity.Application.Features.V1.AccessControl.Policies;
+namespace Mirama.Modules.Identity.Application.Features.V1.AccessControl;
 
 public class GetAvailablePermissionsController : TenantControllerBase
 {
-    [HttpGet("policies/available-permissions")]
+    [HttpGet("available-permissions")]
     public async Task<ActionResult<AvailablePermissionsResponse>> Get()
     {
         var result = await this.Dispatcher.Send(new GetAvailablePermissionsQuery());
