@@ -1,7 +1,6 @@
 using ErrorOr;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Mirama.Modules.Identity.Domain.Aggregates.Policy;
 using Mirama.Modules.Identity.Infrastructure.Persistence;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.SharedKernel.Abstractions.Persistence;
@@ -15,7 +14,7 @@ public class DeletePolicyController : TenantControllerBase
     public async Task<IActionResult> Delete([FromRoute] Guid id)
     {
         var result = await this.Dispatcher.Send(new DeletePolicyCommand(id));
-        return result.Match(_ => NoContent(), Problem);
+        return result.Match(ToNoContent, Problem);
     }
 }
 

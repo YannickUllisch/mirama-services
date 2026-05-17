@@ -1,9 +1,7 @@
 using ErrorOr;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Mirama.Modules.Identity.Application.Features.V1.AccessControl.Roles;
 using Mirama.Modules.Identity.Domain.Aggregates.Policy;
-using Mirama.Modules.Identity.Domain.Aggregates.Role;
 using Mirama.Modules.Identity.Infrastructure.Persistence;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.SharedKernel.Abstractions.Persistence;
@@ -17,7 +15,7 @@ public class DetachPolicyController : TenantControllerBase
     public async Task<IActionResult> Detach([FromRoute] Guid roleId, [FromRoute] Guid policyId)
     {
         var result = await this.Dispatcher.Send(new DetachPolicyCommand(roleId, policyId));
-        return result.Match(_ => NoContent(), Problem);
+        return result.Match(ToNoContent, Problem);
     }
 }
 

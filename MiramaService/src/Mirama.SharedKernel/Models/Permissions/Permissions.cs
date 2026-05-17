@@ -1,5 +1,14 @@
 namespace Mirama.SharedKernel.Models.Permissions;
 
+public sealed record PermissionGroup(
+    string Label,
+    string Scope,
+    string ResourcePattern,
+    string AllActionsPattern,
+    IReadOnlyList<PermissionAction> Actions);
+
+public sealed record PermissionAction(string Action, string Label);
+
 public static class Permissions
 {
     public const string Wildcard = "*";
@@ -15,6 +24,18 @@ public static class Permissions
         public const string ResourcePattern = "project/*";
 
         public static readonly IReadOnlyList<string> All = [Read, Create, Update, Delete];
+
+        public static readonly PermissionGroup Group = new(
+            Label: "Project",
+            Scope: "Project",
+            ResourcePattern: ResourcePattern,
+            AllActionsPattern: AllActions,
+            Actions: [
+                new(Read,   "Read"),
+                new(Create, "Create"),
+                new(Update, "Update"),
+                new(Delete, "Delete"),
+            ]);
     }
 
     public static class Task
@@ -28,6 +49,19 @@ public static class Permissions
         public const string ResourcePattern = "task/*";
 
         public static readonly IReadOnlyList<string> All = [Read, Create, Update, Delete, Assign];
+
+        public static readonly PermissionGroup Group = new(
+            Label: "Task",
+            Scope: "Project",
+            ResourcePattern: ResourcePattern,
+            AllActionsPattern: AllActions,
+            Actions: [
+                new(Read,   "Read"),
+                new(Create, "Create"),
+                new(Update, "Update"),
+                new(Delete, "Delete"),
+                new(Assign, "Assign"),
+            ]);
     }
 
     public static class Member
@@ -41,6 +75,19 @@ public static class Permissions
         public const string ResourcePattern = "member/*";
 
         public static readonly IReadOnlyList<string> All = [Read, Create, Update, Delete, Invite];
+
+        public static readonly PermissionGroup Group = new(
+            Label: "Member",
+            Scope: "Organization",
+            ResourcePattern: ResourcePattern,
+            AllActionsPattern: AllActions,
+            Actions: [
+                new(Read,   "Read"),
+                new(Create, "Create"),
+                new(Update, "Update"),
+                new(Delete, "Delete"),
+                new(Invite, "Invite"),
+            ]);
     }
 
     public static class TeamMember
@@ -53,6 +100,18 @@ public static class Permissions
         public const string ResourcePattern = "teammember/*";
 
         public static readonly IReadOnlyList<string> All = [Read, Create, Update, Delete];
+
+        public static readonly PermissionGroup Group = new(
+            Label: "Team Member",
+            Scope: "Organization",
+            ResourcePattern: ResourcePattern,
+            AllActionsPattern: AllActions,
+            Actions: [
+                new(Read,   "Read"),
+                new(Create, "Create"),
+                new(Update, "Update"),
+                new(Delete, "Delete"),
+            ]);
     }
 
     public static class Milestone
@@ -65,6 +124,18 @@ public static class Permissions
         public const string ResourcePattern = "milestone/*";
 
         public static readonly IReadOnlyList<string> All = [Read, Create, Update, Delete];
+
+        public static readonly PermissionGroup Group = new(
+            Label: "Milestone",
+            Scope: "Project",
+            ResourcePattern: ResourcePattern,
+            AllActionsPattern: AllActions,
+            Actions: [
+                new(Read,   "Read"),
+                new(Create, "Create"),
+                new(Update, "Update"),
+                new(Delete, "Delete"),
+            ]);
     }
 
     public static class Tag
@@ -77,6 +148,18 @@ public static class Permissions
         public const string ResourcePattern = "tag/*";
 
         public static readonly IReadOnlyList<string> All = [Read, Create, Update, Delete];
+
+        public static readonly PermissionGroup Group = new(
+            Label: "Tag",
+            Scope: "Project",
+            ResourcePattern: ResourcePattern,
+            AllActionsPattern: AllActions,
+            Actions: [
+                new(Read,   "Read"),
+                new(Create, "Create"),
+                new(Update, "Update"),
+                new(Delete, "Delete"),
+            ]);
     }
 
     public static class Invitation
@@ -89,6 +172,18 @@ public static class Permissions
         public const string ResourcePattern = "invitation/*";
 
         public static readonly IReadOnlyList<string> All = [Read, Create, Update, Delete];
+
+        public static readonly PermissionGroup Group = new(
+            Label: "Invitation",
+            Scope: "Organization",
+            ResourcePattern: ResourcePattern,
+            AllActionsPattern: AllActions,
+            Actions: [
+                new(Read,   "Read"),
+                new(Create, "Create"),
+                new(Update, "Update"),
+                new(Delete, "Delete"),
+            ]);
     }
 
     public static class Team
@@ -101,6 +196,18 @@ public static class Permissions
         public const string ResourcePattern = "team/*";
 
         public static readonly IReadOnlyList<string> All = [Read, Create, Update, Delete];
+
+        public static readonly PermissionGroup Group = new(
+            Label: "Team",
+            Scope: "Organization",
+            ResourcePattern: ResourcePattern,
+            AllActionsPattern: AllActions,
+            Actions: [
+                new(Read,   "Read"),
+                new(Create, "Create"),
+                new(Update, "Update"),
+                new(Delete, "Delete"),
+            ]);
     }
 
     public static class Comment
@@ -113,6 +220,18 @@ public static class Permissions
         public const string ResourcePattern = "comment/*";
 
         public static readonly IReadOnlyList<string> All = [Read, Create, Update, Delete];
+
+        public static readonly PermissionGroup Group = new(
+            Label: "Comment",
+            Scope: "Project",
+            ResourcePattern: ResourcePattern,
+            AllActionsPattern: AllActions,
+            Actions: [
+                new(Read,   "Read"),
+                new(Create, "Create"),
+                new(Update, "Update"),
+                new(Delete, "Delete"),
+            ]);
     }
 
     public static class Expense
@@ -125,6 +244,18 @@ public static class Permissions
         public const string ResourcePattern = "expense/*";
 
         public static readonly IReadOnlyList<string> All = [Read, Create, Update, Delete];
+
+        public static readonly PermissionGroup Group = new(
+            Label: "Expense",
+            Scope: "Project",
+            ResourcePattern: ResourcePattern,
+            AllActionsPattern: AllActions,
+            Actions: [
+                new(Read,   "Read"),
+                new(Create, "Create"),
+                new(Update, "Update"),
+                new(Delete, "Delete"),
+            ]);
     }
 
     public static class Organization
@@ -136,6 +267,17 @@ public static class Permissions
         public const string ResourcePattern = "organization/*";
 
         public static readonly IReadOnlyList<string> All = [Read, Update, Delete];
+
+        public static readonly PermissionGroup Group = new(
+            Label: "Organization",
+            Scope: "Organization",
+            ResourcePattern: ResourcePattern,
+            AllActionsPattern: AllActions,
+            Actions: [
+                new(Read,   "Read"),
+                new(Update, "Update"),
+                new(Delete, "Delete"),
+            ]);
     }
 
     public static readonly IReadOnlyList<string> All =
@@ -151,5 +293,20 @@ public static class Permissions
         .. Comment.All,
         .. Expense.All,
         .. Organization.All,
+    ];
+
+    public static readonly IReadOnlyList<PermissionGroup> AllGroups =
+    [
+        Project.Group,
+        Task.Group,
+        Member.Group,
+        TeamMember.Group,
+        Milestone.Group,
+        Tag.Group,
+        Invitation.Group,
+        Team.Group,
+        Comment.Group,
+        Expense.Group,
+        Organization.Group,
     ];
 }

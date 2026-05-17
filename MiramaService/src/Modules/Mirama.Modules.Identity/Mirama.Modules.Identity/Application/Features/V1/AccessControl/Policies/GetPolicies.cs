@@ -14,36 +14,34 @@ namespace Mirama.Modules.Identity.Application.Features.V1.AccessControl.Policies
 
 public class GetPoliciesController : TenantControllerBase
 {
-    [HttpGet("policies")]
-    public async Task<ActionResult<PaginatedList<PolicyResponse>>> Get([FromQuery] GetPoliciesQuery query)
+    [HttpGet("policies/{scope}")]
+    public async Task<ActionResult<PaginatedList<PolicyResponse>>> Get([FromRoute] string scope, [FromQuery] GetPoliciesQuery query)
     {
-        var res = await this.Dispatcher.Send(query);
+        var res = await this.Dispatcher.Send(query with { Scope = scope });
         return res.Match(Ok, Problem);
     }
 }
 
 public sealed record GetPoliciesQuery : IQuery<ErrorOr<PaginatedList<PolicyResponse>>>
 {
+    public string Scope { get; init; } = string.Empty;
+
     [JsonPropertyName("pageSize")]
     public int? PageSize { get; init; }
 
     [JsonPropertyName("pageNumber")]
     public int? PageNumber { get; init; }
-
-    [JsonPropertyName("scope")]
-    public string? Scope { get; init; }
 }
 
 internal class GetPoliciesQueryValidator : AbstractValidator<GetPoliciesQuery>
 {
     public GetPoliciesQueryValidator()
     {
-        RuleFor(q => q.PageSize).LessThanOrEqualTo(50);
+        RuleFor(q => q.Scope)
+            .Must(s => Enum.TryParse<AccessScope>(s, ignoreCase: true, out _))
+            .WithMessage("Provided scope is not supported. Valid values: " + string.Join(", ", Enum.GetNames<AccessScope>()));
 
-        When(q => q.Scope is not null, () =>
-            RuleFor(q => q.Scope!)
-                .Must(s => Enum.TryParse<AccessScope>(s, ignoreCase: true, out _))
-                .WithMessage("Scope must be 'Organization' or 'Project'"));
+        RuleFor(q => q.PageSize).LessThanOrEqualTo(50);
     }
 }
 
@@ -61,7 +59,7 @@ internal class GetPoliciesQueryHandler(
             .OrderBy(p => p.TenantId != null)
             .ThenBy(p => p.Name);
 
-        if (request.Scope is not null && Enum.TryParse<AccessScope>(request.Scope, ignoreCase: true, out var scope))
+        Enum.TryParse<AccessScope>(request.Scope, ignoreCase: true, out var scope);
             query = query.Where(p => p.Scope == scope);
 
         if (request.PageNumber is not null && request.PageSize is not null)

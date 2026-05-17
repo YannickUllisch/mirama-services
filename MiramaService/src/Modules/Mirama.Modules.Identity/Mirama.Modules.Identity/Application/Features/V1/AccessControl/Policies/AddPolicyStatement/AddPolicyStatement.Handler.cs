@@ -1,52 +1,11 @@
-using System.Text.Json.Serialization;
 using ErrorOr;
-using FluentValidation;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Mirama.Modules.Identity.Domain.Aggregates.Policy;
 using Mirama.Modules.Identity.Infrastructure.Persistence;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.SharedKernel.Abstractions.Persistence;
-using Mirama.SharedKernel.Models;
 
 namespace Mirama.Modules.Identity.Application.Features.V1.AccessControl.Policies.AddPolicyStatement;
-
-public class AddPolicyStatementController : TenantControllerBase
-{
-    [HttpPost("policies/{policyId:guid}/statements")]
-    public async Task<ActionResult<PolicyResponse>> Add([FromRoute] Guid policyId, [FromBody] AddPolicyStatementCommand command)
-    {
-        var result = await this.Dispatcher.Send(command with { PolicyId = policyId });
-        return result.Match(Ok, Problem);
-    }
-}
-
-public sealed record AddPolicyStatementCommand : ICommand<ErrorOr<PolicyResponse>>
-{
-    [JsonPropertyName("policyId")]
-    public Guid PolicyId { get; init; }
-
-    [JsonPropertyName("action")]
-    public string Action { get; init; } = string.Empty;
-
-    [JsonPropertyName("resource")]
-    public string Resource { get; init; } = "*";
-
-    [JsonPropertyName("effect")]
-    public string Effect { get; init; } = "Allow";
-}
-
-internal class AddPolicyStatementCommandValidator : AbstractValidator<AddPolicyStatementCommand>
-{
-    public AddPolicyStatementCommandValidator()
-    {
-        RuleFor(c => c.Action).NotEmpty().MaximumLength(100);
-        RuleFor(c => c.Resource).NotEmpty().MaximumLength(200);
-        RuleFor(c => c.Effect)
-            .Must(e => Enum.TryParse<Effect>(e, ignoreCase: true, out _))
-            .WithMessage("Effect must be 'Allow' or 'Deny'");
-    }
-}
 
 internal class AddPolicyStatementCommandHandler(
     IdentityDbContext dbContext,

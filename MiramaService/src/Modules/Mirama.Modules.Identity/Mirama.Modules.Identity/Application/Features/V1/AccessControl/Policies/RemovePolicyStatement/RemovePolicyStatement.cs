@@ -15,7 +15,7 @@ public class RemovePolicyStatementController : TenantControllerBase
     public async Task<IActionResult> Remove([FromRoute] Guid policyId, [FromRoute] Guid statementId)
     {
         var result = await this.Dispatcher.Send(new RemovePolicyStatementCommand(policyId, statementId));
-        return result.Match(_ => NoContent(), Problem);
+        return result.Match(ToNoContent, Problem);
     }
 }
 
