@@ -29,7 +29,7 @@ internal class SetupUserCommandHandler(
     {
         var existingUser = await dbContext.Users
             .AsNoTracking()
-            .FirstOrDefaultAsync(u => u.Id == new UserId(request.Id), ct);
+            .FirstOrDefaultAsync(u => u.LinkedExternalIds.Contains(request.Id), ct);
 
         if (existingUser is not null)
         {
@@ -45,19 +45,18 @@ internal class SetupUserCommandHandler(
             return Error.NotFound("Plan.NotFound", "Free plan not seeded.");
         }
 
-        var user = User.CreateWithId(
+        var user = User.CreateWithExternalId(
             new UserDetails(request.Name, request.Email, TenantRole.Owner, request.Image),
             request.Id);
 
         var now = DateTime.UtcNow;
         var tenant = Tenant.Create(
-            request.Id,
+            user.Id.Value,
             new TenantSettingsDetails(request.Name, ReceiveNotifications: true, BrandingColor: null, LogoUrl: null),
             new SubscriptionDetails(freePlan.Id, now, now.AddYears(100)));
 
         dbContext.Users.Add(user);
         dbContext.Tenants.Add(tenant);
-        await dbContext.SaveChangesAsync(ct);
 
         return Result.Created;
     }

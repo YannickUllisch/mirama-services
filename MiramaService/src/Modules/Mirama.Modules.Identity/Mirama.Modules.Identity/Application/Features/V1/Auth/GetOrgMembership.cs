@@ -33,7 +33,7 @@ internal class GetOrgMembershipQueryHandler(
     {
         var user = await dbContext.Users
             .AsNoTracking()
-            .FirstOrDefaultAsync(u => u.Id == new UserId(request.ExternalId), ct);
+            .FirstOrDefaultAsync(u => u.LinkedExternalIds.Contains(request.ExternalId), ct);
 
         if (user is null)
             return Error.NotFound("User.NotFound", "User not found.");

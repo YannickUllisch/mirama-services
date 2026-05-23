@@ -18,7 +18,11 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.Property(u => u.Name).IsRequired();
         builder.Property(u => u.Email).IsRequired();
+        builder.HasIndex(u => u.Email).IsUnique();
         builder.Property(u => u.EmailVerified);
         builder.Property(u => u.Image);
+
+        builder.PrimitiveCollection(u => u.LinkedExternalIds)
+            .HasColumnName("LinkedExternalIds");
     }
 }
