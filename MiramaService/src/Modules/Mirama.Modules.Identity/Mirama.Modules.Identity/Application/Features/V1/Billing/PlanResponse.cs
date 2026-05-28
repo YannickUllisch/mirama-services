@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Mirama.Modules.Identity.Domain.Aggregates.Plan;
 
-namespace Mirama.Modules.Identity.Application.Features.V1.Plans;
+namespace Mirama.Modules.Identity.Application.Features.V1.Billing;
 
 internal static class PlanMapper
 {

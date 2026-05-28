@@ -6,7 +6,7 @@ using Mirama.Modules.Identity.Domain.Aggregates.Plan;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.SharedKernel.Models;
 
-namespace Mirama.Modules.Identity.Application.Features.V1.Plans;
+namespace Mirama.Modules.Identity.Application.Features.V1.Billing;
 
 public class GetPlansController : TenantControllerBase
 {
