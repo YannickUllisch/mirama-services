@@ -29,16 +29,16 @@ theme:
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: mirama
-      primary: indigo
-      accent: red
+      primary: black
+      accent: blue
       toggle:
         icon: material/toggle-switch
         name: Switch to dark mode
 
     - media: "(prefers-color-scheme: dark)"
       scheme: mirama-dark
-      # primary: black
-      accent: red
+      primary: black
+      accent: blue
       toggle:
         icon: material/toggle-switch-off-outline
         name: Switch to light mode

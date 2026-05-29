@@ -4,6 +4,8 @@ arrange:
   - system-context.md
   - requirements.md
   - domain-model.md
+  - multi-tenancy.md
+  - permissions.md
   - "phase1"
   - "phase1.5"
   - "phase2"

@@ -1,0 +1,52 @@
+sequenceDiagram
+title OIDC Auth Flow: Next.js + Next-Auth + AWS Cognito
+autonumber
+
+participant User
+participant Nextjs as Next.js Server (Next-Auth)
+participant Cognito as AWS Cognito (IdP)
+participant DB as Database / Mirama API
+
+%% Initiation
+User ->> Nextjs: Click "Login"
+Nextjs ->> Cognito: Redirect to /oauth2/authorize (PKCE)
+activate Cognito
+
+%% Authentication (Social or Local)
+alt Google Social Login
+    Cognito ->> User: Redirect to Google
+    User ->> Cognito: Google Auth Success
+else Username/Password
+    Cognito ->> User: Show Hosted UI / Login Form
+    User ->> Cognito: Submit Credentials
+end
+
+%% Callback & Code Exchange
+Cognito ->> Nextjs: Redirect to /api/auth/callback/cognito?code=XYZ
+deactivate Cognito
+activate Nextjs
+
+Nextjs ->> Cognito: Exchange Code for Tokens (ID, Access, Refresh)
+activate Cognito
+Cognito -->> Nextjs: Return JWT Tokens
+deactivate Cognito
+
+%% Database Sync and User Validation
+Note over Nextjs, DB: Next-Auth Callback
+Nextjs ->> DB: Fetch/Update User (by Email/Sub)
+activate DB
+DB -->> Nextjs: Return App-Specific Metadata (TenantId, OrgID, UserID, RoleId)
+deactivate DB
+
+%% 5. Session Establishment
+Note over Nextjs: Next.js signs its own Session JWT
+Nextjs -->> User: Set Secure HTTP-only Cookie
+deactivate Nextjs
+
+%% 6. Authenticated Request
+User ->> Nextjs: Request Protected Resource
+activate Nextjs
+Nextjs ->> DB: Query Data using Next.js Access Token Context
+DB -->> Nextjs: Return Data
+Nextjs -->> User: Render Page with Data
+deactivate Nextjs

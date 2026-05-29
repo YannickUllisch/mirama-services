@@ -43,7 +43,7 @@ System_Boundary(auth_boundary, "Centralized Auth / OIDC") {
 
         Boundary(infra_layer, "Infrastructure Layer") {
             Component(db_context, "OpenIdDbContext", "EF Core", "Data access for OpenIddict entities")
-            Component(account_service_client, "AccountServiceHttpClient", "HTTP Client", "Fetches user, tenant, org data from Account Service")
+            Component(account_service_client, "MiramaServiceHttpClient", "HTTP Client", "Fetches user, tenant, org data from Account Service")
             Component(client_worker, "ClientWorker", "Background Job", "Seeds OAuth2 clients and scopes on startup")
         }
     }

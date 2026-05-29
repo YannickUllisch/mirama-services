@@ -1,8 +1,7 @@
 title: "Phase 1.5: Platform & Infrastructure"
 arrange:
   - index.md
-  - iac-strategy.md
   - aws-phase1-architecture.md
-  - security-design.md
+  - deployment-architecture.md
   - cicd.md
   - data-migration.md

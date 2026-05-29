@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Mirama.Api/Mirama.Api.csproj" />
+    <Project Path="src/Mirama.SharedKernel/Mirama.SharedKernel.csproj" />
+  </Folder>
+  <Folder Name="/Modules/Identity/">
+    <Project Path="src/Modules/Mirama.Modules.Identity/Mirama.Modules.Identity.Contracts/Mirama.Modules.Identity.Contracts.csproj" />
+    <Project Path="src/Modules/Mirama.Modules.Identity/Mirama.Modules.Identity/Mirama.Modules.Identity.csproj" />
+  </Folder>
+  <Folder Name="/Modules/Projects/">
+    <Project Path="src/Modules/Mirama.Modules.PM/Mirama.Modules.PM.Contracts/Mirama.Modules.PM.Contracts.csproj" />
+    <Project Path="src/Modules/Mirama.Modules.PM/Mirama.Modules.PM/Mirama.Modules.PM.csproj" />
+  </Folder>
+  <Folder Name="/Modules/Clients/">
+    <Project Path="src/Modules/Mirama.Modules.Clients/Mirama.Modules.Clients.Contracts/Mirama.Modules.Clients.Contracts.csproj" />
+    <Project Path="src/Modules/Mirama.Modules.Clients/Mirama.Modules.Clients/Mirama.Modules.Clients.csproj" />
+  </Folder>
+</Solution>

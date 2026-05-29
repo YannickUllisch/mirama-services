@@ -1,32 +1,32 @@
 
 
 services:
-  authservice:
-    build:
-      context: ./AuthService
-      dockerfile: Dockerfile
-      target: final
-    ports:
-      - "8080:8080"
-    env_file:
-      - ./AuthService/.env
-    volumes:
-      - ./certs:/certificates
-    depends_on:
-      db:
-        condition: service_healthy
+  # authservice:
+  #   build:
+  #     context: ./AuthService
+  #     dockerfile: Dockerfile
+  #     target: final
+  #   ports:
+  #     - "8080:8080"
+  #   env_file:
+  #     - ./AuthService/.env
+  #   volumes:
+  #     - ./certs:/certificates
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
 
-  accountservice:
+  miramaservice:
     build:
-      context: ./AccountService
+      context: ./MiramaService
       dockerfile: Dockerfile
       target: final
     ports:
-      - 8081:8080
+      - 8080:8080
     env_file:
-      - ./AccountService/.env
-    volumes:
-      - ./certs:/certificates:ro
+      - ./MiramaService/.env
+    # volumes:
+    #   - ./certs:/certificates:ro
     depends_on:
       db:
         condition: service_healthy
