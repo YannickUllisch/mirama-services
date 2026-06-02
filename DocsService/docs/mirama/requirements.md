@@ -1,6 +1,6 @@
 # Mirama System Core Requirements
 
-This document defines the functional and non-functional requirements for the Mirama Platform. It serves as the architectural "North Star" ensuring that as the platform evolves, the core mission remains the priority, delivering a visual-first, high-performance production environment for creative teams.
+This document defines the functional and non-functional requirements for the Mirama Platform. It serves as the architectural "North Star" ensuring that as the platform evolves, the core mission remains the priority: delivering a unified Creative Operating System that handles the specific complexity of creative work while maintaining the data integrity needed for client accountability, resource management and - eventually - financial reporting.
 
 ---
 
@@ -26,11 +26,17 @@ This document defines the functional and non-functional requirements for the Mir
 * **FR-1.16 Collaboration & Favorites:** Comments and activity feed.
   Communication stays directly connected to the work itself. Stakeholders comment on visuals, reply in threads and favorite important deliverables for quick access.
 
+* **FR-1.17 Task Dependencies:** Define dependencies between tasks with automatic downstream adjustment.
+  If a "Creative Brief" task is delayed, all dependent downstream tasks (Copywriting, Design, Development) must shift their scheduled dates automatically. This is essential for campaign planning and prevents silent deadline misalignment.
+
+* **FR-1.18 Custom Task Statuses:** Organizations can define and configure their own workflow statuses.
+  Generic "In Progress" is insufficient for creative pipelines. Teams need statuses such as "Internal Review," "Awaiting Client Assets," "Client Revisions," and "Final Approval" to accurately reflect real production stages and reduce miscommunication.
+
 ---
 
 ### 1.2 Large Asset Management & Storage
 
-* **FR-1.21 Large Asset Upload Support:** Support uploads up to 1GB (fow now).
+* **FR-1.21 Large Asset Upload Support:** Support uploads up to 1GB (for now).
   Creative workflows often include large PSD files, 4K video exports, After Effects renders or RAW photography. The system must comfortably handle these without forcing users to rely on external storage tools.
 
 * **FR-1.22 Direct-to-Storage Uploads:** Upload directly to S3.
@@ -78,8 +84,7 @@ This document defines the functional and non-functional requirements for the Mir
   Different UI surfaces require different resolutions, thumbnails, previews and high-resolution views.
 
 * **FR-1.43 Preview-First Rendering:** Load compressed assets first.
-  Users should see visual feedback immediately while larger originals load in the background on request. This is important to not overwhelm the browser
-  but still allow stakeholders to see the intended version when in approval flow.
+  Users should see visual feedback immediately while larger originals load in the background on request. This is important to not overwhelm the browser but still allow stakeholders to see the intended version when in approval flow.
 
 * **FR-1.44 Non-Blocking Processing:** Compression async.
   Upload completion should not wait for processing tasks.
@@ -102,7 +107,7 @@ This document defines the functional and non-functional requirements for the Mir
 
 ---
 
-### 1.6 Review & Approval Workflow
+### 1.6 Review, Approval & Native Proofing
 
 * **FR-1.61 Visual Review Mode:** Dedicated stakeholder view for mockup inspection and approvals.  
   The system needs to provide a dedicated stakeholder view for inspecting high-resolution mockups and leaving approval states. This gives clients and managers a simplified interface focused on reviewing visuals rather than navigating project structure.
@@ -112,6 +117,9 @@ This document defines the functional and non-functional requirements for the Mir
 
 * **FR-1.63 Annotated Notifications:** Notifications linked to assets or comment threads.  
   System-managed notifications are linked directly to visual resources or comment threads. Notifications should bring users back to the exact asset version or discussion, reducing friction in feedback loops.
+
+* **FR-1.64 Native Click-on-Spot Annotation:** Pin comments to specific coordinates on images, PDFs and video.  
+  Reviewers must be able to click any point on a visual asset and leave a contextual comment at that exact location. This eliminates the need for external proofing tools (Frame.io, Markup.io) and keeps feedback directly inside the task. Annotations should be visible as pins on the asset surface, threaded, and resolvable.
 
 ---
 
@@ -124,7 +132,7 @@ This document defines the functional and non-functional requirements for the Mir
   The system shall support authentication via Google IdP and synchronization with Google Calendar. Project milestones and deadlines can automatically appear in calendars, aligning creative production with planning tools teams already use.
 
 * **FR-1.73 Stateless Authentication with JWTs:** The system shall use stateless JSON Web Tokens (JWTs) for user authentication and session management.
-This allows any service or API to validate a token without querying a central session store, improving performance, horizontal scalability, and reliability across distributed services.
+  This allows any service or API to validate a token without querying a central session store, improving performance, horizontal scalability, and reliability across distributed services.
 
 ---
 
@@ -145,12 +153,15 @@ This allows any service or API to validate a token without querying a central se
 * **FR-1.85 Seamless View State Management:** Persist user view preferences.  
   The system shall persist user view preferences. Each user returns to their preferred visualization automatically, improving efficiency across sessions.
 
+* **FR-1.86 Calendar View:** Date-based task and milestone visualization.  
+  A calendar view surfaces tasks, deadlines and milestones by date. This is essential for content-heavy teams (social media, editorial) who plan work in weekly or monthly cycles rather than by sprint.
+
 ---
 
 ### 1.9 Milestone & Project Timeline Tracking
 
 * **FR-1.91 Milestone Tracking:** Define milestones at project level.  
-  Users shall be able to define milestones at the project level. Milestones represent key delivery checkpoints such as “Client Review”, “Final Export” or “Campaign Launch”.
+  Users shall be able to define milestones at the project level. Milestones represent key delivery checkpoints such as "Client Review", "Final Export" or "Campaign Launch".
 
 * **FR-1.92 Milestone Progress Aggregation:** Milestone progress reflects associated tasks/assets.  
   Milestones automatically reflect progress based on associated tasks and assets. This provides a high-level overview of delivery readiness without manual tracking.
@@ -160,6 +171,68 @@ This allows any service or API to validate a token without querying a central se
 
 * **FR-1.94 Milestone Notifications:** Notify users when milestones approach or change state.  
   Users shall receive notifications when milestones approach or change state. This ensures deadlines remain visible and reduces missed delivery dates.
+
+---
+
+### 1.10 Time Tracking & Resource Management
+
+This section covers the financial and operational foundation that separates a professional creative platform from a generic task tracker. Without time tracking and workload visibility, the platform cannot support billing, profitability analysis or capacity planning - making a future ERP layer impossible.
+
+* **FR-1.101 Native Task Timer:** A built-in start/stop timer on every task.  
+  Every task must have a native time tracking control. Designers, developers and copywriters log time directly on the work object without switching to a separate time tracker. Logged time entries capture duration, user and optionally a note. This data is the source of truth for future billing and profitability reports.
+
+* **FR-1.102 Billable vs. Non-Billable Classification:** Time entries are classified as billable or non-billable.  
+  Each time entry must be explicitly classified. Billable time flows into client invoicing; non-billable time represents internal overhead, rework or unbilled scope. Without this distinction, a project can appear profitable on paper while the actual margin is negative.
+
+* **FR-1.103 Budget Tracking & Burn Alerts:** Projects have a defined budget (hours or currency) with threshold alerts.  
+  Project managers must be able to set a budget against a project. The system shall calculate burn rate from logged time entries and notify relevant members when the project reaches 50%, 75% and 100% of the allocated budget. This prevents silent over-servicing - a common cause of margin loss in agencies.
+
+* **FR-1.104 Capacity & Workload View:** A manager-level view showing team member utilization across all active projects.  
+  The system must provide a cross-project workload dashboard showing each team member's scheduled or logged hours in a given period. Overbooked members are surfaced visually (red), available capacity is visible (green). This allows project managers to redistribute work before deadlines are missed rather than after.
+
+---
+
+### 1.11 Client & Intake Management (CRM Foundation)
+
+This section establishes the relational client model and intake pipeline that connects the CRM layer to project execution. The `Client` entity is a first-class object in the data model - linked to intake briefs, projects, time records and (in future) invoices. If the client is a tag or a folder name rather than a relational object, cross-client reporting and billing break.
+
+* **FR-1.111 Custom Intake & Request Forms:** Configurable external forms for client brief submission.  
+  Organizations must be able to create branded, configurable intake forms that external clients fill out to submit a brief or request. A submitted form automatically creates a Lead record (CRM) or a Project (PM) depending on configuration. This gives freelancers and agencies a professional intake pipeline without a separate CRM tool.
+
+* **FR-1.112 Client Portal & Guest Access:** A simplified, scoped view for external clients.  
+  External clients must be able to access a dedicated portal that shows project progress, active assets for review, and approved deliverables - without seeing internal budget data, team discussions, or organizational structure. The portal requires no account creation if accessed via a secure invitation link.
+
+* **FR-1.113 Public/Private Privacy Toggles on Tasks and Comments:** Granular control over what clients see in the portal.  
+  Project managers must be able to mark individual tasks or comment threads as internal-only. Internal content is hidden from the client portal regardless of project-level sharing settings. This allows teams to have honest internal discussions about revisions or issues without exposing them to the client.
+
+* **FR-1.114 Lead-to-Project Conversion:** A brief submitted via intake form links to a structured project.  
+  When a Lead is converted to a Project, the client relationship record, brief data and any attachments carry over automatically. The `Client` object remains the parent entity linking the intake brief, the project, logged time and future invoices - maintaining a continuous audit trail of the client engagement.
+
+---
+
+### 1.12 Automation, Templates & Search
+
+* **FR-1.121 Project Templates:** One-click project creation from a saved template.  
+  Organizations must be able to save any project structure as a reusable template - including pre-set tasks, subtasks, roles, custom statuses and estimated durations. Common service packages (e.g., "Brand Identity," "Campaign Package," "Website Build") become one-click setups rather than manual recreation. This is the primary scaling mechanism for small agencies delivering repeatable services.
+
+* **FR-1.122 Automated Workflow Triggers:** Event-driven rule engine for status changes and notifications.  
+  The system shall support configurable automations of the form: "When [condition], then [action]." Examples: when a task status changes to "Approved," automatically send a notification to the client and move the task to "Final Delivery." When a milestone deadline is 48 hours away with no activity, notify the project lead. Automations reduce manual overhead and enforce consistent workflows across teams.
+
+* **FR-1.123 Global Search:** A unified search engine across tasks, files and conversations.  
+  Users must be able to search across task names, file names, comment text and client records in a single query from anywhere in the application. Search results are scoped to the user's active organization and respect all permission boundaries. This is critical for large projects where content accumulates quickly and navigation becomes insufficient.
+
+---
+
+### 1.13 Platform Extensibility
+
+* **FR-1.131 Open API:** A versioned, publicly documented REST API.  
+  All core entities (clients, projects, tasks, time entries, assets) must be accessible via a documented REST API. This allows users to integrate Mirama with tools not natively supported - custom scripts, internal dashboards, or industry-specific software - without relying on Mirama to build every integration.
+
+* **FR-1.132 Webhooks:** Outbound event notifications for key platform events.  
+  The system must support configurable webhooks that fire on defined events (task status change, new comment, asset uploaded, milestone reached). This enables real-time integration with Slack, email services, Adobe Creative Cloud and custom workflow tooling without polling the API.
+
+* **FR-1.133 Audit Logs:** An immutable record of all significant platform actions.  
+  The system must record who performed what action, on what resource, and when - for all destructive or permission-sensitive operations (deadline changes, file deletions, role modifications, billing record edits). Audit logs are read-only, scoped to the organization and accessible to Administrators. This is a non-negotiable requirement for large firm accountability and compliance.
 
 ---
 
@@ -213,7 +286,7 @@ This allows any service or API to validate a token without querying a central se
 
 * **NFR-2.43 Encryption & TLS:** Assets encrypted at rest (AES-256) and all transfers over TLS 1.2+.
 
-* **NFR-2.44 Access Enforcement (RBAC):** Delegated permissions, role-based access and external review links must respect scoped access at all times.
+* **NFR-2.44 Access Enforcement (PBAC):** Delegated permissions, policy-based access and external review links must respect scoped access at all times.
 
 * **NFR-2.45 Stateless JWT & OIDC:** Authentication tokens must be stateless JWTs compliant with OpenID Connect (OIDC) standards, including claims for tenantId, orgId and roles. Services can validate tokens independently without additional database lookups, reducing attack surface and improving response speed.
 
@@ -221,7 +294,7 @@ This allows any service or API to validate a token without querying a central se
 
 ### 2.5 Availability & Reliability
 
-* **NFR-2.51 System Availability:** Platform target uptime 99.5% (Phase 1)*, 99.9% (Phase 2).
+* **NFR-2.51 System Availability:** Platform target uptime 99.5% (initial), 99.9% (production scale).
 
 * **NFR-2.52 Background Job Retry:** Failed processing jobs retried up to **3 times**. After which they should be handled in a dead-letter-queue (DLQ).
 
@@ -249,11 +322,11 @@ This allows any service or API to validate a token without querying a central se
 
 ### 2.7 Maintainability
 
-* **NFR-2.71 Layered Architecture (Next.js Backend):** Enforce clear backend code separation.  
-  Backend code must follow clear layered separation (controllers, services, repositories, utilities) to improve readability, testability and feature evolution.
+* **NFR-2.71 Layered Architecture (Next.js Frontend):** Enforce clear frontend code separation.  
+  Frontend code must follow clear layered separation (components, hooks, services, utilities) to improve readability, testability and feature evolution.
 
-* **NFR-2.72 Clean Architecture & Vertical Slices (.NET Backend):** Use Clean Architecture for microservices.  
-  Phase 2 microservices and backend components must use Clean Architecture principles with vertical slice patterns, ensuring independent services can evolve without breaking unrelated functionality.
+* **NFR-2.72 Clean Architecture & Vertical Slices (MiramaService Backend):** Use Clean Architecture for the modular monolith.  
+  The MiramaService backend must use Clean Architecture principles with vertical slice patterns per feature, ensuring modules can evolve independently without breaking unrelated functionality.
 
 * **NFR-2.73 Consistent Coding Standards:** Adhere to coding conventions and linting.  
   All codebases (frontend, backend, scripts) must adhere to defined coding conventions, naming rules and linting policies for readability and maintainability.
@@ -272,8 +345,8 @@ This allows any service or API to validate a token without querying a central se
 
 * **NFR-2.78 Structured Logging & Tracing:** Implement structured logging and distributed tracing.  
   All services must implement structured logging to capture meaningful events, errors, and context for each request.  
-    * Phase 1 (Next.js): Use structured logging (e.g., Pino) to record request/response metadata, errors and key application events. Tracing should also be implemented to propagate and match `traceId`s across flows such as SNS, SQS file handling, so that errors can be directly related back to a specific request.
-    * Phase 2 (.NET services): Extend logging with distributed tracing to allow correlation of requests across services, supporting debugging, performance analysis, and visualization in monitoring tools.
+    * **Next.js Frontend:** Use structured logging (e.g., Pino) to record request/response metadata, errors and key application events. Tracing should propagate `traceId`s across async flows (SNS, SQS file handling) so that errors can be directly related back to a specific request.  
+    * **MiramaService Backend:** Extend logging with structured tracing (e.g., Serilog + OpenTelemetry) to allow correlation of requests across module boundaries, supporting debugging, performance analysis, and visualization in monitoring tools.
 
 ---
 

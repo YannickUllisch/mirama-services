@@ -67,7 +67,7 @@ public static class DependencyInjection
                 .MigrationsHistoryTable(tableName: "__EFMigrationsHistory", schema: "identity"));
         });
 
-        // Expose IdentityDbContext as IUnitOfWork — TransactionDecorator resolves this.
+        // Expose IdentityDbContext as IUnitOfWork - TransactionDecorator resolves this.
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<IdentityDbContext>());
 
         return services;

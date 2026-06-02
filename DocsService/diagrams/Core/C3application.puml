@@ -10,16 +10,16 @@ skinparam ArrowColor #555555
 LAYOUT_TOP_DOWN()
 LAYOUT_WITH_LEGEND()
 
-title MiramaService — Modular Monolith Component Structure
+title MiramaService - Modular Monolith Component Structure
 
 ' ── External ───────────────────────────────────────────────────────────────────
 Person_Ext(client, "Client", "BFF or browser. Sends HTTP requests.")
 
-' ── SharedKernel — every project in the solution depends on this ───────────────
+' ── SharedKernel - every project in the solution depends on this ───────────────
 Component(sk, "Mirama.SharedKernel", "Shared Project", "Foundation for all modules.\nAggregateRoot, IDomainEvent, ICommand, IQuery,\nIDispatcher, IUnitOfWork, Decorators, OutboxMessage.")
 
 ' ── API Host ───────────────────────────────────────────────────────────────────
-System_Boundary(host, "MiramaService — .NET Host (Mirama.Api)") {
+System_Boundary(host, "MiramaService - .NET Host (Mirama.Api)") {
 
     Component(api, "Endpoints & Middleware", "ASP.NET Core Minimal API", "HTTP entry point. Idempotency middleware.\nEach module registers its own endpoint group here.")
 
@@ -45,7 +45,7 @@ System_Boundary(host, "MiramaService — .NET Host (Mirama.Api)") {
 }
 
 ' ── Database ───────────────────────────────────────────────────────────────────
-ContainerDb(db, "PostgreSQL", "Database", "Schema [account]  — Identity tables + OutboxMessages\nSchema [projects] — Projects tables + OutboxMessages")
+ContainerDb(db, "PostgreSQL", "Database", "Schema [account]  - Identity tables + OutboxMessages\nSchema [projects] - Projects tables + OutboxMessages")
 
 ' ── Request flow ───────────────────────────────────────────────────────────────
 Rel(client, api,  "HTTPS")
@@ -53,12 +53,12 @@ Rel(api,   disp,  "Send ICommand / IQuery")
 Rel(disp,  id_app, "Route to handler")
 Rel(disp,  pr_app, "Route to handler")
 
-' ── Clean architecture — Identity (Infra → App → Domain) ───────────────────────
+' ── Clean architecture - Identity (Infra → App → Domain) ───────────────────────
 Rel(id_inf, id_app, "Implements interfaces from")
 Rel(id_app, id_dom, "Uses aggregates in")
 Rel(id_inf, db,     "Read / Write", "[account]")
 
-' ── Clean architecture — Projects (Infra → App → Domain) ───────────────────────
+' ── Clean architecture - Projects (Infra → App → Domain) ───────────────────────
 Rel(pr_inf, pr_app, "Implements interfaces from")
 Rel(pr_app, pr_dom, "Uses aggregates in")
 Rel(pr_inf, db,     "Read / Write", "[projects]")
@@ -67,11 +67,11 @@ Rel(pr_inf, db,     "Read / Write", "[projects]")
 Rel(relay, db,   "Poll OutboxMessages")
 Rel(relay, disp, "Re-publish domain event")
 
-' ── Cross-module boundary — Contracts only ─────────────────────────────────────
+' ── Cross-module boundary - Contracts only ─────────────────────────────────────
 Rel(id_app, pr_con, "References (compile-time)")
 Rel(pr_app, id_con, "References (compile-time)")
 
-' ── SharedKernel — shown once per module via outermost layer ───────────────────
+' ── SharedKernel - shown once per module via outermost layer ───────────────────
 Rel(id_inf, sk, "Depends on")
 Rel(pr_inf, sk, "Depends on")
 
