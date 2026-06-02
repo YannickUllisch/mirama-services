@@ -1,0 +1,1595 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Portfolio & Project Documentation Hub">
+      
+      
+      
+        <link rel="canonical" href="https://docs.yannickullisch.com/mirama/multi-tenancy/">
+      
+      
+        <link rel="prev" href="../domain-model/">
+      
+      
+        <link rel="next" href="../security-design/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Multi-Tenancy Architecture - Yannick Ullisch</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="mirama" data-md-color-primary="black" data-md-color-accent="blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#multi-tenancy-architecture" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Yannick Ullisch" class="md-header__button md-logo" aria-label="Yannick Ullisch" data-md-component="logo">
+      
+  <img src="../../images/yul-logo-white.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Yannick Ullisch
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Multi-Tenancy Architecture
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="mirama" data-md-color-primary="black" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="mirama-dark" data-md-color-primary="black" data-md-color-accent="blue"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6m0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4M7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/yannickullisch" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    YannickUllisch
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Welcome
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Mirama Platform
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Yannick Ullisch" class="md-nav__button md-logo" aria-label="Yannick Ullisch" data-md-component="logo">
+      
+  <img src="../../images/yul-logo-white.png" alt="logo">
+
+    </a>
+    Yannick Ullisch
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/yannickullisch" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    YannickUllisch
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Welcome
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mirama Platform
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Mirama Platform
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../system-context/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mirama Platform – System Context
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../requirements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mirama System Core Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../domain-model/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mirama Platform – Core Domain Model
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-Tenancy Architecture
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-Tenancy Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#architectural-philosophy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architectural Philosophy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-ownership-hierarchy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Ownership Hierarchy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#this-hierarchy-in-a-b2b-and-b2c-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        This Hierarchy in a B2B and B2C Context
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="This Hierarchy in a B2B and B2C Context">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#b2b-is-the-natural-fit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B2B is the Natural Fit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b2c-works-with-product-design-effort" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B2C Works, With Product Design Effort
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-strains-both" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Strains Both
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-isolation-is-enforced" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How Isolation Is Enforced
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="How Isolation Is Enforced">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-scopeddb-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The ScopedDb Pattern
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-request-lifecycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Request Lifecycle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-orm-layer-isolation-instead-of-postgres-row-level-security" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why ORM-Layer Isolation Instead of Postgres Row-Level Security
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jwt-based-organization-scoping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JWT-Based Organization Scoping
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-this-matters-for-creative-teams" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why This Matters for Creative Teams
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#iam-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IAM Integration
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../security-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../future-enhancements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Future enhancements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Api design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cross-module-communication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cross-Module Communication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../database-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../iac-strategy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Iac strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../maintenance-and-monitoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Maintenance and monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../module-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Module design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../recursive-task-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Designing a Scalable and Intuitive Task Management Backbone
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../risks-and-mitigation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Risks and mitigation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../system-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../testing-strategy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_18" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../phase1/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 1: Next.js Standalone
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_18_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_18">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Phase 1: Next.js Standalone
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#architectural-philosophy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architectural Philosophy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-ownership-hierarchy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Ownership Hierarchy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#this-hierarchy-in-a-b2b-and-b2c-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        This Hierarchy in a B2B and B2C Context
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="This Hierarchy in a B2B and B2C Context">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#b2b-is-the-natural-fit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B2B is the Natural Fit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b2c-works-with-product-design-effort" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B2C Works, With Product Design Effort
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-strains-both" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Strains Both
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-isolation-is-enforced" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How Isolation Is Enforced
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="How Isolation Is Enforced">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-scopeddb-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The ScopedDb Pattern
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#the-request-lifecycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Request Lifecycle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-orm-layer-isolation-instead-of-postgres-row-level-security" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why ORM-Layer Isolation Instead of Postgres Row-Level Security
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jwt-based-organization-scoping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JWT-Based Organization Scoping
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-this-matters-for-creative-teams" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why This Matters for Creative Teams
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#iam-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IAM Integration
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="multi-tenancy-architecture">Multi-Tenancy Architecture<a class="headerlink" href="#multi-tenancy-architecture" title="Permanent link">&para;</a></h1>
+<p>As outlined in the <a href="../system-context/">System Context</a>, Mirama is a visual-first production environment for creative teams managing complex projects, assets and workflows. For a platform like that, the most critical engineering challenge isn't just storing data, it is guaranteeing isolation. We built our request pipeline around a Logical Multi-Tenancy model to answer two foundational questions. 1) Whose data is this? and 2) Who can see it? By baking these checks into the infrastructure, we've made unauthorized access a structural impossibility rather than a pinky-promise in a policy doc.</p>
+<hr />
+<h2 id="architectural-philosophy">Architectural Philosophy<a class="headerlink" href="#architectural-philosophy" title="Permanent link">&para;</a></h2>
+<p>Mirama uses a <strong>Single-Database, Shared-Schema</strong> model of multi-tenancy. Rather than spinning up a separate database per customer (I don't have the money for that, and this is usually more required in very high security environments like Gov or Finance), all tenant data lives in the same schema. Isolation is enforced at the <strong>application layer</strong> through a custom ORM infrastructure extensions rather than relying on database-engine features.</p>
+<p>This is a deliberate trade-off. A single schema means a single migration deploys across every tenant simultaneously. One connection pool, one monitoring surface, one backup strategy. Thousands of organizations can be onboarded with zero infrastructure overhead per signup. For a platform at Mirama's stage, this is the correct call.</p>
+<p>The caveat is that this model puts the full weight of isolation correctness on the application code. That is exactly why the enforcement layer described later in this document is non-negotiable.</p>
+<hr />
+<h2 id="the-ownership-hierarchy">The Ownership Hierarchy<a class="headerlink" href="#the-ownership-hierarchy" title="Permanent link">&para;</a></h2>
+<p>All data in Mirama flows through a strict top-down ownership tree:</p>
+<div class="highlight"><pre><span></span><code>Tenant<span class="w">  </span><span class="o">(</span>billing<span class="w"> </span>entity<span class="w"> </span><span class="p">&amp;</span><span class="w"> </span>root<span class="w"> </span>owner<span class="o">)</span>
+<span class="w">  </span>└──<span class="w"> </span>Organization<span class="w">  </span><span class="o">(</span>the<span class="w"> </span>primary<span class="w"> </span>operational<span class="w"> </span>workspace<span class="o">)</span>
+<span class="w">        </span>├──<span class="w"> </span>Members<span class="w">  </span><span class="o">(</span>users<span class="w"> </span>within<span class="w"> </span>this<span class="w"> </span>org<span class="o">)</span>
+<span class="w">        </span>├──<span class="w"> </span>Teams<span class="w">    </span><span class="o">(</span>functional<span class="w"> </span>groups<span class="w"> </span>within<span class="w"> </span>the<span class="w"> </span>org<span class="o">)</span>
+<span class="w">        </span>└──<span class="w"> </span>Projects
+<span class="w">              </span>├──<span class="w"> </span>Tasks
+<span class="w">              </span>└──<span class="w"> </span>Milestones
+</code></pre></div>
+<p>The <strong>Tenant</strong> is the billing entity. Created automatically on signup, every piece of data in the system ultimately traces back to a single Tenant, which maintains a 1:1 relationship with its Root User. The <strong>Organization</strong> is where day-to-day work happens. An agency might run everything inside a single organization; a larger enterprise might create separate organizations per business unit or client. Teams, members, and all project data live at this level. <strong>Resources</strong> like Projects, Tasks, and Milestones are always children of a specific Organization. They cannot exist without one and they cannot be accessed outside of one.</p>
+<hr />
+<h2 id="this-hierarchy-in-a-b2b-and-b2c-context">This Hierarchy in a B2B and B2C Context<a class="headerlink" href="#this-hierarchy-in-a-b2b-and-b2c-context" title="Permanent link">&para;</a></h2>
+<p>The Tenant to Organization hierarchy is simple by design, but the implications of that simplicity change significantly depending on who is actually using the platform. What feels natural to a fifty-person agency feels like unnecessary overhead to a solo freelancer and what scales beautifully for a startup becomes a constraint for a Fortune 500 procurement team. This section walks through both sides honestly.</p>
+<h3 id="b2b-is-the-natural-fit">B2B is the Natural Fit<a class="headerlink" href="#b2b-is-the-natural-fit" title="Permanent link">&para;</a></h3>
+<p>For business customers the hierarchy maps directly onto how they already operate. A design agency has one billing relationship with Mirama (the Tenant) but might serve a dozen separate client accounts, each with their own isolated workspace. Their team members hop between client organizations without needing separate logins, and billing stays unified under the agency's account. Nobody needs to explain how context switching works because the structure already mirrors how they think about their engagements.</p>
+<p>The model also scales smoothly as a B2B customer grows. A startup might begin with a single organization. As they expand into regional teams or separate product lines, they spin up additional organizations under the same tenant without any restructuring. Access control within each organization remains completely independent, so a developer in the "Platform" org cannot accidentally wander into the "Marketing" org's expense reports. There is no migration step, no plan upgrade required, just a new workspace under the same roof.</p>
+<p>Delegated access is another strength here. An external contractor can be added to one organization without being given any visibility into the others under the same tenant. When the contract ends, removing them from that organization is the only step required and it cleans up every associated permission automatically.</p>
+<p>Where the model starts to strain on the B2B side is at the enterprise tier. Large enterprise customers often have compliance teams that demand physical data separation, not logical isolation. A security auditor may not care how good the ORM extension is, they want contractual guarantees backed by separate hardware and separate network boundaries. The shared-schema model cannot offer that without fundamentally changing what it is. There is also the cross-organization reporting gap. Enterprises frequently want consolidated analytics across all their organizations within a tenant, which means querying across the very isolation boundaries the system is specifically built to enforce. That is solvable with a dedicated reporting pipeline, but it is additional work that the current architecture does not hand you for free.</p>
+<h3 id="b2c-works-with-product-design-effort">B2C Works, With Product Design Effort<a class="headerlink" href="#b2c-works-with-product-design-effort" title="Permanent link">&para;</a></h3>
+<p>For individual consumer users, the hierarchy introduces concepts that don't map to their mental model. A freelancer who signs up gets a Tenant and an Organization whether they need it or not. They are never going to "switch organizations" because they only have one, and exposing that language in the UI would just create confusion. The model is not wrong for B2C, but the product layer has to do real work to hide the scaffolding.</p>
+<p>The payoff comes the moment that freelancer wants to collaborate. Say they want to share a project with a client or bring in another designer for review. The organization and membership model is already in place underneath. There is no feature to retrofit, no schema migration to run, no "upgrade to team plan" gate. Solo use is simply a degenerate case of the same structure that handles a fifty-person agency, which means the upgrade path from individual to team is seamless.</p>
+<p>The scaling economics are also genuinely good for a B2C growth pattern. A large number of small, mostly-inactive tenants is exactly the scenario where a shared-schema model performs best. There are no thousands of empty schemas sitting on disk. It is one schema with more rows, and relational databases handle that very comfortably. The marginal cost of a new consumer signup is effectively zero in infrastructure terms.</p>
+<p>The real B2C limitation is feature expectations. Consumer users tend to expect things like social login flows, free tier usage caps and instant onboarding with no setup. None of those are blocked by the tenancy model, but they aren't provided by it either. The hierarchy is invisible infrastructure for B2C and the product experience has to be built separately on top of it.</p>
+<h3 id="what-strains-both">What Strains Both<a class="headerlink" href="#what-strains-both" title="Permanent link">&para;</a></h3>
+<p>The most consistent pressure point across B2B and B2C is the noisy neighbor problem. Because all tenants share the same connection pool and compute, an unusually heavy workload from one customer can degrade response times for others. Application-layer rate limiting softens this but does not eliminate it. It is an inherent characteristic of logical multi-tenancy and the honest answer is that you manage it rather than solve it.</p>
+<p>The harder ceiling is compliance. This architecture is not suitable for industries requiring physical data residency or hardware-level separation. GovCloud workloads, financial services with data locality mandates and healthcare all need a fundamentally different foundation. If we ever move into those segments, we’d likely evolve toward a Pooled and Silo hybrid. In that world, high-compliance organizations get their own dedicated infrastructure, while standard tenants stay on the shared pool. It’s an evolution of our current stack rather than a total rewrite, but it represents a significant shift in operational overhead.</p>
+<p>Fortunately, that’s not our target. Mirama is built for design firms and creative studios. For these users, the primary concern isn't a complex government audit, it's for the most part contractual integrity and asset safety.</p>
+<hr />
+<h2 id="how-isolation-is-enforced">How Isolation Is Enforced<a class="headerlink" href="#how-isolation-is-enforced" title="Permanent link">&para;</a></h2>
+<p>Everything described above only matters if the isolation is actually airtight. Saying "data belongs to an organization" is just a label until the system physically prevents one organization's code path from touching another organization's rows. This section covers how that is achieved across the ORM, the request pipeline, and the authentication layer.</p>
+<h3 id="the-scopeddb-pattern">The ScopedDb Pattern<a class="headerlink" href="#the-scopeddb-pattern" title="Permanent link">&para;</a></h3>
+<p>The most dangerous assumption in any multi-tenant application is that developers will remember to filter by organization on every single database query. They will not. Not consistently, not under deadline pressure, not in a late-night debugging session. So we removed the assumption entirely.</p>
+<p>We customized the ORM across our API server with a <strong>ScopedDb</strong> extension, a scoped proxy over the standard Prisma client that intercepts every operation before it reaches the database. Reads automatically have <code>tenantId</code> or <code>organizationId</code> injected into the where clause. Writes are automatically stamped with the correct owner IDs. If a query is attempted without a valid scope in context, for example during a misconfigured middleware chain, the client throws a hard exception rather than silently falling back to an unscoped query. There is no silent failure mode. A developer literally cannot write application code that leaks data across organizations because the wrong data is structurally unreachable from <code>ctx.db</code>.</p>
+<p>Not all data is scoped the same way. Three distinct access patterns exist within the extension.</p>
+<table>
+<thead>
+<tr>
+<th>Scope</th>
+<th>What It Covers</th>
+<th>Who Can Access It</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Tenant</code></td>
+<td>Subscription data, billing, global settings</td>
+<td>Root User of the tenant only</td>
+</tr>
+<tr>
+<td><code>Organization</code></td>
+<td>Projects, Tasks, Members, Teams</td>
+<td>All members of that organization</td>
+</tr>
+<tr>
+<td><code>Inclusive</code></td>
+<td>System defaults (e.g., built-in IAM roles)</td>
+<td>Readable by all; modifiable by none</td>
+</tr>
+</tbody>
+</table>
+<h3 id="the-request-lifecycle">The Request Lifecycle<a class="headerlink" href="#the-request-lifecycle" title="Permanent link">&para;</a></h3>
+<p>Every incoming API request passes through a functional middleware stack before any handler executes. The philosophy is to fail fast and fail loudly rather than let ambiguous access pass through silently.</p>
+<p>First, the JWT is decoded to retrieve the <code>userId</code> and the currently active <code>organizationId</code>. An expired or tampered token terminates the request immediately.</p>
+<p>Second, the middleware validates that any resource IDs present in the URL path, for example <code>/api/org/:orgId/project/:projectId</code>, match the IDs encoded in the user's session. A mismatch returns a <code>403 Forbidden</code> before the database is ever contacted. This is the primary defense against <a href="https://owasp.org/www-project-top-ten/">Insecure Direct Object Reference (IDOR)</a> attacks, where an attacker manually edits a URL parameter hoping to reach a resource in a different organization.</p>
+<p>Third, a <code>ScopedDb</code> instance is created and attached to the request context as <code>ctx.db</code>. From this point forward, every database operation the handler performs is automatically scoped. The developer writes standard Prisma code and does not need to think about organization filtering because it has already happened.</p>
+<h3 id="why-orm-layer-isolation-instead-of-postgres-row-level-security">Why ORM-Layer Isolation Instead of Postgres Row-Level Security<a class="headerlink" href="#why-orm-layer-isolation-instead-of-postgres-row-level-security" title="Permanent link">&para;</a></h3>
+<p>An alternative approach would be to enforce isolation at the database engine level using Postgres Row-Level Security. We chose ORM-layer enforcement instead, and the reasoning is worth being explicit about.</p>
+<p>The security logic lives in the TypeScript codebase. It is auditable, unit-testable, and visible during pull request reviews without needing to context-switch into SQL policy definitions that most engineers rarely touch. Adding a new data access pattern means the isolation rules are checked as part of the normal development workflow. The approach is also database-agnostic, so migrating storage engines or layering in Redis does not require rewriting policies.</p>
+<p>The honest trade-off is that Postgres RLS enforces isolation at the engine level, meaning even a raw SQL escape would still run through the policies. Application-layer isolation does not have that backstop. If someone bypasses the ORM entirely, there is nothing catching them below. Code review discipline and thorough test coverage are the equivalent safety net, which means this approach requires consistent effort to maintain. We consider that trade-off acceptable given the gains in developer velocity, portability, and testability.</p>
+<h3 id="jwt-based-organization-scoping">JWT-Based Organization Scoping<a class="headerlink" href="#jwt-based-organization-scoping" title="Permanent link">&para;</a></h3>
+<p>The user's currently active <code>organizationId</code> is embedded directly in the JWT payload. This means there is no extra database round-trip to verify "does this user belong to this org?" on every request. The signed token is a stateless, cryptographically verifiable proof of membership that works equally well on the API server, at a CDN edge, or inside SSR functions.</p>
+<p>The trade-off is stale sessions. If a user is removed from an organization, their existing JWT may continue to carry a now-invalid <code>organizationId</code> until the token expires. We mitigate this with short token lifetimes and explicit revocation events triggered by membership changes, but the window exists and is worth being aware of.</p>
+<hr />
+<h2 id="why-this-matters-for-creative-teams">Why This Matters for Creative Teams<a class="headerlink" href="#why-this-matters-for-creative-teams" title="Permanent link">&para;</a></h2>
+<p>Everything above is infrastructure. This section is about why that infrastructure exists in the first place.</p>
+<p>For a design agency, a data leak is not just a security incident on a compliance spreadsheet. It is a breach of trust that can end a client relationship overnight. Creative assets, unreleased brand identities, campaign imagery under NDA, packaging mockups months ahead of a product launch are some of the most commercially sensitive material a business handles. They are also exactly the kind of material that Mirama is built to manage.</p>
+<p>The isolation model protects these assets in three concrete ways.</p>
+<p>First, contractual air-gapping. A user from Agency X can never guess, enumerate, or accidentally stumble into a URL that resolves to a mockup belonging to Agency Y. The system treats every organization as its own island. There is no shared namespace, no global search that leaks across boundaries, no "related content" sidebar pulling from the wrong pool. The data simply does not exist from the perspective of anyone outside the owning organization.</p>
+<p>Second, leak-proof derivatives. Creative workflows generate a lot of secondary material. Thumbnails, low-resolution previews, transcoded video renditions, compressed board exports. Every one of those generated assets inherits the same strict ownership rules as the original upload. The multi-tenancy model extends into the storage layer so that a thumbnail cannot become a side-channel around the isolation that protects its parent file.</p>
+<p>Third, audit-ready access logs. Because <code>organizationId</code> is baked into every database transaction through the ScopedDb extension, we maintain a clean and immutable record of who accessed which asset and when. If a client ever asks for proof of data handling practices, the answer is already sitting in the transaction metadata. There is no retroactive log assembly required.</p>
+<p>We are not building for intelligence agencies. We are building so that a lead designer can hand off a staging link to a stakeholder and sleep soundly knowing their client's next product launch will not end up on a public mood board because of a missing WHERE clause somewhere in the codebase.</p>
+<hr />
+<h2 id="iam-integration">IAM Integration<a class="headerlink" href="#iam-integration" title="Permanent link">&para;</a></h2>
+<p>Tenancy boundaries define <em>which data</em> a tenant can access. They say nothing about <em>what a specific user</em> inside e.g. an organization is allowed to do with that data. That responsibility belongs to the fine-grained authorization layer.</p>
+<p>Mirama uses a <strong>Policy-Based Access Control (PBAC)</strong> system for this, described in the companion document: <a href="permissions.md">Permissions &amp; Authorization System</a>.</p>
+<p>The two systems are complementary by design. The tenancy layer is the outer wall that separates organizations from each other and the PBAC layer is the set of locks inside that determines what each person within an organization can do.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../domain-model/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Mirama Platform – Core Domain Model">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Mirama Platform – Core Domain Model
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../security-design/" class="md-footer__link md-footer__link--next" aria-label="Next: Security Design">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Security Design
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2026 Yannick Ullisch
+    </div>
+  
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/yannickullisch" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.sections", "navigation.tracking", "navigation.footer", "navigation.indexes", "navigation.top", "navigation.tabs", "search.highlight", "search.share", "search.suggest", "content.code.copy", "content.tabs.link", "content.tooltips"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>

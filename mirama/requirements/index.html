@@ -1,0 +1,2165 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Portfolio & Project Documentation Hub">
+      
+      
+      
+        <link rel="canonical" href="https://docs.yannickullisch.com/mirama/requirements/">
+      
+      
+        <link rel="prev" href="../system-context/">
+      
+      
+        <link rel="next" href="../domain-model/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Mirama System Core Requirements - Yannick Ullisch</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="mirama" data-md-color-primary="black" data-md-color-accent="blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#mirama-system-core-requirements" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Yannick Ullisch" class="md-header__button md-logo" aria-label="Yannick Ullisch" data-md-component="logo">
+      
+  <img src="../../images/yul-logo-white.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Yannick Ullisch
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Mirama System Core Requirements
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="mirama" data-md-color-primary="black" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="mirama-dark" data-md-color-primary="black" data-md-color-accent="blue"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6m0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4M7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/yannickullisch" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    YannickUllisch
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Welcome
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Mirama Platform
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Yannick Ullisch" class="md-nav__button md-logo" aria-label="Yannick Ullisch" data-md-component="logo">
+      
+  <img src="../../images/yul-logo-white.png" alt="logo">
+
+    </a>
+    Yannick Ullisch
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/yannickullisch" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    YannickUllisch
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Welcome
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mirama Platform
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Mirama Platform
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../system-context/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mirama Platform – System Context
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mirama System Core Requirements
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mirama System Core Requirements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-functional-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Functional Requirements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Functional Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-visual-first-project-task-asset-lifecycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 Visual-First Project, Task &amp; Asset Lifecycle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-large-asset-management-storage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 Large Asset Management &amp; Storage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13-asset-versioning-fast-retrieval" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3 Asset Versioning &amp; Fast Retrieval
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#14-background-asset-processing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4 Background Asset Processing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#15-multi-tenant-identity-workspace-hierarchy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.5 Multi-Tenant Identity &amp; Workspace Hierarchy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#16-review-approval-native-proofing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.6 Review, Approval &amp; Native Proofing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#17-platform-intelligence-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.7 Platform Intelligence &amp; Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#18-creative-interface-adaptive-visualization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.8 Creative Interface &amp; Adaptive Visualization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#19-milestone-project-timeline-tracking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.9 Milestone &amp; Project Timeline Tracking
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#110-time-tracking-resource-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.10 Time Tracking &amp; Resource Management
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#111-client-intake-management-crm-foundation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.11 Client &amp; Intake Management (CRM Foundation)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#112-automation-templates-search" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.12 Automation, Templates &amp; Search
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#113-platform-extensibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.13 Platform Extensibility
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-non-functional-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Non-Functional Requirements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Non-Functional Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-performance-edge-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Performance &amp; Edge Optimization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-large-asset-upload-reliability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Large Asset Upload Reliability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-asset-processing-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 Asset Processing Performance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-security-isolation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4 Security &amp; Isolation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#25-availability-reliability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5 Availability &amp; Reliability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#26-scalability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.6 Scalability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#27-maintainability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.7 Maintainability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#28-storage-organization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.8 Storage Organization
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../domain-model/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mirama Platform – Core Domain Model
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../multi-tenancy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-Tenancy Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../security-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../future-enhancements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Future enhancements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Api design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cross-module-communication/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cross-Module Communication
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../database-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Database design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../iac-strategy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Iac strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../maintenance-and-monitoring/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Maintenance and monitoring
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../module-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Module design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../recursive-task-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Designing a Scalable and Intuitive Task Management Backbone
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../risks-and-mitigation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Risks and mitigation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../system-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../testing-strategy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testing strategy
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_18" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../phase1/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Phase 1: Next.js Standalone
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_18_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_18">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Phase 1: Next.js Standalone
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-functional-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Functional Requirements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Functional Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-visual-first-project-task-asset-lifecycle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 Visual-First Project, Task &amp; Asset Lifecycle
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-large-asset-management-storage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 Large Asset Management &amp; Storage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13-asset-versioning-fast-retrieval" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.3 Asset Versioning &amp; Fast Retrieval
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#14-background-asset-processing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.4 Background Asset Processing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#15-multi-tenant-identity-workspace-hierarchy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.5 Multi-Tenant Identity &amp; Workspace Hierarchy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#16-review-approval-native-proofing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.6 Review, Approval &amp; Native Proofing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#17-platform-intelligence-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.7 Platform Intelligence &amp; Integration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#18-creative-interface-adaptive-visualization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.8 Creative Interface &amp; Adaptive Visualization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#19-milestone-project-timeline-tracking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.9 Milestone &amp; Project Timeline Tracking
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#110-time-tracking-resource-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.10 Time Tracking &amp; Resource Management
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#111-client-intake-management-crm-foundation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.11 Client &amp; Intake Management (CRM Foundation)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#112-automation-templates-search" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.12 Automation, Templates &amp; Search
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#113-platform-extensibility" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.13 Platform Extensibility
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-non-functional-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Non-Functional Requirements
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Non-Functional Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-performance-edge-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Performance &amp; Edge Optimization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-large-asset-upload-reliability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Large Asset Upload Reliability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-asset-processing-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 Asset Processing Performance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-security-isolation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4 Security &amp; Isolation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#25-availability-reliability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5 Availability &amp; Reliability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#26-scalability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.6 Scalability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#27-maintainability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.7 Maintainability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#28-storage-organization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.8 Storage Organization
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="mirama-system-core-requirements">Mirama System Core Requirements<a class="headerlink" href="#mirama-system-core-requirements" title="Permanent link">&para;</a></h1>
+<p>This document defines the functional and non-functional requirements for the Mirama Platform. It serves as the architectural "North Star" ensuring that as the platform evolves, the core mission remains the priority: delivering a unified Creative Operating System that handles the specific complexity of creative work while maintaining the data integrity needed for client accountability, resource management and - eventually - financial reporting.</p>
+<hr />
+<h2 id="1-functional-requirements">1. Functional Requirements<a class="headerlink" href="#1-functional-requirements" title="Permanent link">&para;</a></h2>
+<h3 id="11-visual-first-project-task-asset-lifecycle">1.1 Visual-First Project, Task &amp; Asset Lifecycle<a class="headerlink" href="#11-visual-first-project-task-asset-lifecycle" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p><strong>FR-1.11 Recursive Asset Trees:</strong> Support N-level deep task nesting.
+  This allows creative teams to structure work exactly like their design folder hierarchies. A branding project can contain logo work, which can contain variations, which can contain social exports, without forcing users into rigid depth limits.</p>
+</li>
+<li>
+<p><strong>FR-1.12 Complex Task Modeling:</strong> Support Epics, Features, Stories, Tasks, Issues.
+  Mirama must accommodate both structured planning and creative workflows. Some teams work with epics and stories, others work with design deliverables. The system needs to support both without friction.</p>
+</li>
+<li>
+<p><strong>FR-1.13 Asset-Centric Tasks:</strong> Tasks act as containers for Figures.
+  Instead of assets being secondary attachments, the visual output becomes the core object. Users interact with mockups, videos and images first, with metadata and discussion surrounding them.</p>
+</li>
+<li>
+<p><strong>FR-1.14 Version Tracking:</strong> Upload iterations to same task.
+  Designers frequently iterate. This ensures revisions remain grouped together, allowing stakeholders to follow the evolution of a concept from first draft to final production version.</p>
+</li>
+<li>
+<p><strong>FR-1.15 Progress Aggregation:</strong> Parent progress auto-calculated.
+  Project leads should instantly understand progress without manually updating rollups. Nested tasks automatically determine the completion of higher-level containers.</p>
+</li>
+<li>
+<p><strong>FR-1.16 Collaboration &amp; Favorites:</strong> Comments and activity feed.
+  Communication stays directly connected to the work itself. Stakeholders comment on visuals, reply in threads and favorite important deliverables for quick access.</p>
+</li>
+<li>
+<p><strong>FR-1.17 Task Dependencies:</strong> Define dependencies between tasks with automatic downstream adjustment.
+  If a "Creative Brief" task is delayed, all dependent downstream tasks (Copywriting, Design, Development) must shift their scheduled dates automatically. This is essential for campaign planning and prevents silent deadline misalignment.</p>
+</li>
+<li>
+<p><strong>FR-1.18 Custom Task Statuses:</strong> Organizations can define and configure their own workflow statuses.
+  Generic "In Progress" is insufficient for creative pipelines. Teams need statuses such as "Internal Review," "Awaiting Client Assets," "Client Revisions," and "Final Approval" to accurately reflect real production stages and reduce miscommunication.</p>
+</li>
+</ul>
+<hr />
+<h3 id="12-large-asset-management-storage">1.2 Large Asset Management &amp; Storage<a class="headerlink" href="#12-large-asset-management-storage" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p><strong>FR-1.21 Large Asset Upload Support:</strong> Support uploads up to 1GB (for now).
+  Creative workflows often include large PSD files, 4K video exports, After Effects renders or RAW photography. The system must comfortably handle these without forcing users to rely on external storage tools.</p>
+</li>
+<li>
+<p><strong>FR-1.22 Direct-to-Storage Uploads:</strong> Upload directly to S3.
+  Large file transfers should never pass through the application server. Instead, the client uploads directly to storage using secure signed URLs, ensuring stability and scalability.</p>
+</li>
+<li>
+<p><strong>FR-1.23 Chunked Multipart Upload:</strong> Files split into chunks.
+  Uploading in smaller chunks avoids timeouts and improves reliability, especially on slower or unstable internet connections.</p>
+</li>
+<li>
+<p><strong>FR-1.24 Resume Interrupted Uploads:</strong> Support resumable uploads.
+  If a connection drops mid-upload, users should be able to continue from where they left off rather than restarting a 900MB upload.</p>
+</li>
+<li>
+<p><strong>FR-1.25 Original Format Preservation:</strong> Store original file.
+  Mirama should act as a centralized asset repository, meaning the exact original file must always remain available for download.</p>
+</li>
+<li>
+<p><strong>FR-1.26 Upload Progress Feedback:</strong> Real-time progress UI.
+  Users need clear feedback when uploading large files, including percentage progress and retry indicators.</p>
+</li>
+</ul>
+<hr />
+<h3 id="13-asset-versioning-fast-retrieval">1.3 Asset Versioning &amp; Fast Retrieval<a class="headerlink" href="#13-asset-versioning-fast-retrieval" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p><strong>FR-1.31 Fast Asset History Loading:</strong> Optimized version retrieval.
+  Even assets with dozens of revisions should load instantly so users can navigate between versions without delays.</p>
+</li>
+<li>
+<p><strong>FR-1.32 Active Version Prioritization:</strong> Fetch active version first.
+  Boards and dashboards should render quickly by loading only the currently active version before loading the full history.</p>
+</li>
+<li>
+<p><strong>FR-1.33 Lazy Loading History:</strong> Load versions incrementally.
+  Historical versions load on demand to prevent performance degradation.</p>
+</li>
+<li>
+<p><strong>FR-1.34 Version Metadata Indexing:</strong> Indexed metadata.
+  Version information such as uploader, status and timestamps should be searchable and filterable.</p>
+</li>
+<li>
+<p><strong>FR-1.35 Evolution Toggle:</strong> Switch versions instantly.
+  Designers and stakeholders can quickly compare revisions and approvals.</p>
+</li>
+</ul>
+<hr />
+<h3 id="14-background-asset-processing">1.4 Background Asset Processing<a class="headerlink" href="#14-background-asset-processing" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p><strong>FR-1.41 Background Compression:</strong> Generate compressed previews.
+  Large assets automatically generate smaller preview versions for fast rendering.</p>
+</li>
+<li>
+<p><strong>FR-1.42 Multi-Resolution Assets:</strong> Create thumbnails.
+  Different UI surfaces require different resolutions, thumbnails, previews and high-resolution views.</p>
+</li>
+<li>
+<p><strong>FR-1.43 Preview-First Rendering:</strong> Load compressed assets first.
+  Users should see visual feedback immediately while larger originals load in the background on request. This is important to not overwhelm the browser but still allow stakeholders to see the intended version when in approval flow.</p>
+</li>
+<li>
+<p><strong>FR-1.44 Non-Blocking Processing:</strong> Compression async.
+  Upload completion should not wait for processing tasks.</p>
+</li>
+</ul>
+<hr />
+<h3 id="15-multi-tenant-identity-workspace-hierarchy">1.5 Multi-Tenant Identity &amp; Workspace Hierarchy<a class="headerlink" href="#15-multi-tenant-identity-workspace-hierarchy" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p><strong>FR-1.51 Tenant Isolation:</strong> Strictly filter all data by active organization and tenant.<br />
+  The system must strictly filter all data, mockups and user metadata by the user's currently active <code>OrganizationId</code> and assumed <code>TenantId</code>. This ensures that no data from another organization is ever accidentally visible. Every request, query and asset lookup is always scoped to the active tenant context.</p>
+</li>
+<li>
+<p><strong>FR-1.52 Context Switching:</strong> Switch organization and tenant context without reauthentication.<br />
+  Users with access to multiple organizations must be able to switch their active organization and tenant context without reauthentication. Agencies often work across multiple clients. Switching context should feel instant and should not interrupt the workflow or require logging out.</p>
+</li>
+<li>
+<p><strong>FR-1.53 Team-Based Workspaces:</strong> Partition projects into teams with granular access control.<br />
+  Organizations must be able to partition projects into teams with granular access control. This allows departments such as Illustration, Marketing, and Finance to work in isolation while still belonging to the same organization.</p>
+</li>
+<li>
+<p><strong>FR-1.54 Delegated Invitation &amp; Access:</strong> Invite members and limit access by project or team.<br />
+  Admins can invite internal members or external collaborators using secure tokenized invitations. Once accepted, access can be limited to specific projects or teams so for example freelancers only see the work relevant to them.</p>
+</li>
+</ul>
+<hr />
+<h3 id="16-review-approval-native-proofing">1.6 Review, Approval &amp; Native Proofing<a class="headerlink" href="#16-review-approval-native-proofing" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p><strong>FR-1.61 Visual Review Mode:</strong> Dedicated stakeholder view for mockup inspection and approvals.<br />
+  The system needs to provide a dedicated stakeholder view for inspecting high-resolution mockups and leaving approval states. This gives clients and managers a simplified interface focused on reviewing visuals rather than navigating project structure.</p>
+</li>
+<li>
+<p><strong>FR-1.62 Asset Direct-Link:</strong> Secure, time-limited URLs for asset viewing.<br />
+  The system must generate secure, time-limited URLs for viewing high-resolution assets. These links allow external reviewers to access visuals without exposing the entire workspace or storage bucket.</p>
+</li>
+<li>
+<p><strong>FR-1.63 Annotated Notifications:</strong> Notifications linked to assets or comment threads.<br />
+  System-managed notifications are linked directly to visual resources or comment threads. Notifications should bring users back to the exact asset version or discussion, reducing friction in feedback loops.</p>
+</li>
+<li>
+<p><strong>FR-1.64 Native Click-on-Spot Annotation:</strong> Pin comments to specific coordinates on images, PDFs and video.<br />
+  Reviewers must be able to click any point on a visual asset and leave a contextual comment at that exact location. This eliminates the need for external proofing tools (Frame.io, Markup.io) and keeps feedback directly inside the task. Annotations should be visible as pins on the asset surface, threaded, and resolvable.</p>
+</li>
+</ul>
+<hr />
+<h3 id="17-platform-intelligence-integration">1.7 Platform Intelligence &amp; Integration<a class="headerlink" href="#17-platform-intelligence-integration" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p><strong>FR-1.71 Favourite Entities &amp; Routes:</strong> Favorite projects, tasks, assets or views.<br />
+  Users must be able to favorite projects, tasks, asset versions or specific views. This allows frequently accessed deliverables to appear instantly in the sidebar or on the application dashboard for faster navigation.</p>
+</li>
+<li>
+<p><strong>FR-1.72 Google Ecosystem Integration:</strong> Google authentication and calendar sync.<br />
+  The system shall support authentication via Google IdP and synchronization with Google Calendar. Project milestones and deadlines can automatically appear in calendars, aligning creative production with planning tools teams already use.</p>
+</li>
+<li>
+<p><strong>FR-1.73 Stateless Authentication with JWTs:</strong> The system shall use stateless JSON Web Tokens (JWTs) for user authentication and session management.
+  This allows any service or API to validate a token without querying a central session store, improving performance, horizontal scalability, and reliability across distributed services.</p>
+</li>
+</ul>
+<hr />
+<h3 id="18-creative-interface-adaptive-visualization">1.8 Creative Interface &amp; Adaptive Visualization<a class="headerlink" href="#18-creative-interface-adaptive-visualization" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p><strong>FR-1.81 Multi-Surface Task Navigation:</strong> Synchronized Kanban, lists, tables and Gantt views.<br />
+  The system shall provide synchronized views such as Kanban boards, hierarchical lists, tables and Gantt charts. Different roles prefer different visualizations. Designers may prefer boards, while managers rely on timelines and structured views.</p>
+</li>
+<li>
+<p><strong>FR-1.82 Contextual Mockup Visualization:</strong> Visualize assets across different scopes.<br />
+  Users shall visualize design assets across different scopes. A single task view focuses on immediate work, while container views aggregate all visuals across campaigns or epics.</p>
+</li>
+<li>
+<p><strong>FR-1.83 Evolution &amp; Approval Dashboard:</strong> Approval matrix for status and versions.<br />
+  The UI shall provide an approval matrix for quickly identifying approval status and active versions. This helps teams understand what is production-ready and what still requires revision.</p>
+</li>
+<li>
+<p><strong>FR-1.84 Visual Asset Boards:</strong> Board view with assets as primary cards.<br />
+  A dedicated board view visualizes assets as primary cards. This allows creative teams to scan visual progress without reading heavy text-based task cards.</p>
+</li>
+<li>
+<p><strong>FR-1.85 Seamless View State Management:</strong> Persist user view preferences.<br />
+  The system shall persist user view preferences. Each user returns to their preferred visualization automatically, improving efficiency across sessions.</p>
+</li>
+<li>
+<p><strong>FR-1.86 Calendar View:</strong> Date-based task and milestone visualization.<br />
+  A calendar view surfaces tasks, deadlines and milestones by date. This is essential for content-heavy teams (social media, editorial) who plan work in weekly or monthly cycles rather than by sprint.</p>
+</li>
+</ul>
+<hr />
+<h3 id="19-milestone-project-timeline-tracking">1.9 Milestone &amp; Project Timeline Tracking<a class="headerlink" href="#19-milestone-project-timeline-tracking" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p><strong>FR-1.91 Milestone Tracking:</strong> Define milestones at project level.<br />
+  Users shall be able to define milestones at the project level. Milestones represent key delivery checkpoints such as "Client Review", "Final Export" or "Campaign Launch".</p>
+</li>
+<li>
+<p><strong>FR-1.92 Milestone Progress Aggregation:</strong> Milestone progress reflects associated tasks/assets.<br />
+  Milestones automatically reflect progress based on associated tasks and assets. This provides a high-level overview of delivery readiness without manual tracking.</p>
+</li>
+<li>
+<p><strong>FR-1.93 Timeline Visualization:</strong> Visualize milestones in Gantt and roadmap views.<br />
+  Milestones shall be visualized within Gantt and roadmap views. This helps teams understand dependencies and plan delivery schedules visually.</p>
+</li>
+<li>
+<p><strong>FR-1.94 Milestone Notifications:</strong> Notify users when milestones approach or change state.<br />
+  Users shall receive notifications when milestones approach or change state. This ensures deadlines remain visible and reduces missed delivery dates.</p>
+</li>
+</ul>
+<hr />
+<h3 id="110-time-tracking-resource-management">1.10 Time Tracking &amp; Resource Management<a class="headerlink" href="#110-time-tracking-resource-management" title="Permanent link">&para;</a></h3>
+<p>This section covers the financial and operational foundation that separates a professional creative platform from a generic task tracker. Without time tracking and workload visibility, the platform cannot support billing, profitability analysis or capacity planning - making a future ERP layer impossible.</p>
+<ul>
+<li>
+<p><strong>FR-1.101 Native Task Timer:</strong> A built-in start/stop timer on every task.<br />
+  Every task must have a native time tracking control. Designers, developers and copywriters log time directly on the work object without switching to a separate time tracker. Logged time entries capture duration, user and optionally a note. This data is the source of truth for future billing and profitability reports.</p>
+</li>
+<li>
+<p><strong>FR-1.102 Billable vs. Non-Billable Classification:</strong> Time entries are classified as billable or non-billable.<br />
+  Each time entry must be explicitly classified. Billable time flows into client invoicing; non-billable time represents internal overhead, rework or unbilled scope. Without this distinction, a project can appear profitable on paper while the actual margin is negative.</p>
+</li>
+<li>
+<p><strong>FR-1.103 Budget Tracking &amp; Burn Alerts:</strong> Projects have a defined budget (hours or currency) with threshold alerts.<br />
+  Project managers must be able to set a budget against a project. The system shall calculate burn rate from logged time entries and notify relevant members when the project reaches 50%, 75% and 100% of the allocated budget. This prevents silent over-servicing - a common cause of margin loss in agencies.</p>
+</li>
+<li>
+<p><strong>FR-1.104 Capacity &amp; Workload View:</strong> A manager-level view showing team member utilization across all active projects.<br />
+  The system must provide a cross-project workload dashboard showing each team member's scheduled or logged hours in a given period. Overbooked members are surfaced visually (red), available capacity is visible (green). This allows project managers to redistribute work before deadlines are missed rather than after.</p>
+</li>
+</ul>
+<hr />
+<h3 id="111-client-intake-management-crm-foundation">1.11 Client &amp; Intake Management (CRM Foundation)<a class="headerlink" href="#111-client-intake-management-crm-foundation" title="Permanent link">&para;</a></h3>
+<p>This section establishes the relational client model and intake pipeline that connects the CRM layer to project execution. The <code>Client</code> entity is a first-class object in the data model - linked to intake briefs, projects, time records and (in future) invoices. If the client is a tag or a folder name rather than a relational object, cross-client reporting and billing break.</p>
+<ul>
+<li>
+<p><strong>FR-1.111 Custom Intake &amp; Request Forms:</strong> Configurable external forms for client brief submission.<br />
+  Organizations must be able to create branded, configurable intake forms that external clients fill out to submit a brief or request. A submitted form automatically creates a Lead record (CRM) or a Project (PM) depending on configuration. This gives freelancers and agencies a professional intake pipeline without a separate CRM tool.</p>
+</li>
+<li>
+<p><strong>FR-1.112 Client Portal &amp; Guest Access:</strong> A simplified, scoped view for external clients.<br />
+  External clients must be able to access a dedicated portal that shows project progress, active assets for review, and approved deliverables - without seeing internal budget data, team discussions, or organizational structure. The portal requires no account creation if accessed via a secure invitation link.</p>
+</li>
+<li>
+<p><strong>FR-1.113 Public/Private Privacy Toggles on Tasks and Comments:</strong> Granular control over what clients see in the portal.<br />
+  Project managers must be able to mark individual tasks or comment threads as internal-only. Internal content is hidden from the client portal regardless of project-level sharing settings. This allows teams to have honest internal discussions about revisions or issues without exposing them to the client.</p>
+</li>
+<li>
+<p><strong>FR-1.114 Lead-to-Project Conversion:</strong> A brief submitted via intake form links to a structured project.<br />
+  When a Lead is converted to a Project, the client relationship record, brief data and any attachments carry over automatically. The <code>Client</code> object remains the parent entity linking the intake brief, the project, logged time and future invoices - maintaining a continuous audit trail of the client engagement.</p>
+</li>
+</ul>
+<hr />
+<h3 id="112-automation-templates-search">1.12 Automation, Templates &amp; Search<a class="headerlink" href="#112-automation-templates-search" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p><strong>FR-1.121 Project Templates:</strong> One-click project creation from a saved template.<br />
+  Organizations must be able to save any project structure as a reusable template - including pre-set tasks, subtasks, roles, custom statuses and estimated durations. Common service packages (e.g., "Brand Identity," "Campaign Package," "Website Build") become one-click setups rather than manual recreation. This is the primary scaling mechanism for small agencies delivering repeatable services.</p>
+</li>
+<li>
+<p><strong>FR-1.122 Automated Workflow Triggers:</strong> Event-driven rule engine for status changes and notifications.<br />
+  The system shall support configurable automations of the form: "When [condition], then [action]." Examples: when a task status changes to "Approved," automatically send a notification to the client and move the task to "Final Delivery." When a milestone deadline is 48 hours away with no activity, notify the project lead. Automations reduce manual overhead and enforce consistent workflows across teams.</p>
+</li>
+<li>
+<p><strong>FR-1.123 Global Search:</strong> A unified search engine across tasks, files and conversations.<br />
+  Users must be able to search across task names, file names, comment text and client records in a single query from anywhere in the application. Search results are scoped to the user's active organization and respect all permission boundaries. This is critical for large projects where content accumulates quickly and navigation becomes insufficient.</p>
+</li>
+</ul>
+<hr />
+<h3 id="113-platform-extensibility">1.13 Platform Extensibility<a class="headerlink" href="#113-platform-extensibility" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p><strong>FR-1.131 Open API:</strong> A versioned, publicly documented REST API.<br />
+  All core entities (clients, projects, tasks, time entries, assets) must be accessible via a documented REST API. This allows users to integrate Mirama with tools not natively supported - custom scripts, internal dashboards, or industry-specific software - without relying on Mirama to build every integration.</p>
+</li>
+<li>
+<p><strong>FR-1.132 Webhooks:</strong> Outbound event notifications for key platform events.<br />
+  The system must support configurable webhooks that fire on defined events (task status change, new comment, asset uploaded, milestone reached). This enables real-time integration with Slack, email services, Adobe Creative Cloud and custom workflow tooling without polling the API.</p>
+</li>
+<li>
+<p><strong>FR-1.133 Audit Logs:</strong> An immutable record of all significant platform actions.<br />
+  The system must record who performed what action, on what resource, and when - for all destructive or permission-sensitive operations (deadline changes, file deletions, role modifications, billing record edits). Audit logs are read-only, scoped to the organization and accessible to Administrators. This is a non-negotiable requirement for large firm accountability and compliance.</p>
+</li>
+</ul>
+<hr />
+<h2 id="2-non-functional-requirements">2. Non-Functional Requirements<a class="headerlink" href="#2-non-functional-requirements" title="Permanent link">&para;</a></h2>
+<h3 id="21-performance-edge-optimization">2.1 Performance &amp; Edge Optimization<a class="headerlink" href="#21-performance-edge-optimization" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p><strong>NFR-2.11 API Response Latency:</strong> 95th percentile API responses must complete under <strong>800ms</strong>, with critical navigation endpoints targeting <strong>&lt;250ms</strong>.</p>
+</li>
+<li>
+<p><strong>NFR-2.12 Asset Preview Load Time:</strong> Compressed preview assets should render within <strong>&lt;500ms</strong> from CDN edge locations.</p>
+</li>
+<li>
+<p><strong>NFR-2.13 Active Board Rendering:</strong> Visual boards should display primary content within <strong>&lt;1.2 seconds</strong> even for projects containing 100+ assets.</p>
+</li>
+<li>
+<p><strong>NFR-2.14 Time-To-Interactive:</strong> Initial application load should reach interactive state within <strong>&lt;2.5 seconds</strong> on standard broadband.</p>
+</li>
+<li>
+<p><strong>NFR-2.15 Token Validation Efficiency:</strong> Stateless JWT validation must complete within &lt;5ms per request, avoiding additional round-trips or database calls, even under high concurrency.</p>
+</li>
+</ul>
+<hr />
+<h3 id="22-large-asset-upload-reliability">2.2 Large Asset Upload Reliability<a class="headerlink" href="#22-large-asset-upload-reliability" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p><strong>NFR-2.21 Upload Stability:</strong> The system must support sustained uploads of <strong>1GB files</strong> without server memory consumption exceeding <strong>50MB per request</strong>.</p>
+</li>
+<li>
+<p><strong>NFR-2.22 Multipart Chunk Size:</strong> Uploads should use chunk sizes between <strong>5MB–25MB</strong> for optimal throughput.</p>
+</li>
+<li>
+<p><strong>NFR-2.23 Upload Timeout Avoidance:</strong> No upload operation should rely on API routes exceeding <strong>30 seconds</strong> execution time.</p>
+</li>
+<li>
+<p><strong>NFR-2.24 Resume Reliability:</strong> Upload recovery must succeed for <strong>&gt;95%</strong> of interrupted uploads.</p>
+</li>
+<li>
+<p><strong>NFR-2.25 Upload Feedback:</strong> Users should see progress and error recovery options in real time.</p>
+</li>
+</ul>
+<hr />
+<h3 id="23-asset-processing-performance">2.3 Asset Processing Performance<a class="headerlink" href="#23-asset-processing-performance" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p><strong>NFR-2.31 Preview Generation:</strong> Images, videos and other asset previews should be generated efficiently (&lt;8–25s for large assets).</p>
+</li>
+<li>
+<p><strong>NFR-2.32 Dashboard Responsiveness:</strong> Evolution and approval dashboards, multi-view boards, and milestone views must remain responsive during active asset processing.</p>
+</li>
+<li>
+<p><strong>NFR-2.33 Background Queue Throughput:</strong> Processing system should support <strong>minimum 20 concurrent asset jobs</strong>.</p>
+</li>
+<li>
+<p><strong>NFR-2.34 Compression Ratio Target:</strong> Preview assets should reduce file size by <strong>70–95%</strong> compared to originals.</p>
+</li>
+</ul>
+<hr />
+<h3 id="24-security-isolation">2.4 Security &amp; Isolation<a class="headerlink" href="#24-security-isolation" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p><strong>NFR-2.41 Signed URL Expiration:</strong> Asset URLs expire within 5 minutes.</p>
+</li>
+<li>
+<p><strong>NFR-2.42 Tenant &amp; Organization Isolation:</strong> All asset, project, and task access must validate tenant and organization membership.</p>
+</li>
+<li>
+<p><strong>NFR-2.43 Encryption &amp; TLS:</strong> Assets encrypted at rest (AES-256) and all transfers over TLS 1.2+.</p>
+</li>
+<li>
+<p><strong>NFR-2.44 Access Enforcement (PBAC):</strong> Delegated permissions, policy-based access and external review links must respect scoped access at all times.</p>
+</li>
+<li>
+<p><strong>NFR-2.45 Stateless JWT &amp; OIDC:</strong> Authentication tokens must be stateless JWTs compliant with OpenID Connect (OIDC) standards, including claims for tenantId, orgId and roles. Services can validate tokens independently without additional database lookups, reducing attack surface and improving response speed.</p>
+</li>
+</ul>
+<hr />
+<h3 id="25-availability-reliability">2.5 Availability &amp; Reliability<a class="headerlink" href="#25-availability-reliability" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p><strong>NFR-2.51 System Availability:</strong> Platform target uptime 99.5% (initial), 99.9% (production scale).</p>
+</li>
+<li>
+<p><strong>NFR-2.52 Background Job Retry:</strong> Failed processing jobs retried up to <strong>3 times</strong>. After which they should be handled in a dead-letter-queue (DLQ).</p>
+</li>
+<li>
+<p><strong>NFR-2.53 Eventual Consistency Window:</strong> Data convergence within <strong>&lt;5 seconds</strong> for most operations.</p>
+</li>
+<li>
+<p><strong>NFR-2.54 CDN Cache Hit Ratio:</strong> Preview assets and dashboards must make use of CDN caching with a hit ratio <strong>&gt;70%</strong>, ensuring fast load even for large projects.</p>
+</li>
+</ul>
+<hr />
+<h3 id="26-scalability">2.6 Scalability<a class="headerlink" href="#26-scalability" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p><strong>NFR-2.61 Horizontal Elasticity:</strong> Automatically scale horizontally during demand spikes.<br />
+  In production the cloud infrastructure must be able to automatically scale horizontally during traffic or processing spikes (uploads, previews, dashboards) and scale down when demand is low. This ensures resources are only used when needed, keeping costs under control without impacting performance.</p>
+</li>
+<li>
+<p><strong>NFR-2.62 Stateless Services:</strong> Core services remain stateless for flexible scaling.<br />
+  Core services (API, asset processing, BFF) should remain stateless, allowing any instance to handle requests independently and be safely added or removed from the cluster.</p>
+</li>
+<li>
+<p><strong>NFR-2.63 Queue-Based Load Management:</strong> Use asynchronous queues for burst handling.<br />
+  Asset uploads, compression and preview generation should use asynchronous queues (SNS+SQS) to handle bursts in demand without overwhelming servers.</p>
+</li>
+<li>
+<p><strong>NFR-2.64 CDN &amp; Edge Scaling:</strong> Leverage CDNs for global low-latency access.<br />
+  Asset previews, dashboards and frequently accessed resources must make use of CDNs with regional edge nodes to maintain low latency worldwide, even as the user base grows.</p>
+</li>
+</ul>
+<hr />
+<h3 id="27-maintainability">2.7 Maintainability<a class="headerlink" href="#27-maintainability" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p><strong>NFR-2.71 Layered Architecture (Next.js Frontend):</strong> Enforce clear frontend code separation.<br />
+  Frontend code must follow clear layered separation (components, hooks, services, utilities) to improve readability, testability and feature evolution.</p>
+</li>
+<li>
+<p><strong>NFR-2.72 Clean Architecture &amp; Vertical Slices (MiramaService Backend):</strong> Use Clean Architecture for the modular monolith.<br />
+  The MiramaService backend must use Clean Architecture principles with vertical slice patterns per feature, ensuring modules can evolve independently without breaking unrelated functionality.</p>
+</li>
+<li>
+<p><strong>NFR-2.73 Consistent Coding Standards:</strong> Adhere to coding conventions and linting.<br />
+  All codebases (frontend, backend, scripts) must adhere to defined coding conventions, naming rules and linting policies for readability and maintainability.</p>
+</li>
+<li>
+<p><strong>NFR-2.74 Modular &amp; Componentized Frontend:</strong> Build reusable and decoupled UI components.<br />
+  UI components and pages must be reusable, composable, and decoupled, allowing teams to extend views, boards, and dashboards efficiently.</p>
+</li>
+<li>
+<p><strong>NFR-2.75 Automated Testing &amp; Coverage:</strong> Ensure high test coverage with automation.<br />
+  Unit, integration and end-to-end tests must cover all critical workflows, with automated pipelines ensuring high test coverage before deployment.</p>
+</li>
+<li>
+<p><strong>NFR-2.76 Documentation &amp; Onboarding:</strong> Maintain up-to-date documentation and guides.<br />
+  Maintain up-to-date technical documentation, architecture diagrams and setup guides to ensure new developers can onboard quickly.</p>
+</li>
+<li>
+<p><strong>NFR-2.77 Configurable Environment Management:</strong> Replicate environments easily.<br />
+  Local, staging, and production environments must be easy to replicate with configuration files, scripts, and containerization to reduce environment-specific bugs.</p>
+</li>
+<li>
+<p><strong>NFR-2.78 Structured Logging &amp; Tracing:</strong> Implement structured logging and distributed tracing.<br />
+  All services must implement structured logging to capture meaningful events, errors, and context for each request.  </p>
+<ul>
+<li><strong>Next.js Frontend:</strong> Use structured logging (e.g., Pino) to record request/response metadata, errors and key application events. Tracing should propagate <code>traceId</code>s across async flows (SNS, SQS file handling) so that errors can be directly related back to a specific request.  </li>
+<li><strong>MiramaService Backend:</strong> Extend logging with structured tracing (e.g., Serilog + OpenTelemetry) to allow correlation of requests across module boundaries, supporting debugging, performance analysis, and visualization in monitoring tools.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h3 id="28-storage-organization">2.8 Storage Organization<a class="headerlink" href="#28-storage-organization" title="Permanent link">&para;</a></h3>
+<p>Assets must follow deterministic hierarchical paths:</p>
+<div class="highlight"><pre><span></span><code>tenant/<span class="o">{</span>tenantId<span class="o">}</span>/org/<span class="o">{</span>orgId<span class="o">}</span>/project/<span class="o">{</span>projectId<span class="o">}</span>/task/<span class="o">{</span>taskId<span class="o">}</span>/asset/<span class="o">{</span>assetId<span class="o">}</span>/version/<span class="o">{</span>versionId<span class="o">}</span>
+</code></pre></div>
+<p>This structure ensures strict tenant isolation, predictable retrieval patterns and scalability as the asset library grows.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../system-context/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Mirama Platform – System Context">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Mirama Platform – System Context
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../domain-model/" class="md-footer__link md-footer__link--next" aria-label="Next: Mirama Platform – Core Domain Model">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Mirama Platform – Core Domain Model
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2026 Yannick Ullisch
+    </div>
+  
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/yannickullisch" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.sections", "navigation.tracking", "navigation.footer", "navigation.indexes", "navigation.top", "navigation.tabs", "search.highlight", "search.share", "search.suggest", "content.code.copy", "content.tabs.link", "content.tooltips"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+      
+    
+  </body>
+</html>
