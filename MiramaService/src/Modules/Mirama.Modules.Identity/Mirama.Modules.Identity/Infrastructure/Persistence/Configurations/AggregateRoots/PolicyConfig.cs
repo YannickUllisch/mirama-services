@@ -21,7 +21,7 @@ public class PolicyConfiguration : IEntityTypeConfiguration<Policy>
         builder.Property(p => p.IsManaged).IsRequired();
         builder.Property(p => p.Scope).IsRequired();
 
-        // Nullable — null means system-level policy
+        // Nullable - null means system-level policy
         builder.Property(p => p.TenantId);
         builder.HasIndex(p => p.TenantId);
 

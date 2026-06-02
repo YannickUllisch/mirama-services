@@ -7,25 +7,33 @@ hide:
 
 ## Welcome to My Projects & Documentation
 
-Hi, I’m Yannick. 👋  
+Hi, I'm Yannick. 👋  
 
-This is the central hub for the documentation of my personal and professional projects. Its purpose is to give you a clear view of the work I’ve done, the systems I’ve designed and the platforms I maintain, all in one place.
+This is the central hub for the documentation of my personal and professional projects. Its purpose is to give you a clear view of the work I've done, the systems I've designed and the platforms I maintain, all in one place.
 
 ---
 
 ## Current Focus: The Mirama Platform
 
-The primary project documented here is the **Mirama Platform**, a task and project management system designed for modern agile workflows. Mirama serves as a technical showcase of system evolution—moving from a rapid-growth monolith to a scalable, distributed architecture.
+The primary project documented here is the **Mirama Platform** - a Creative Operating System designed for the specific chaos of creative work. Where generic project management tools fall short for designers, studios and agencies, Mirama is built from the ground up around visual assets, client collaboration, and the financial accountability creative businesses actually need.
 
-### The Evolution of Mirama
+The platform is designed to grow from a CRM and project management foundation into a unified workspace that covers the full operational lifecycle of a creative business - from client intake and brief creation, through production and approval, to time-based billing and resource planning. A lean ERP layer sits on the horizon as the long-term direction, built on the same relational data model from day one.
 
-To understand the platform, you can explore its development through three distinct phases:
+The initial target is three segments of the creative market, each with distinct needs the platform must serve:
 
-* **Phase 1: The Pragmatic Monolith (Next.js)** A self-contained full-stack application focused on high-performance UI and deep-tree recursive task logic. Features **React Query** for optimistic updates, **Prisma ORM**, and **Pino** for structured observability.
-  
-* **Phase 1.5: Platform & Infrastructure (Terraform & AWS)** The transition from PaaS (Vercel) to managed cloud infrastructure. This phase covers the **Infrastructure as Code (IaC)** used to provision **RDS (Postgres)**, **ElastiCache (Redis)** and **ECS & EC2 Auto-scaling Group**.
+* **Freelancers** - professional intake forms, time tracking and client portals that make solo operators look like agencies.
+* **Small Agencies** - project templates, workload visibility and client collaboration without the overhead of stitching together five different tools.
+* **Large Creative Firms** - capacity planning, audit trails, fine-grained access control and budget burn reporting at scale.
 
-* **Phase 2: Microservices Evolution (C#/.NET)** The decoupling of the core logic into independent services. Explore the **MiramaService**, **AuthService** and **ProjectService**, built with Clean Architecture, Domain-Driven Design (DDD) and high-performance cross-service security.
+### Current Architecture
+
+Mirama is built as two primary components:
+
+* **Next.js Frontend** - A full-stack React application handling the UI, server-side rendering and client-side state. Uses React Query for optimistic updates, Prisma ORM, AWS Cognito for authentication and Pino for structured observability.
+
+* **MiramaService Backend (Modular Monolith)** - A C#/.NET backend built as a modular monolith. Domain boundaries are enforced through module interfaces and internal service contracts rather than network calls, making it well-suited for Mirama's complex, interconnected business logic. Uses Clean Architecture, Domain-Driven Design and OpenIddict as a self-hosted OIDC authority.
+
+The platform runs on AWS infrastructure provisioned with Terraform, using RDS (PostgreSQL), ElastiCache (Redis) and ECS for container orchestration.
 
 ---
 
@@ -33,10 +41,12 @@ To understand the platform, you can explore its development through three distin
 
 Inside the documentation, you will find deep dives into:
 
-* **Recursive Task Engines:** Managing N-level hierarchical data in the UI and Database.
-* **Distributed Caching:** Invalidation strategies using Redis and custom ORM extensions.
-* **Identity Management:** Secure authentication flows integrated via AWS Cognito, as well as a self-hosted centralized OIDC server using **OpenIddict**.
-* **DevOps & Observability:** Structured logging with Pino & Serilog (with plans of extending to OLTP Protocol) and automated provisioning with Terraform.
+* **Recursive Task Engines:** Managing N-level hierarchical data in the UI and database.
+* **Native Proofing & Asset Versioning:** Click-on-spot annotation for images, PDFs and video; stacked version history so teams never lose a revision.
+* **CRM & Intake Foundation:** Relational client object linked to briefs, projects and time records - the data model that makes a future billing and ERP layer possible.
+* **Security & Authorization:** Policy-Based Access Control (PBAC), multi-tenant data isolation and a self-hosted OIDC server using OpenIddict.
+* **Modular Monolith Design:** Clean Architecture with vertical slices and enforced module boundaries without the overhead of microservices.
+* **DevOps & Observability:** Structured logging with Pino & Serilog and automated provisioning with Terraform.
 
 ---
 

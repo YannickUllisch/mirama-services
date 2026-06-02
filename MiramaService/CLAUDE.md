@@ -39,7 +39,7 @@ ASP.NET Core 10 modular monolith. Clean architecture + vertical slices inside ea
 
 ```
 src/
-  Mirama.Api/                  # Entry point — wires modules, auth, middleware
+  Mirama.Api/                  # Entry point - wires modules, auth, middleware
   Mirama.SharedKernel/         # Cross-cutting abstractions and base types
   Modules/
     Mirama.Modules.Identity/
@@ -70,10 +70,10 @@ Each module registers itself via `AddXxxModule(config)` called from `Program.cs`
 
 ### Dispatcher decorator chain (applied in order)
 
-1. `TransactionDecorator` — wraps commands in a DB transaction; applied per-module before SharedKernel decorators
-2. `LoggingDecorator` — logs handler start/end
-3. `PerformanceDecorator` — logs slow handlers
-4. `ValidationDecorator` — runs FluentValidation before handler
+1. `TransactionDecorator` - wraps commands in a DB transaction; applied per-module before SharedKernel decorators
+2. `LoggingDecorator` - logs handler start/end
+3. `PerformanceDecorator` - logs slow handlers
+4. `ValidationDecorator` - runs FluentValidation before handler
 
 Queries bypass the transaction decorator. Decorators are wired via **Scrutor** (`services.Decorate`).
 
@@ -87,8 +87,8 @@ Resources implement `ITenantOwned` and/or `IOrganizationOwned`, `OrganizationAgg
 
 ### Outbox / Inbox
 
-`OutboxMessage` and `InboxMessage` models exist in SharedKernel — infrastructure for reliable async messaging between modules (not yet fully wired).
+`OutboxMessage` and `InboxMessage` models exist in SharedKernel - infrastructure for reliable async messaging between modules (not yet fully wired).
 
 ### Permissions
 
-`Mirama.SharedKernel.Models.Permissions.Permissions` — static string constants for all resource actions (e.g. `Permissions.Project.Create`). Used in authorization checks.
+`Mirama.SharedKernel.Models.Permissions.Permissions` - static string constants for all resource actions (e.g. `Permissions.Project.Create`). Used in authorization checks.

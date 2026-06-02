@@ -6,7 +6,7 @@ description: "A deep dive into structuring tasks for flexibility, performance, a
 
 ## Designing a Scalable and Intuitive Task Management Backbone
 
-Building a robust task and project management system means balancing flexibility with simplicity, performance with usability, and structure with scalability. In our system, we envision a platform where a set of team members is allocated to projects, and tasks are carefully categorized to suit a variety of use cases—all while speeding up workflow and maintaining an intuitive user experience. In this post, I’ll outline our general design principles around task structure, grouping, and subtasking, and explain some of the key decisions, alternatives, and performance considerations we’ve made.
+Building a robust task and project management system means balancing flexibility with simplicity, performance with usability, and structure with scalability. In our system, we envision a platform where a set of team members is allocated to projects, and tasks are carefully categorized to suit a variety of use cases-all while speeding up workflow and maintaining an intuitive user experience. In this post, I’ll outline our general design principles around task structure, grouping, and subtasking, and explain some of the key decisions, alternatives, and performance considerations we’ve made.
 
 ## Task Structure: Grouping and Individuality
 
@@ -33,7 +33,7 @@ Tasks such as tests and issues fall into this category. These can be nested as s
 Allowing individual tasks to have subtasks is essential for breaking work into manageable pieces. However, deep nesting can lead to performance bottlenecks and can overwhelm users.
 
 ### Performance Strategies: DFS vs. BFS
-When it comes to processing task trees—whether for rendering updates or propagating changes—we need an efficient strategy. We chose a **depth-first search (DFS)** approach for several reasons:
+When it comes to processing task trees-whether for rendering updates or propagating changes-we need an efficient strategy. We chose a **depth-first search (DFS)** approach for several reasons:
 
 #### Speed and Efficiency:
 DFS processes tasks by exploring one branch fully before moving to the next. This means that updates or validations can be performed on a deep branch quickly without being delayed by the breadth of the entire tree.
@@ -50,13 +50,13 @@ Some systems combine both approaches, but the added complexity wasn’t justifie
 
 ## Design for Future Scalability and Integration
 
-One of the exciting aspects of our architecture is its forward compatibility. Today, the system is optimized to handle real-time collaboration—such as showing active team status, live updates on Kanban boards, and intuitive task updates via a combination of SWR and WebSocket notifications. In future phases, asynchronous background operations performed by microservices will seamlessly integrate into this backbone. These microservices will be able to push real-time updates (for instance, upon completion of file processing or batch operations) through the same communication channels that power our current user interactions.
+One of the exciting aspects of our architecture is its forward compatibility. Today, the system is optimized to handle real-time collaboration-such as showing active team status, live updates on Kanban boards, and intuitive task updates via a combination of SWR and WebSocket notifications. In future phases, asynchronous background operations performed by microservices will seamlessly integrate into this backbone. These microservices will be able to push real-time updates (for instance, upon completion of file processing or batch operations) through the same communication channels that power our current user interactions.
 
 This approach ensures that, as our system scales or evolves to support new functionalities, the underlying real-time and hierarchical task management systems remain robust and adaptable. Our clear separation between group tasks and individual tasks, combined with performance-aware subtasking, creates a foundation that is both intuitive for users and efficient from an engineering standpoint.
 
 ## Conclusion
 
-In designing the backbone of our project and task management system, we’ve carefully weighed flexibility against simplicity and performance against complexity. By categorizing tasks into group and individual types—with group tasks remaining at the top of the hierarchy—and by employing a DFS-based approach for handling subtasks, we’re able to deliver a responsive, intuitive user experience while keeping the system scalable and efficient.
+In designing the backbone of our project and task management system, we’ve carefully weighed flexibility against simplicity and performance against complexity. By categorizing tasks into group and individual types-with group tasks remaining at the top of the hierarchy-and by employing a DFS-based approach for handling subtasks, we’re able to deliver a responsive, intuitive user experience while keeping the system scalable and efficient.
 
 This design not only meets the diverse needs of various use cases today but also lays the groundwork for integrating advanced asynchronous operations in the future. Ultimately, our goal is to streamline workflows, empower team collaboration, and ensure that our system remains robust even as demands grow.
 

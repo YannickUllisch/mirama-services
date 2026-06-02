@@ -88,7 +88,7 @@ public static class PolicySeed
         ]),
 
         new("project-reviewer-policy",
-            "Read-only access with the ability to leave comments — ideal for client reviews",
+            "Read-only access with the ability to leave comments - ideal for client reviews",
             AccessScope.Project,
         [
             new(Permissions.Project.Read,    Permissions.Project.ResourcePattern),

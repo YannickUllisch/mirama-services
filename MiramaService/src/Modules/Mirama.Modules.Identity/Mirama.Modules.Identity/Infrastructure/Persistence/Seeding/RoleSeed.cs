@@ -14,7 +14,7 @@ public static class RoleSeed
 
     private static readonly IReadOnlyList<SeedRole> Seeds =
     [
-        new("Owner", "Full unrestricted access — cannot be removed", AccessScope.Organization,
+        new("Owner", "Full unrestricted access - cannot be removed", AccessScope.Organization,
             ["full-access-policy"]),
         new("Admin", "Administrative access to organization settings, members, projects, and content", AccessScope.Organization,
             ["organization-manager-policy", "member-management-policy", "project-manager-policy"]),
@@ -27,7 +27,7 @@ public static class RoleSeed
             ["project-full-access-policy"]),
         new("Contributor", "Create and manage tasks, milestones, expenses, and comments within the project", AccessScope.Project,
             ["project-contributor-policy"]),
-        new("Client", "Read tasks and leave review comments — designed for external client access", AccessScope.Project,
+        new("Client", "Read tasks and leave review comments - designed for external client access", AccessScope.Project,
             ["project-reviewer-policy"]),
         new("Project Viewer", "Read-only access within the assigned project", AccessScope.Project,
             ["project-readonly-policy"]),

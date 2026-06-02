@@ -23,7 +23,7 @@ public class RoleConfiguration : IEntityTypeConfiguration<Role>
         builder.Property(r => r.Description).HasMaxLength(500);
         builder.Property(r => r.Scope).IsRequired();
 
-        // Nullable — null means system-level role
+        // Nullable - null means system-level role
         builder.Property(r => r.TenantId);
         builder.HasIndex(r => r.TenantId);
 

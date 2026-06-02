@@ -1,7 +1,0 @@
-title: "Phase 1.5: Platform & Infrastructure"
-arrange:
-  - index.md
-  - aws-phase1-architecture.md
-  - deployment-architecture.md
-  - cicd.md
-  - data-migration.md

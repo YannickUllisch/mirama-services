@@ -10,48 +10,83 @@ Unique Identifier: `mirama-platform`
 
 ## Project Description
 
-Mirama is a next-generation project and task management platform designed specifically for creative teams and organizations that work with visual assets at the core of their process. The platform’s primary goal is to centralize the management of projects, tasks and creative deliverables—such as images, mockups and design files, while enabling seamless collaboration between internal teams and external stakeholders.
+Mirama is a Creative Operating System - a unified CRM, project management, and operational platform built specifically for how creative businesses actually work. The platform's mission is to eliminate the patchwork of disconnected tools that agencies, studios and freelancers rely on today: a separate task tracker, a file-sharing service, a client feedback tool, a time tracker and a spreadsheet for budgets. Mirama brings these into a single, coherent workspace without sacrificing the visual-first experience that creative work demands.
 
-A key part of Mirama’s development was the close collaboration with **Mirage.xyz**, a creative design studio based in London. By working directly with them, we were able to observe real creative processes, gather authentic requirements and solve genuine problems faced by creative professionals, instead of just addressing hypothetical developer assumptions. This partnership ensured that Mirama’s features and design are grounded in real-world needs and deliver practical value to creative teams.
+A key part of Mirama's development was the close collaboration with **Mirage.xyz**, a creative design studio based in London. By working directly with them, we were able to observe real creative processes, gather authentic requirements and solve genuine problems faced by creative professionals, instead of just addressing hypothetical developer assumptions. This partnership ensured that Mirama's features and design are grounded in real-world needs and deliver practical value to creative teams.
 
-Mirama stands out by making visual assets first-class citizens throughout the entire project lifecycle. It helps teams track the evolution of creative work, from early drafts to final approvals, all in a single, unified workspace. The platform is built to streamline feedback and approval cycles, reduce communication friction and ensure that everyone from designers, managers and clients, are always working from the same source of truth.
+The platform is designed to serve three segments with meaningfully different needs:
 
-Over time, Mirama has grown into a broader platform and technical playground, used to experiment with system design, scalability and maintainability, while always keeping the user experience visual-first and collaborative.
+- **Freelancers** - professional client intake forms, a built-in timer for billable work, and a clean client portal that makes solo operators look like a full agency.
+- **Small Agencies** - project templates, workload visibility across the team, and contextual client collaboration without context-switching between tools.
+- **Large Creative Firms** - capacity planning across multiple teams, audit logs for accountability, fine-grained access control, and budget burn reporting at scale.
 
 The platform is structured to support:
 
-- Centralized asset management and versioning
-- Visual project and task tracking
-- Integrated client feedback and approval
-- Secure, scalable infrastructure for creative organizations
+- **Client & Intake Management (CRM):** A relational client object linking intake briefs, projects, time records and invoices from the start - the foundation that makes future billing and reporting possible.
+- **Visual Project & Task Execution:** N-level task hierarchies, Kanban boards, Gantt timelines, task dependencies and custom statuses designed around creative production stages.
+- **Asset Collaboration & Proofing:** Native annotation on images, PDFs and video; stacked version history; contextual task-level discussion - all without external tools.
+- **Resource & Financial Visibility:** Built-in time tracking with billable/non-billable classification, budget burn alerts and a workload view showing who is overbooked or available.
+- **Automation & Scale:** Project templates, automated workflow triggers and a global search engine spanning tasks, files and conversations.
 
 Key objectives and purposes of Mirama include:
 
-- **Visual-First Workflow:** Centralize and organize all creative assets, making it easy to manage, review and approve work visually.
-- **Collaboration Hub:** Integrate clients and collaborators directly into the workflow, eliminating scattered feedback and email threads.
-- **Scalability & Security:** Support multi-tenant organizations, strict data isolation, and robust access control for teams of any size.
-- **Iterative Evolution:** Serve as a technical playground for exploring modern system design, distributed architectures, and best practices, while remaining practical and usable for real-world creative teams.
+- **Creative-First Workflow:** Build around the visual asset, not the text-based ticket. Every view, board and dashboard treats visual output as the primary object.
+- **Unified Client Relationship:** The client is a first-class data object - linked to briefs, projects, time entries and (eventually) invoices - not a tag or a folder name.
+- **Scalability & Security:** Multi-tenant architecture with strict data isolation, PBAC authorization and audit trails for teams of any size.
+- **ERP-Ready Data Model:** Time tracking, project financials and client relationships are modelled correctly from the start so that profitability reporting and invoicing are a natural extension, not a rebuild.
 
 Mirama is intentionally iterative and adaptable, evolving alongside the needs of its users and the creative industry. It is both a production-ready tool for creative professionals and a platform for ongoing technical exploration and learning.
 
 ---
 
-## Project Evolution
+## Architecture Overview
 
-Mirama’s development is intentionally phased, reflecting how real-world systems grow and adapt:
+Mirama is structured as two primary components: a **Next.js frontend** and a **MiramaService backend**. This two-component architecture reflects a deliberate choice to keep operations simple and maintainable while still enforcing clean domain boundaries.
 
-### Phase 1: Pragmatic, Visual-First Application
+### Next.js Frontend
 
-A standalone Next.js application focused on rapid delivery of core visual workflow features. This phase prioritized simplicity, speed and a user-friendly interface for managing creative assets, galleries, and feedback.
+The frontend is a standalone Next.js application responsible for the user interface, server-side rendering and client-side state management. It communicates with the MiramaService backend over a well-defined API boundary.
 
-### Phase 1.5: Platform & Infrastructure (Terraform & AWS)
+Key characteristics:
 
-A critical infrastructure pivot, moving from managed PaaS (Vercel) to a custom AWS cloud environment. This phase established the foundation for future scalability, security and microservices, though the infrastructure is not currently active due to personal project cost constraints.
+- **Next.js App Router** for SSR, API route handling and edge middleware
+- **React Query (TanStack)** for optimistic UI updates and server state synchronization
+- **Prisma ORM** for database access
+- **AWS Cognito + NextAuth** for cloud-native authentication
+- **Permission Matrix** passed from the backend and stored in React Context for zero-round-trip authorization checks in the UI
 
-### Phase 2: Microservices as Technical Exploration
+### MiramaService Backend (Modular Monolith)
 
-**Status: Far from complete (as of 23/03/2026).**  
-Phase 2 is not a production requirement but serves as a technical exploration and learning phase for me, the developer. It investigates distributed systems, service boundaries and advanced security patterns, mirroring how microservices often emerge organically in maturing systems. The documentation for this phase is a work in progress and primarily targets technical audiences interested in architecture and system evolution.
+The backend is a **C#/.NET modular monolith**. Rather than splitting into independent microservices, the system enforces domain boundaries through module interfaces and internal service contracts within a single deployable unit.
+
+This architecture was chosen deliberately:
+
+- Mirama's core business logic is complex and frequently spans multiple domains (projects, tasks, organizations, billing, assets). In a microservices model this would require expensive cross-service coordination and distributed transactions.
+- A modular monolith preserves clear separation of concerns-each module owns its data and exposes a defined interface-without the operational overhead of service meshes, independent deployments and network-based inter-service calls.
+- The platform is intended to grow in business logic complexity, not in service count. A modular monolith scales that dimension well.
+
+Key characteristics:
+
+- **Clean Architecture** with vertical slice organization per feature
+- **Domain-Driven Design (DDD)** within module boundaries
+- **Inter-module communication** via direct in-process interfaces (no HTTP overhead between domains)
+- **OpenIddict** as a self-hosted OIDC authority for centralized token issuance
+- Deployed as a single containerized application
+
+### Infrastructure
+
+The platform runs on AWS infrastructure provisioned via Terraform (Infrastructure as Code):
+
+| Resource      | Service              | Purpose                                          |
+|---------------|----------------------|--------------------------------------------------|
+| Orchestration | Terraform            | Infrastructure as Code (IaC)                     |
+| Database      | Amazon RDS           | Managed PostgreSQL for persistent storage        |
+| Caching       | Amazon ElastiCache   | Redis for high-speed data retrieval and sessions |
+| Identity      | AWS Cognito          | Managed User Pools and Identity Providers        |
+| Networking    | AWS VPC              | Isolated network environment                     |
+| Containers    | ECS + EC2 ASG        | Container orchestration and auto-scaling         |
+
+> **Note:** The AWS infrastructure has been tested and validated but is not currently active due to cost overhead for a personal project. The Next.js frontend is currently hosted on Vercel and the MiramaService runs in a containerized environment.
 
 ---
 
@@ -61,19 +96,14 @@ Mirama is guided by the principle that **architecture should serve the problem, 
 Key ideas include:
 
 - Start simple and evolve intentionally as needs grow
-- Align complexity with real domain requirements
-- Avoid premature abstractions
+- Align complexity with real domain requirements-complex business logic warrants a structured backend, not more services
+- Avoid premature abstractions and distributed systems overhead until the scale genuinely demands it
 - Prioritize clarity, maintainability, and practical value
-
-Different parts of the system use layered, clean or domain-driven architectures as appropriate, always aiming for the right tool for the job.
 
 ---
 
 ## Documentation Structure
 
-- **Root:** High-level overview of Mirama, including project vision, requirements, future enhancements and the domain model.
-- **Phase 1 & 1.5:** Documentation of the Next.js monolith and the supporting infrastructure. Includes core architecture, file handling, integration with S3, SNS, and SQS, as well as cloud setup, IaC (Terraform), AWS architecture and all foundational components that enable scalability and reliability.
-- **Phase 2** Technical documentation for the C# .NET backend microservice structure, focusing on distributed system patterns, service boundaries, and advanced security.
-
-The working version of Mirama is based on Phase 1, with some infrastructure elements from Phase 1.5.  
-This entry point provides a high-level understanding of Mirama’s vision, goals and evolution. For detailed technical or implementation-specific information, refer to the respective sections in the documentation.
+- **Root:** High-level overview of Mirama, including project vision, requirements, domain model, security design, multi-tenancy model and future enhancements.
+- **Frontend (Phase 1):** Documentation of the Next.js application. Covers the BFF architecture, recursive task engine, React Query patterns, custom Redis caching extension, Cognito integration and structured logging.
+- **Infrastructure:** IaC strategy, AWS topology, networking and secrets management are covered in the root-level `iac-strategy.md`.

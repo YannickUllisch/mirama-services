@@ -1,1 +1,0 @@
-# Phase 1 Deployment Architecture (AWS)

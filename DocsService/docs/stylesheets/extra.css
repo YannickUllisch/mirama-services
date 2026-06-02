@@ -1,5 +1,5 @@
 [data-md-color-scheme="mirama"] {
-  /* Primary — near-black ink header */
+  /* Primary - near-black ink header */
   --md-primary-fg-color: #181d26;
   --md-primary-fg-color--light: #2a303d;
   --md-primary-fg-color--dark: #0d1218;
@@ -33,7 +33,7 @@
 
 [data-md-color-scheme="mirama-dark"] {
 
-  /* Primary — near-black header, not white */
+  /* Primary - near-black header, not white */
   --md-primary-fg-color: #181d26;
   --md-primary-fg-color--light: #252b36;
   --md-primary-fg-color--dark: #0d1218;
