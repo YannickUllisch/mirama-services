@@ -223,6 +223,24 @@ This section establishes the relational client model and intake pipeline that co
 
 ---
 
+### 1.14 AI Platform Intelligence
+
+This section defines requirements for the AI capabilities embedded across the Mirama engagement lifecycle. Each capability targets a specific workflow pain point rather than adding a generic "AI assistant" layer. The goal is augmentation of existing workflows, not replacement of user judgment.
+
+* **FR-1.141 AI Brief Intelligence:** When a client submits an intake form, the system shall use an LLM to parse the brief text and extract key structured data - deliverable types, desired timelines, budget signals, and scope indicators. Extracted data shall pre-populate project creation fields and suggest the most relevant project template from the organization's library. This removes manual interpretation overhead from the intake-to-project conversion step and connects directly to FR-1.114 (Lead-to-Project Conversion).
+
+* **FR-1.142 Vision-Based Asset Tagging:** On upload, image and PDF assets shall be processed by a multimodal AI model to generate descriptive tags covering visual content, dominant colors, style characteristics and detected objects or subjects. Tags are indexed alongside file metadata and surfaced within global search (FR-1.123), enabling visual assets to be found by content rather than file name alone.
+
+* **FR-1.143 Annotation Feedback Summarization:** After a client or reviewer leaves multiple point annotations across one or more asset versions (FR-1.64), the system shall offer an AI-generated summary consolidating all comments into a structured list of actionable revision notes grouped by theme. The summary is attached to the task and visible to the production team, reducing the time spent interpreting scattered client feedback.
+
+* **FR-1.144 Predictive Risk Detection:** The system shall continuously analyze active projects for signals of budget overrun and deadline risk - including burn rate velocity, unresolved task dependencies, blocked tasks, and low logged-hour ratios relative to estimated work. When a risk threshold is crossed, a prioritized alert is surfaced to the project lead with the specific contributing factors. This extends the budget burn alerts in FR-1.103 with predictive rather than threshold-only logic.
+
+* **FR-1.145 Conversational Project Copilot:** Users shall be able to query the platform in natural language from a persistent command interface. Queries may retrieve information ("show me all tasks awaiting client approval on Project X"), trigger actions ("create a task for logo revisions under the Brand Identity milestone"), or request summaries ("what is the current budget burn across all active projects?"). Responses are scoped to the user's organization and respect all PBAC permission boundaries.
+
+* **FR-1.146 Smart Automation Suggestions:** The system shall observe recurring workflow patterns across teams - such as consistently moving tasks to a specific status after a client comment, or always creating the same task type at project kickoff - and surface suggested automation rules (FR-1.122) based on observed behavior. Suggestions are presented as a proposed rule with a one-click acceptance flow, reducing the expertise required to configure workflow automation.
+
+---
+
 ### 1.13 Platform Extensibility
 
 * **FR-1.131 Open API:** A versioned, publicly documented REST API.  

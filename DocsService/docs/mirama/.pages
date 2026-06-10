@@ -4,6 +4,7 @@ arrange:
   - system-context.md
   - requirements.md
   - system-architecture.md
+  - ai
   - modules
   - database-design.md
   - api-design.md

@@ -53,6 +53,7 @@ Inside the documentation, you will find deep dives into:
 * **Modular Monolith Design:** Clean Architecture with vertical slices and enforced module boundaries without the overhead of microservices.
 * **Analytics & Audit:** Project health dashboards, budget burn tracking, utilization views and an immutable audit trail for accountability.
 * **Architecture Decision Records:** Explanations of key choices made in the development and planning phase.
+* **AI Platform Intelligence:** Generative AI and LLM-powered capabilities woven into the engagement lifecycle - from parsing client briefs and auto-tagging visual assets, to summarizing annotation feedback and predicting project risk before deadlines are missed.
 
 ---
 

@@ -37,13 +37,14 @@ The platform is designed to serve four tiers with meaningfully different needs:
 - **Mid-Size Agencies (20-75)** - multi-team capacity planning, structured approval workflows, detailed per-client profitability reporting, and the ability to run multiple client organizations under one account without losing isolation between them.
 - **Established Studios & Firms (75-200+)** - fine-grained access control across departments, audit trails for compliance and accountability, organization-level analytics, and the scale to onboard new clients and projects without adding operational overhead.
 
-The platform is structured around five interconnected capabilities:
+The platform is structured around six interconnected capabilities:
 
 - **Client & Intake Management (CRM):** A relational client object linking intake briefs, projects, time records and invoices from day one - the foundation that makes billing and reporting possible without retrofitting.
 - **Visual Project & Task Execution:** N-level task hierarchies, Kanban boards, Gantt timelines, task dependencies and custom production statuses designed around service delivery workflows.
 - **Asset Collaboration & Proofing:** Native annotation on images, PDFs and video; stacked version history; automatic watermarking and low-quality proxy generation so clients can review and approve work without receiving full-resolution files they haven't paid for.
 - **Billing & Financial Visibility:** Stripe-connected automatic invoicing tied to tracked time and project milestones, billable/non-billable time classification, budget burn alerts and project profitability snapshots.
 - **Analytics & Audit:** Project health dashboards, utilization reports, client revenue tracking and an immutable audit trail covering all destructive or sensitive actions.
+- **AI Platform Intelligence:** LLM and generative AI capabilities embedded across the engagement lifecycle. Brief parsing extracts deliverables and suggests project templates from client intake submissions. Vision AI auto-tags and indexes uploaded assets for richer search. Annotation summarization aggregates client feedback across asset versions into structured revision notes. Predictive risk detection surfaces budget and deadline overruns before they escalate. A conversational copilot lets operators query projects, tasks and assets in natural language.
 
 Key objectives and purposes of Mirama:
 
@@ -52,6 +53,7 @@ Key objectives and purposes of Mirama:
 - **Asset Protection by Default:** Client previews are automatically watermarked and served at reduced quality. Full-resolution delivery happens as a deliberate action, not a default.
 - **Freelancer-First Scaling:** Every feature makes sense for a single-person operation. Adding team members or clients doesn't require restructuring; the underlying model already supports it.
 - **Scalability & Security:** Multi-tenant architecture with strict data isolation, PBAC authorization and audit trails that hold up as the team grows.
+- **AI-Augmented Operations:** AI is not a bolt-on feature layer but a set of targeted capabilities embedded in the workflows where they create the most leverage - intake, asset management, client feedback and project risk.
 
 Mirama is intentionally iterative and adaptable, evolving alongside the needs of its users. It is both a production-ready tool for service professionals and a platform for ongoing technical exploration.
 
