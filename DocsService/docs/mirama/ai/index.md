@@ -1,6 +1,6 @@
 # AI Platform Intelligence
 
-> **Status: Planned — Post-Core**
+> **Status: Planned - Post-Core**
 >
 > The AI capabilities described in this section are not yet built. They are planned for a dedicated phase of development after the core platform (CRM, project execution, asset proofing, billing) reaches production readiness. This document captures the intended design so that AI integration is treated as a first-class concern during core development rather than a retrofit.
 
