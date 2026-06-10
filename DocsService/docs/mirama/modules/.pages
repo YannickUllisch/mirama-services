@@ -1,0 +1,9 @@
+title: Module Design
+arrange:
+  - index.md
+  - identity-module.md
+  - pm-module.md
+  - clients-module.md
+  - finance-module.md
+  - crm-module.md
+  - cross-module-communication.md

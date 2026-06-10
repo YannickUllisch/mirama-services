@@ -3,7 +3,16 @@ arrange:
   - index.md
   - system-context.md
   - requirements.md
-  - domain-model.md
-  - multi-tenancy.md
+  - system-architecture.md
+  - modules
+  - database-design.md
+  - api-design.md
+  - frontend
   - security-design.md
-  - future-enhancements.md
+  - infrastructure
+  - testing-strategy.md
+  - maintenance-and-monitoring
+  - backup-recovery.md
+  - risks-and-mitigation.md
+  - future-enhancements.md´
+  - adrs

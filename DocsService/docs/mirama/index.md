@@ -10,38 +10,56 @@ Unique Identifier: `mirama-platform`
 
 ## Project Description
 
-Mirama is a Creative Operating System - a unified CRM, project management, and operational platform built specifically for how creative businesses actually work. The platform's mission is to eliminate the patchwork of disconnected tools that agencies, studios and freelancers rely on today: a separate task tracker, a file-sharing service, a client feedback tool, a time tracker and a spreadsheet for budgets. Mirama brings these into a single, coherent workspace without sacrificing the visual-first experience that creative work demands.
+Mirama is an end-to-end client and project operating system for freelancers and service-based teams. The platform's core proposition is covering the entire engagement lifecycle in one place: acquiring a client through an intake form, executing the project with visual task boards and asset proofing, collaborating with the client through a protected portal, and closing the engagement with automatic Stripe billing - without switching tools at any stage.
 
-A key part of Mirama's development was the close collaboration with **Mirage.xyz**, a creative design studio based in London. By working directly with them, we were able to observe real creative processes, gather authentic requirements and solve genuine problems faced by creative professionals, instead of just addressing hypothetical developer assumptions. This partnership ensured that Mirama's features and design are grounded in real-world needs and deliver practical value to creative teams.
+The niche is intentionally focused. Mirama is built for service businesses that deliver visual output to clients on a project-by-project basis - where the project, the client relationship, and the invoice are all connected. It is visual-first by default but works equally well as a pure project and task management tool for teams that don't need the asset layer.
 
-The platform is designed to serve three segments with meaningfully different needs:
+The target space spans several industries that share the same underlying pain points:
 
-- **Freelancers** - professional client intake forms, a built-in timer for billable work, and a clean client portal that makes solo operators look like a full agency.
-- **Small Agencies** - project templates, workload visibility across the team, and contextual client collaboration without context-switching between tools.
-- **Large Creative Firms** - capacity planning across multiple teams, audit logs for accountability, fine-grained access control, and budget burn reporting at scale.
+| Vertical | What they deliver |
+|---|---|
+| Design & brand studios | Logos, identity systems, brand guidelines, print and digital assets |
+| Web development agencies | Websites, web applications, landing pages, interactive prototypes |
+| Video & film production companies | Commercials, branded content, social video, documentary |
+| Marketing & campaign agencies | Campaign assets, social content, ad creatives, content calendars |
+| Architecture & interior design firms | Renders, blueprints, mood boards, material palettes, presentation decks |
+| Motion & animation studios | Explainer videos, motion graphics, title sequences, animated ads |
+| Photography studios | Photo galleries, retouched images, lookbooks, editorial shoots |
 
-The platform is structured to support:
+Across all of these, the operational problem is the same: client intake is handled in email, projects are tracked in one tool, files are shared through another, client review happens in a third, and billing is assembled manually at the end. Mirama replaces that patchwork.
 
-- **Client & Intake Management (CRM):** A relational client object linking intake briefs, projects, time records and invoices from the start - the foundation that makes future billing and reporting possible.
-- **Visual Project & Task Execution:** N-level task hierarchies, Kanban boards, Gantt timelines, task dependencies and custom statuses designed around creative production stages.
-- **Asset Collaboration & Proofing:** Native annotation on images, PDFs and video; stacked version history; contextual task-level discussion - all without external tools.
-- **Resource & Financial Visibility:** Built-in time tracking with billable/non-billable classification, budget burn alerts and a workload view showing who is overbooked or available.
-- **Automation & Scale:** Project templates, automated workflow triggers and a global search engine spanning tasks, files and conversations.
+A key part of Mirama's development was close collaboration with **Mirage.xyz**, a creative design studio based in London. Working directly with them grounded the feature set in real operational problems rather than developer assumptions.
 
-Key objectives and purposes of Mirama include:
+The platform is designed to serve four tiers with meaningfully different needs:
 
-- **Creative-First Workflow:** Build around the visual asset, not the text-based ticket. Every view, board and dashboard treats visual output as the primary object.
-- **Unified Client Relationship:** The client is a first-class data object - linked to briefs, projects, time entries and (eventually) invoices - not a tag or a folder name.
-- **Scalability & Security:** Multi-tenant architecture with strict data isolation, PBAC authorization and audit trails for teams of any size.
-- **ERP-Ready Data Model:** Time tracking, project financials and client relationships are modelled correctly from the start so that profitability reporting and invoicing are a natural extension, not a rebuild.
+- **Solo Freelancers** - professional client intake, a built-in timer for billable work, Stripe-connected invoicing, and a client portal that makes a one-person operation look and run like a full agency.
+- **Boutique Studios & Small Teams (2-20)** - project templates, cross-project workload visibility, collaborative client portals, and shared billing workflows without the overhead of stitching together multiple tools.
+- **Mid-Size Agencies (20-75)** - multi-team capacity planning, structured approval workflows, detailed per-client profitability reporting, and the ability to run multiple client organizations under one account without losing isolation between them.
+- **Established Studios & Firms (75-200+)** - fine-grained access control across departments, audit trails for compliance and accountability, organization-level analytics, and the scale to onboard new clients and projects without adding operational overhead.
 
-Mirama is intentionally iterative and adaptable, evolving alongside the needs of its users and the creative industry. It is both a production-ready tool for creative professionals and a platform for ongoing technical exploration and learning.
+The platform is structured around five interconnected capabilities:
+
+- **Client & Intake Management (CRM):** A relational client object linking intake briefs, projects, time records and invoices from day one - the foundation that makes billing and reporting possible without retrofitting.
+- **Visual Project & Task Execution:** N-level task hierarchies, Kanban boards, Gantt timelines, task dependencies and custom production statuses designed around service delivery workflows.
+- **Asset Collaboration & Proofing:** Native annotation on images, PDFs and video; stacked version history; automatic watermarking and low-quality proxy generation so clients can review and approve work without receiving full-resolution files they haven't paid for.
+- **Billing & Financial Visibility:** Stripe-connected automatic invoicing tied to tracked time and project milestones, billable/non-billable time classification, budget burn alerts and project profitability snapshots.
+- **Analytics & Audit:** Project health dashboards, utilization reports, client revenue tracking and an immutable audit trail covering all destructive or sensitive actions.
+
+Key objectives and purposes of Mirama:
+
+- **Visual-First, Not Visual-Only:** Every board and dashboard treats visual output as the primary object. The same platform works as a plain task tracker for teams that don't need the asset layer.
+- **End-to-End Engagement Flow:** The platform covers the full client lifecycle - lead intake, project execution, client collaboration, billing - so operators run their business from one tool instead of five.
+- **Asset Protection by Default:** Client previews are automatically watermarked and served at reduced quality. Full-resolution delivery happens as a deliberate action, not a default.
+- **Freelancer-First Scaling:** Every feature makes sense for a single-person operation. Adding team members or clients doesn't require restructuring; the underlying model already supports it.
+- **Scalability & Security:** Multi-tenant architecture with strict data isolation, PBAC authorization and audit trails that hold up as the team grows.
+
+Mirama is intentionally iterative and adaptable, evolving alongside the needs of its users. It is both a production-ready tool for service professionals and a platform for ongoing technical exploration.
 
 ---
 
 ## Architecture Overview
 
-Mirama is structured as two primary components: a **Next.js frontend** and a **MiramaService backend**. This two-component architecture reflects a deliberate choice to keep operations simple and maintainable while still enforcing clean domain boundaries.
+Mirama is structured as two primary components: a **Next.js frontend** and a **MiramaService backend**. This two-component architecture reflects a deliberate choice to keep operations simple and maintainable while enforcing clean domain boundaries.
 
 ### Next.js Frontend
 
@@ -52,7 +70,7 @@ Key characteristics:
 - **Next.js App Router** for SSR, API route handling and edge middleware
 - **React Query (TanStack)** for optimistic UI updates and server state synchronization
 - **Prisma ORM** for database access
-- **AWS Cognito + NextAuth** for cloud-native authentication
+- **NextAuth** for authentication and session management
 - **Permission Matrix** passed from the backend and stored in React Context for zero-round-trip authorization checks in the UI
 
 ### MiramaService Backend (Modular Monolith)
@@ -62,7 +80,7 @@ The backend is a **C#/.NET modular monolith**. Rather than splitting into indepe
 This architecture was chosen deliberately:
 
 - Mirama's core business logic is complex and frequently spans multiple domains (projects, tasks, organizations, billing, assets). In a microservices model this would require expensive cross-service coordination and distributed transactions.
-- A modular monolith preserves clear separation of concerns-each module owns its data and exposes a defined interface-without the operational overhead of service meshes, independent deployments and network-based inter-service calls.
+- A modular monolith preserves clear separation of concerns - each module owns its data and exposes a defined interface - without the operational overhead of service meshes, independent deployments and network-based inter-service calls.
 - The platform is intended to grow in business logic complexity, not in service count. A modular monolith scales that dimension well.
 
 Key characteristics:
@@ -82,7 +100,7 @@ The platform runs on AWS infrastructure provisioned via Terraform (Infrastructur
 | Orchestration | Terraform            | Infrastructure as Code (IaC)                     |
 | Database      | Amazon RDS           | Managed PostgreSQL for persistent storage        |
 | Caching       | Amazon ElastiCache   | Redis for high-speed data retrieval and sessions |
-| Identity      | AWS Cognito          | Managed User Pools and Identity Providers        |
+| Storage       | Amazon S3            | Asset storage and proxy/watermark delivery       |
 | Networking    | AWS VPC              | Isolated network environment                     |
 | Containers    | ECS + EC2 ASG        | Container orchestration and auto-scaling         |
 
@@ -96,7 +114,7 @@ Mirama is guided by the principle that **architecture should serve the problem, 
 Key ideas include:
 
 - Start simple and evolve intentionally as needs grow
-- Align complexity with real domain requirements-complex business logic warrants a structured backend, not more services
+- Align complexity with real domain requirements - complex business logic warrants a structured backend, not more services
 - Avoid premature abstractions and distributed systems overhead until the scale genuinely demands it
 - Prioritize clarity, maintainability, and practical value
 
@@ -104,6 +122,7 @@ Key ideas include:
 
 ## Documentation Structure
 
-- **Root:** High-level overview of Mirama, including project vision, requirements, domain model, security design, multi-tenancy model and future enhancements.
-- **Frontend (Phase 1):** Documentation of the Next.js application. Covers the BFF architecture, recursive task engine, React Query patterns, custom Redis caching extension, Cognito integration and structured logging.
-- **Infrastructure:** IaC strategy, AWS topology, networking and secrets management are covered in the root-level `iac-strategy.md`.
+- **Root:** High-level overview of Mirama, including project vision, system context, security design, and architecture decisions (ADRs).
+- **Frontend:** Documentation of the Next.js application. Covers the BFF architecture, recursive task engine, React Query patterns, custom Redis caching extension and structured logging.
+- **Infrastructure:** IaC strategy, AWS topology, networking and secrets management.
+- **ADRs:** Architecture Decision Records capturing the key decisions, trade-offs and alternatives considered during platform design.

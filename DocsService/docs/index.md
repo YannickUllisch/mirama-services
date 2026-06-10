@@ -9,31 +9,36 @@ hide:
 
 Hi, I'm Yannick. 👋  
 
-This is the central hub for the documentation of my personal and professional projects. Its purpose is to give you a clear view of the work I've done, the systems I've designed and the platforms I maintain, all in one place.
+This is the central hub for documentation of my personal and professional projects. Its purpose is to give you a clear view of the systems I've designed and the platforms I maintain, all in one place.
 
 ---
 
 ## Current Focus: The Mirama Platform
 
-The primary project documented here is the **Mirama Platform** - a Creative Operating System designed for the specific chaos of creative work. Where generic project management tools fall short for designers, studios and agencies, Mirama is built from the ground up around visual assets, client collaboration, and the financial accountability creative businesses actually need.
+The primary project documented here is the **Mirama Platform** - an end-to-end client and project operating system built for freelancers and service-based teams.
 
-The platform is designed to grow from a CRM and project management foundation into a unified workspace that covers the full operational lifecycle of a creative business - from client intake and brief creation, through production and approval, to time-based billing and resource planning. A lean ERP layer sits on the horizon as the long-term direction, built on the same relational data model from day one.
+Where generic project management tools treat work as a collection of text tickets, Mirama is built around the full lifecycle of a client engagement: bringing in a lead, scoping and executing the work, collaborating with the client on visual deliverables and issuing the invoice - all without switching tools.
 
-The initial target is three segments of the creative market, each with distinct needs the platform must serve:
+The niche is intentionally focused. Mirama is built for service businesses that deliver visual output to clients on a project-by-project basis. That covers a wide range of industries operating in this space: design and brand studios, web development agencies (where the deliverable is a website or web app), video and film production companies, marketing and campaign agencies, architecture and interior design firms, and motion or animation studios. The common thread is client work with visual deliverables, a project has a start, a set of things to produce, a client who needs to review and approve them, and an invoice at the end.
 
-* **Freelancers** - professional intake forms, time tracking and client portals that make solo operators look like agencies.
-* **Small Agencies** - project templates, workload visibility and client collaboration without the overhead of stitching together five different tools.
-* **Large Creative Firms** - capacity planning, audit trails, fine-grained access control and budget burn reporting at scale.
+The platform is designed to make immediate sense for a solo freelancer and scale to a mid-size agency of 100+ people without requiring a migration, a plan change, or a different tool. The underlying data model and access control work the same at every size.
+
+The platform covers four interconnected pillars:
+
+* **Client & CRM** - intake forms, lead tracking, client portals and a relational client object that stays linked to every project and invoice from day one.
+* **Project & Task Management** - visual task boards, Gantt timelines, task dependencies and custom production stages built for how service work actually flows.
+* **Asset Collaboration & Proofing** - native annotation on images, PDFs and video, stacked version history, watermarked low-quality client previews that protect the work until delivery.
+* **Billing & Financial Visibility** - Stripe-connected invoicing and automatic billing, time tracking, budget burn alerts and project profitability snapshots.
 
 ### Current Architecture
 
 Mirama is built as two primary components:
 
-* **Next.js Frontend** - A full-stack React application handling the UI, server-side rendering and client-side state. Uses React Query for optimistic updates, Prisma ORM, AWS Cognito for authentication and Pino for structured observability.
+* **Next.js Frontend** - A full-stack React application handling the UI, server-side rendering and client-side state. Uses React Query for optimistic updates, NextAuth for authentication and a Redis-backed permission matrix for zero-round-trip authorization checks.
 
-* **MiramaService Backend (Modular Monolith)** - A C#/.NET backend built as a modular monolith. Domain boundaries are enforced through module interfaces and internal service contracts rather than network calls, making it well-suited for Mirama's complex, interconnected business logic. Uses Clean Architecture, Domain-Driven Design and OpenIddict as a self-hosted OIDC authority.
+* **MiramaService Backend (Modular Monolith)** - A C#/.NET backend built as a modular monolith. Domain boundaries are enforced through module interfaces and internal service contracts, making it well-suited for Mirama's interconnected business logic across CRM, project management and billing. Uses Clean Architecture, Vertical Slices and Domain-Driven Design.
 
-The platform runs on AWS infrastructure provisioned with Terraform, using RDS (PostgreSQL), ElastiCache (Redis) and ECS for container orchestration.
+The platform is designed to run on AWS infrastructure provisioned with Terraform, using RDS (PostgreSQL), ElastiCache (Redis) and ECS for container orchestration. The frontend currently runs on Vercel and the backend on a containerized VM while the platform is in development.
 
 ---
 
@@ -41,12 +46,13 @@ The platform runs on AWS infrastructure provisioned with Terraform, using RDS (P
 
 Inside the documentation, you will find deep dives into:
 
-* **Recursive Task Engines:** Managing N-level hierarchical data in the UI and database.
-* **Native Proofing & Asset Versioning:** Click-on-spot annotation for images, PDFs and video; stacked version history so teams never lose a revision.
-* **CRM & Intake Foundation:** Relational client object linked to briefs, projects and time records - the data model that makes a future billing and ERP layer possible.
-* **Security & Authorization:** Policy-Based Access Control (PBAC), multi-tenant data isolation and a self-hosted OIDC server using OpenIddict.
+* **Native Proofing & Asset Versioning:** Click-on-spot annotation for images, PDFs and video; stacked version history; automatic watermarking and low-quality proxy generation for client previews.
+* **Client & CRM Foundation:** Relational client object linked to briefs, projects, time records and invoices - the data model that makes automatic billing possible without retrofitting.
+* **Stripe Billing Integration:** Automatic invoice generation and payment collection connected to tracked time and project milestones.
+* **Security & Authorization:** Policy-Based Access Control (PBAC), multi-tenant data isolation and OAuth2-based authorization flows with JWTs.
 * **Modular Monolith Design:** Clean Architecture with vertical slices and enforced module boundaries without the overhead of microservices.
-* **DevOps & Observability:** Structured logging with Pino & Serilog and automated provisioning with Terraform.
+* **Analytics & Audit:** Project health dashboards, budget burn tracking, utilization views and an immutable audit trail for accountability.
+* **Architecture Decision Records:** Explanations of key choices made in the development and planning phase.
 
 ---
 
@@ -55,17 +61,15 @@ Inside the documentation, you will find deep dives into:
 While the Mirama Platform is the primary project documented now, the goal is to expand this hub to include:
 
 * New personal platforms as they emerge.
-* Open-source projects
-* Research or experimental prototypes
-
-The vision is to provide a **comprehensive view of my technical work**, from code structure to system architecture, in an accessible and navigable format.
+* Open-source projects.
+* Research or experimental prototypes.
 
 ---
 
 ## How to Use This Site
 
 * Use the **sidebar navigation** to explore each project and its submodules.
-* Each page includes explanations, architecture diagrams and when relevant some code snippets to make it easier to understand the structure and functionality.
+* Each page includes explanations, architecture diagrams and where relevant, code snippets to make the structure and functionality easier to understand.
 
 ---
 

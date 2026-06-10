@@ -1,5 +1,4 @@
-# Mirama Platform – Core Domain Model
-
+# TODO: Update this
 This document describes the core domain model for the Mirama Platform, focusing on the main entities, their relationships, and the principles that guide the system’s structure. The model is designed to support visual-first project management, multi-tenant collaboration, and scalable asset workflows for creative teams.
 
 ---
