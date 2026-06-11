@@ -24,6 +24,6 @@ public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<IdentityD
                 .MigrationsAssembly(typeof(IdentityDbContext).Assembly.FullName)
                 .MigrationsHistoryTable("__EFMigrationsHistory", "identity"));
 
-        return new IdentityDbContext(optionsBuilder.Options, null!, null!);
+        return new IdentityDbContext(optionsBuilder.Options, null!, null!, null!);
     }
 }

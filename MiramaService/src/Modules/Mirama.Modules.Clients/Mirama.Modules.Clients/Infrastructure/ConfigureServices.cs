@@ -4,12 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Mirama.Modules.Clients.Application.Common;
 using Mirama.Modules.Clients.Infrastructure.Persistence;
 using Mirama.Modules.Clients.Infrastructure.Persistence.Repositories;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.SharedKernel.Abstractions.Persistence;
 using Mirama.SharedKernel.Infrastructure.Options;
-using Mirama.SharedKernel.Models.Decorators;
 
 namespace Mirama.Modules.Clients.Infrastructure;
 
@@ -40,7 +40,7 @@ public static class ConfigureServices
             .AsImplementedInterfaces()
             .WithScopedLifetime());
 
-        services.Decorate(typeof(IRequestHandler<,>), typeof(TransactionDecorator<,>));
+        services.Decorate(typeof(IRequestHandler<,>), typeof(ClientsTransactionDecorator<,>));
 
         return services;
     }

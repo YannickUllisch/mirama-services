@@ -10,12 +10,12 @@ using Microsoft.EntityFrameworkCore;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.SharedKernel.Abstractions.Permissions;
 using Mirama.SharedKernel.Abstractions.Persistence;
-using Mirama.SharedKernel.Models.Decorators;
 using Mirama.Modules.Identity.Application.Common.Models;
 using Mirama.Modules.Identity.Application.Common.Interfaces;
 using Mirama.SharedKernel.Infrastructure.Options;
+using Mirama.Modules.Identity.Application.Common;
 
-namespace Mirama.Modules.Identity;
+namespace Mirama.Modules.Identity.Infrastructure;
 
 public static class DependencyInjection
 {
@@ -45,9 +45,8 @@ public static class DependencyInjection
             .AsImplementedInterfaces()
             .WithScopedLifetime());
 
-        // Wrap Identity handlers only, SharedKernel's AddSharedServices applies all other decorators after.
-        // IUnitOfWork resolves to IdentityDbContext within this module's scope.
-        services.Decorate(typeof(IRequestHandler<,>), typeof(TransactionDecorator<,>));
+        // Use module-specific decorator, avoids IUnitOfWork being overridden by other modules.
+        services.Decorate(typeof(IRequestHandler<,>), typeof(IdentityTransactionDecorator<,>));
 
         return services;
     }
@@ -66,9 +65,6 @@ public static class DependencyInjection
                 .MigrationsAssembly(typeof(IdentityDbContext).Assembly.FullName)
                 .MigrationsHistoryTable(tableName: "__EFMigrationsHistory", schema: "identity"));
         });
-
-        // Expose IdentityDbContext as IUnitOfWork - TransactionDecorator resolves this.
-        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<IdentityDbContext>());
 
         return services;
     }

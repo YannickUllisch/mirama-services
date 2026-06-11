@@ -48,7 +48,6 @@ public static class DependencyInjection
             .WithScopedLifetime());
 
         services.Decorate(typeof(IRequestHandler<,>), typeof(ValidationDecorator<,>));
-        services.Decorate(typeof(IRequestHandler<,>), typeof(PerformanceDecorator<,>));
         services.Decorate(typeof(IRequestHandler<,>), typeof(LoggingDecorator<,>));
 
         // Permission enforcement

@@ -17,9 +17,9 @@ using Mirama.SharedKernel.Infrastructure.Messaging.Outbox;
 using Mirama.SharedKernel.Abstractions.Domain.Core;
 using Mirama.SharedKernel.Abstractions.Domain.Events;
 using Mirama.SharedKernel.Infrastructure.Extensions;
-using Mirama.SharedKernel.Infrastructure.Idempotency;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Logging;
 
 namespace Mirama.Modules.Identity.Infrastructure.Persistence;
 
@@ -30,6 +30,8 @@ public sealed class IdentityDbContext : DbContext, IUnitOfWork
     private IDbContextTransaction? _currentTransaction;
     private Guid? TenantId => _contextProvider?.TenantId;
     private Guid? OrganizationId => _contextProvider?.OrganizationId;
+    private readonly ILogger<DbContext> _logger = default!;
+
 
     public DbSet<Organization> Organizations => Set<Organization>();
     public DbSet<User> Users => Set<User>();
@@ -46,9 +48,11 @@ public sealed class IdentityDbContext : DbContext, IUnitOfWork
 
     public IdentityDbContext(
         DbContextOptions<IdentityDbContext> options,
+        ILogger<DbContext> logger,
         IDispatcher dispatcher,
         IRequestContextProvider requestContext) : base(options)
     {
+        _logger = logger;
         _dispatcher = dispatcher;
         _contextProvider = requestContext;
     }
@@ -62,7 +66,10 @@ public sealed class IdentityDbContext : DbContext, IUnitOfWork
 
     public async Task CommitTransactionAsync(CancellationToken cancellationToken = default)
     {
+        _logger.LogError("made it to commit tran");
         if (_currentTransaction is null) return;
+        _logger.LogError("made it to commit trans and trans exists");
+
         await _currentTransaction.CommitAsync(cancellationToken);
         await _currentTransaction.DisposeAsync();
         _currentTransaction = null;
@@ -70,6 +77,8 @@ public sealed class IdentityDbContext : DbContext, IUnitOfWork
 
     public async Task RollbackTransactionAsync(CancellationToken cancellationToken = default)
     {
+        _logger.LogError("made it to rollback");
+
         if (_currentTransaction is null) return;
         await _currentTransaction.RollbackAsync(cancellationToken);
         await _currentTransaction.DisposeAsync();
@@ -89,7 +98,7 @@ public sealed class IdentityDbContext : DbContext, IUnitOfWork
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         var entries = ChangeTracker.Entries<IAuditable>();
-
+        _logger.LogWarning(entries.ToString());
         string actorId;
         try { actorId = _contextProvider.UserId.ToString(); }
         catch { actorId = "system"; }
@@ -103,6 +112,7 @@ public sealed class IdentityDbContext : DbContext, IUnitOfWork
                     entry.Entity.SetCreated(DateTime.UtcNow, actorId);
                     break;
                 case EntityState.Modified:
+                    Console.WriteLine("here in modified");
                     entry.Entity.SetModified(DateTime.UtcNow, actorId);
                     break;
                 default:

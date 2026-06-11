@@ -13,21 +13,19 @@ using Mirama.Modules.Clients.Infrastructure;
 using Mirama.Modules.Identity;
 using Mirama.Modules.Identity.Infrastructure.Persistence;
 using Mirama.Modules.Identity.Infrastructure.Persistence.Seeding;
+using Mirama.Api.Extensions;
+using Mirama.Modules.Identity.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Debug()
     .WriteTo.Console()
     .CreateBootstrapLogger();
 
-builder.Host.UseSerilog((context, services, configuration) =>
+builder.Host.UseSerilog((context, configuration) =>
 {
-    configuration
-        .ReadFrom.Configuration(context.Configuration)
-        .Enrich.FromLogContext();
+    configuration.ReadFrom.Configuration(context.Configuration);
 });
-builder.Services.AddLogging();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -111,75 +109,75 @@ builder.Services.AddAuthorizationBuilder()
     .AddPolicy("RequireTenantOnly", policy =>
         policy.Requirements.Add(new TenantOnlyRequirement()));
 
-var app = builder.Build();
-
-// TODO: Make this work for all modules
-// Applying migrations immediately in Development, handled in CICD pipeline for production
-if (app.Environment.IsDevelopment())
-{
-    using var scope = app.Services.CreateScope();
-    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-    try
-    {
-        var db = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
-        logger.LogInformation("Applying database migrations...");
-        await db.Database.MigrateAsync();
-        logger.LogInformation("Database migrations applied successfully");
-
-        logger.LogInformation("Seeding database...");
-        await PolicySeed.SeedDataAsync(db);
-        await RoleSeed.SeedDataAsync(db);
-        await PlanSeed.SeedDataAsync(db);
-        logger.LogInformation("Database seeding complete");
-    }
-    catch (Exception ex)
-    {
-        logger.LogError(ex, "An error occurred while applying database migrations.");
-        throw;
-    }
-}
-
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-        options.RoutePrefix = string.Empty;
-    });
-}
-
-app.UseMiddleware<Mirama.Api.Middleware.ExceptionMiddleware>();
-app.UseExceptionHandler();
-app.UseForwardedHeaders();
-
-// Forcing HTTPS
-if (app.Environment.IsProduction())
-{
-    app.UseHsts();
-    app.UseHttpsRedirection();
-}
-
-app.UseRouting();
-app.UseCors();
-// app.UseIdempotency();
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.MapControllers();
-app.MapHealthChecks("/health");
 try
 {
-    Log.Information("Starting host...");
-    app.Run();
-}
-catch (Exception ex)
+    var app = builder.Build();
+
+    // TODO: Make this work for all modules
+    // Applying migrations immediately in Development, handled in CICD pipeline for production
+    if (app.Environment.IsDevelopment())
+    {
+        using var scope = app.Services.CreateScope();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        try
+        {
+            var db = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
+            logger.LogInformation("Applying database migrations...");
+            await db.Database.MigrateAsync();
+            logger.LogInformation("Database migrations applied successfully");
+
+            logger.LogInformation("Seeding database...");
+            await PolicySeed.SeedDataAsync(db);
+            await RoleSeed.SeedDataAsync(db);
+            await PlanSeed.SeedDataAsync(db);
+            logger.LogInformation("Database seeding complete");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "An error occurred while applying database migrations.");
+            throw;
+        }
+    }
+
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI(options =>
+        {
+            options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+            options.RoutePrefix = string.Empty;
+        });
+    }
+
+    app.UseMiddleware<Mirama.Api.Middleware.ExceptionMiddleware>();
+    app.UseRequestLogging();
+    app.UseExceptionHandler();
+    app.UseForwardedHeaders();
+
+    // Forcing HTTPS
+    if (app.Environment.IsProduction())
+    {
+        app.UseHsts();
+        app.UseHttpsRedirection();
+    }
+
+    app.UseRouting();
+    app.UseCors();
+    // app.UseIdempotency();
+    app.UseAuthentication();
+    app.UseAuthorization();
+
+    app.MapControllers();
+    app.MapHealthChecks("/health");
+
+    await app.RunWithLoggingAsync();
+} catch (Exception ex)
 {
-    Log.Fatal(ex, "Host terminated unexpectedly");
-}
-finally
+    Log.Fatal(ex, "Application terminated unexpectedly");
+    throw;
+} finally
 {
-    Log.CloseAndFlush();
+    await Log.CloseAndFlushAsync();
 }
 
 static byte[] DeriveAuthJsKey(string secret, string cookieName) =>
