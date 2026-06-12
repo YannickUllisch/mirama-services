@@ -9,11 +9,11 @@ public static class ApplicationExtensions
     {
         try
         {
-            Log.Information("Starting application {Application} in {Environment}", 
-                app.Environment.ApplicationName, 
+            Log.Information("Starting application {Application} in {Environment}",
+                app.Environment.ApplicationName,
                 app.Environment.EnvironmentName);
-            
-            Log.Information("Application listening on {Urls}", 
+
+            Log.Information("Application listening on {Urls}",
                 string.Join(", ", app.Urls));
 
             await app.RunAsync();

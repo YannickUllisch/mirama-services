@@ -5,6 +5,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Notes 
 
 - In the domain layer when refering to a field of that class or inherited field, ensure it is prefixed by 'this.' for readability
+- All GetX list endpoints must return `PaginatedList<T>` (from `Mirama.SharedKernel.Models`). Add `int? PageNumber` and `int? PageSize` to the query record. When both are provided paginate; when omitted return all results wrapped in a single-page `PaginatedList`. Add a validator with `RuleFor(q => q.PageSize).LessThanOrEqualTo(50)`.
+- Always use async variants for all DB and IO operations: `ToListAsync`, `FirstOrDefaultAsync`, `AnyAsync`, `CountAsync`, `AddAsync`, `SaveChangesAsync`, etc. Never use synchronous equivalents.
 
 ## Commands
 

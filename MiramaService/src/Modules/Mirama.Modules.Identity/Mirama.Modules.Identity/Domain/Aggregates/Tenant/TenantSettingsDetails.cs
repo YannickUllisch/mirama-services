@@ -6,7 +6,7 @@ public sealed record TenantSettingsDetails
 (
     string Name,
     bool ReceiveNotifications,
-    string? BrandingColor, 
+    string? BrandingColor,
     string? LogoUrl,
     string Timezone = "UTC"
 );

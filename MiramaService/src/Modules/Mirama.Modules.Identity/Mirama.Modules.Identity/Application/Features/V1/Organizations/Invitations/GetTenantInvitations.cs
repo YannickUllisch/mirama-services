@@ -1,4 +1,5 @@
 using ErrorOr;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Mirama.Modules.Identity.Domain.Aggregates.Organization.Invitation;
@@ -13,20 +14,32 @@ namespace Mirama.Modules.Identity.Application.Features.V1.Organizations.Invitati
 public class GetTenantInvitationsController : TenantControllerBase
 {
     [HttpGet("invitations")]
-    public async Task<ActionResult<List<InvitationResponse>>> Get()
+    public async Task<ActionResult<PaginatedList<InvitationResponse>>> Get([FromQuery] GetTenantInvitationsQuery query)
     {
-        var res = await this.Dispatcher.Send(new GetTenantInvitationsQuery());
+        var res = await this.Dispatcher.Send(query);
         return res.Match(Ok, Problem);
     }
 }
 
-public sealed record GetTenantInvitationsQuery : IQuery<ErrorOr<List<InvitationResponse>>>;
+public sealed record GetTenantInvitationsQuery : IQuery<ErrorOr<PaginatedList<InvitationResponse>>>
+{
+    public int? PageSize { get; init; }
+    public int? PageNumber { get; init; }
+}
+
+internal class GetTenantInvitationsQueryValidator : AbstractValidator<GetTenantInvitationsQuery>
+{
+    public GetTenantInvitationsQueryValidator()
+    {
+        RuleFor(q => q.PageSize).LessThanOrEqualTo(50);
+    }
+}
 
 internal class GetTenantInvitationsQueryHandler(
     IdentityDbContext dbContext,
-    IRequestContextProvider contextProvider) : IRequestHandler<GetTenantInvitationsQuery, ErrorOr<List<InvitationResponse>>>
+    IRequestContextProvider contextProvider) : IRequestHandler<GetTenantInvitationsQuery, ErrorOr<PaginatedList<InvitationResponse>>>
 {
-    public async Task<ErrorOr<List<InvitationResponse>>> HandleAsync(GetTenantInvitationsQuery request, CancellationToken ct)
+    public async Task<ErrorOr<PaginatedList<InvitationResponse>>> HandleAsync(GetTenantInvitationsQuery request, CancellationToken ct)
     {
         var user = await dbContext.Users
             .AsNoTracking()
@@ -38,7 +51,7 @@ internal class GetTenantInvitationsQueryHandler(
 
         var tenantId = contextProvider.TenantId!.Value;
 
-        var results = await (
+        var baseQuery = (
             from i in dbContext.Invitations.AsNoTracking().IgnoreQueryFilters()
             join o in dbContext.Organizations.AsNoTracking().IgnoreQueryFilters()
                 on i.OrganizationId equals o.Id.Value
@@ -48,8 +61,16 @@ internal class GetTenantInvitationsQueryHandler(
                 && o.TenantId == tenantId
             orderby i.ExpiresAt descending
             select new { Invitation = i, OrgName = o.Name }
-        ).ToListAsync(ct);
+        );
 
-        return results.ConvertAll(r => r.Invitation.MapResponse(r.OrgName));
+        if (request.PageNumber is not null && request.PageSize is not null)
+        {
+            var total = await baseQuery.CountAsync(ct);
+            var page = await baseQuery.Skip((request.PageNumber.Value - 1) * request.PageSize.Value).Take(request.PageSize.Value).ToListAsync(ct);
+            return new PaginatedList<InvitationResponse>(page.ConvertAll(r => r.Invitation.MapResponse(r.OrgName)), total, request.PageNumber.Value, request.PageSize.Value);
+        }
+
+        var results = await baseQuery.ToListAsync(ct);
+        return new PaginatedList<InvitationResponse>(results.ConvertAll(r => r.Invitation.MapResponse(r.OrgName)), results.Count, 1, results.Count > 0 ? results.Count : 1);
     }
 }

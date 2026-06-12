@@ -60,7 +60,7 @@ internal class GetPoliciesQueryHandler(
             .ThenBy(p => p.Name);
 
         Enum.TryParse<AccessScope>(request.Scope, ignoreCase: true, out var scope);
-            query = query.Where(p => p.Scope == scope);
+        query = query.Where(p => p.Scope == scope);
 
         if (request.PageNumber is not null && request.PageSize is not null)
         {

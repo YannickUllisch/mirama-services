@@ -36,7 +36,7 @@ public sealed class Tenant : AggregateRoot<Guid>
 
     public void SetSubscription(SubscriptionDetails details)
     {
-        this.Subscription = SubscriptionEntity.Create(details); 
+        this.Subscription = SubscriptionEntity.Create(details);
     }
 
     public void UpdateSettings(TenantSettingsDetails details)

@@ -171,11 +171,13 @@ try
     app.MapHealthChecks("/health");
 
     await app.RunWithLoggingAsync();
-} catch (Exception ex)
+}
+catch (Exception ex)
 {
     Log.Fatal(ex, "Application terminated unexpectedly");
     throw;
-} finally
+}
+finally
 {
     await Log.CloseAndFlushAsync();
 }

@@ -16,10 +16,10 @@ public sealed class TenantSettings : Entity<TenantSettingsId>
     private TenantSettings() { }
 
     private TenantSettings(
-        string name, 
-        string timezone, 
-        string? brandingColor, 
-        string? logoUrl, 
+        string name,
+        string timezone,
+        string? brandingColor,
+        string? logoUrl,
         bool receiveNotifications)
     {
         this.Name = name;
