@@ -47,9 +47,11 @@ public static class DependencyInjection
         services.AddDbContext<ProjectsDbContext>(static (sp, options) =>
         {
             var infra = sp.GetRequiredService<IOptions<InfrastructureOptions>>().Value;
-            options.UseNpgsql(infra.DatabaseConnection, b => b
-                .MigrationsAssembly(typeof(ProjectsDbContext).Assembly.FullName)
-                .MigrationsHistoryTable("__EFMigrationsHistory", "projects"));
+            options
+                .UseNpgsql(infra.DatabaseConnection, b => b
+                    .MigrationsAssembly(typeof(ProjectsDbContext).Assembly.FullName)
+                    .MigrationsHistoryTable("__EFMigrationsHistory", "projects"))
+                .AddInterceptors(sp.GetRequiredService<Mirama.SharedKernel.Infrastructure.Interceptors.AuditSaveChangesInterceptor>());
         });
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ProjectsDbContext>());

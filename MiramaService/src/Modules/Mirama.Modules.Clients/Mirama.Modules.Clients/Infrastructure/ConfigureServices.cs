@@ -53,9 +53,11 @@ public static class ConfigureServices
         services.AddDbContext<ClientsDbContext>(static (sp, options) =>
         {
             var infra = sp.GetRequiredService<IOptions<InfrastructureOptions>>().Value;
-            options.UseNpgsql(infra.DatabaseConnection, b => b
-                .MigrationsAssembly(typeof(ClientsDbContext).Assembly.FullName)
-                .MigrationsHistoryTable("__EFMigrationsHistory", schema: "clients"));
+            options
+                .UseNpgsql(infra.DatabaseConnection, b => b
+                    .MigrationsAssembly(typeof(ClientsDbContext).Assembly.FullName)
+                    .MigrationsHistoryTable("__EFMigrationsHistory", schema: "clients"))
+                .AddInterceptors(sp.GetRequiredService<Mirama.SharedKernel.Infrastructure.Interceptors.AuditSaveChangesInterceptor>());
         });
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ClientsDbContext>());

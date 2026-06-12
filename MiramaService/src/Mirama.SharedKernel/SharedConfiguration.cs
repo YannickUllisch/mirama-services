@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.SharedKernel.Abstractions.Permissions;
 using Mirama.SharedKernel.Abstractions.Persistence;
+using Mirama.SharedKernel.Infrastructure.Interceptors;
 using Mirama.SharedKernel.Infrastructure.Options;
 using Mirama.SharedKernel.Infrastructure.Services;
 using Mirama.SharedKernel.Models;
@@ -34,6 +35,8 @@ public static class DependencyInjection
 
         services.AddScoped<IRequestContextProvider, RequestContextProvider>();
         services.AddScoped<IDispatcher, Dispatcher>();
+        services.AddScoped<IAuditLogger, SerilogAuditLogger>();
+        services.AddScoped<AuditSaveChangesInterceptor>();
 
         services.Scan(scan => scan
             .FromAssemblies(Assembly.GetExecutingAssembly())
@@ -49,6 +52,7 @@ public static class DependencyInjection
 
         services.Decorate(typeof(IRequestHandler<,>), typeof(ValidationDecorator<,>));
         services.Decorate(typeof(IRequestHandler<,>), typeof(LoggingDecorator<,>));
+        services.Decorate(typeof(IRequestHandler<,>), typeof(AuditDecorator<,>));
 
         // Permission enforcement
         services.AddMemoryCache();
