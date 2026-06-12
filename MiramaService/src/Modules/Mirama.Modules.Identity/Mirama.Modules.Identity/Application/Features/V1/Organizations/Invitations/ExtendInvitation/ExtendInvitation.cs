@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Mirama.Modules.Identity.Domain.Aggregates.Organization.Invitation;
 using Mirama.Modules.Identity.Infrastructure.Persistence;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
-using Mirama.SharedKernel.Abstractions.Persistence;
 using Mirama.SharedKernel.Models;
 
 namespace Mirama.Modules.Identity.Application.Features.V1.Organizations.Invitations.ExtendInvitation;

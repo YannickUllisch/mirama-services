@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Mirama.Modules.Identity.Domain.Aggregates.Organization;
 using Mirama.Modules.Identity.Domain.Aggregates.Organization.Invitation;
 using Mirama.Modules.Identity.Domain.Aggregates.Organization.Member;
+using Mirama.Modules.Identity.Domain.Aggregates.Organization.Tag;
 using Mirama.Modules.Identity.Domain.Aggregates.Organization.Team;
 using Mirama.Modules.Identity.Domain.Aggregates.Plan;
 using Mirama.Modules.Identity.Domain.Aggregates.Policy;
@@ -44,6 +45,7 @@ public sealed class IdentityDbContext : DbContext, IUnitOfWork
     public DbSet<Policy> Policies => Set<Policy>();
     public DbSet<PolicyStatement> PolicyStatements => Set<PolicyStatement>();
     public DbSet<Plan> Plans => Set<Plan>();
+    public DbSet<Tag> Tags => Set<Tag>();
     public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
 
     public IdentityDbContext(

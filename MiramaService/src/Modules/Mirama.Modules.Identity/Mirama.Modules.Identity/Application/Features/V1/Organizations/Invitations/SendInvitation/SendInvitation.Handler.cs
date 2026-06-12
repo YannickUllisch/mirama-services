@@ -49,7 +49,7 @@ internal class SendInvitationCommandHandler(
         var details = new InvitationDetails(request.Email, request.Name, userId, new RoleId(request.IamRoleId));
         var invitation = Invitation.Create(details);
 
-        dbContext.Invitations.Add(invitation);
+        await dbContext.Invitations.AddAsync(invitation, ct);
 
         return invitation.MapResponse() with { OrganizationId = organizationId.Value };
     }

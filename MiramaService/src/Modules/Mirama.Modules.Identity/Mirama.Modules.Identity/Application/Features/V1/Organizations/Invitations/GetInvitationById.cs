@@ -1,9 +1,11 @@
 using ErrorOr;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Mirama.Modules.Identity.Domain.Aggregates.Organization;
 using Mirama.Modules.Identity.Domain.Aggregates.Organization.Invitation;
 using Mirama.Modules.Identity.Infrastructure.Persistence;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
+using Mirama.SharedKernel.Abstractions.Persistence;
 using Mirama.SharedKernel.Models;
 
 namespace Mirama.Modules.Identity.Application.Features.V1.Organizations.Invitations;
@@ -21,7 +23,8 @@ public class GetInvitationByIdController : OrganizationControllerBase
 public sealed record GetInvitationByIdQuery(Guid InvitationId) : IQuery<ErrorOr<InvitationResponse>>;
 
 internal class GetInvitationByIdQueryHandler(
-    IdentityDbContext dbContext) : IRequestHandler<GetInvitationByIdQuery, ErrorOr<InvitationResponse>>
+    IdentityDbContext dbContext,
+    IRequestContextProvider contextProvider) : IRequestHandler<GetInvitationByIdQuery, ErrorOr<InvitationResponse>>
 {
     public async Task<ErrorOr<InvitationResponse>> HandleAsync(GetInvitationByIdQuery request, CancellationToken ct)
     {
@@ -32,6 +35,10 @@ internal class GetInvitationByIdQueryHandler(
         if (invitation is null)
             return Error.NotFound("Invitation.NotFound", "Invitation not found.");
 
-        return invitation.MapResponse();
+        var org = await dbContext.Organizations.AsNoTracking()
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(o => o.Id == new OrganizationId(contextProvider.OrganizationId!.Value), ct);
+
+        return invitation.MapResponse(org?.Name ?? string.Empty);
     }
 }

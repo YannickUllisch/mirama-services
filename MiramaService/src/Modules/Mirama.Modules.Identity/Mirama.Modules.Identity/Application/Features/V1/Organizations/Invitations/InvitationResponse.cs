@@ -5,16 +5,17 @@ namespace Mirama.Modules.Identity.Application.Features.V1.Organizations.Invitati
 
 internal static class InvitationMapper
 {
-    internal static InvitationResponse MapResponse(this Invitation invitation) => new()
+    internal static InvitationResponse MapResponse(this Invitation invitation, string organizationName = "") => new()
     {
         Id = invitation.Id.Value,
         Email = invitation.Email,
         Name = invitation.Name,
         InviterId = invitation.InviterId,
         IamRoleId = invitation.IamRoleId.Value,
-        Status = invitation.Status.ToString(),
+        Status = Enum.GetName(invitation.Status)!,
         ExpiresAt = invitation.ExpiresAt,
-        OrganizationId = invitation.OrganizationId
+        OrganizationId = invitation.OrganizationId,
+        OrganizationName = organizationName
     };
 }
 
@@ -43,4 +44,7 @@ public sealed record InvitationResponse
 
     [JsonPropertyName("organizationId")]
     public Guid OrganizationId { get; init; }
+
+    [JsonPropertyName("organizationName")]
+    public string OrganizationName { get; init; } = string.Empty;
 }
