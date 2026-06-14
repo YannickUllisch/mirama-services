@@ -51,26 +51,32 @@ internal class GetTenantInvitationsQueryHandler(
 
         var tenantId = contextProvider.TenantId!.Value;
 
-        var baseQuery = (
-            from i in dbContext.Invitations.AsNoTracking().IgnoreQueryFilters()
-            join o in dbContext.Organizations.AsNoTracking().IgnoreQueryFilters()
-                on i.OrganizationId equals o.Id.Value
-            where i.Email == user.Email
+        var tenantOrgs = await dbContext.Organizations
+            .AsNoTracking()
+            .IgnoreQueryFilters()
+            .Where(o => o.TenantId == tenantId)
+            .Select(o => new { Id = o.Id.Value, o.Name })
+            .ToDictionaryAsync(o => o.Id, o => o.Name, ct);
+
+        var tenantOrgIds = tenantOrgs.Keys.ToList();
+
+        var invitationQuery = dbContext.Invitations
+            .AsNoTracking()
+            .IgnoreQueryFilters()
+            .Where(i => i.Email == user.Email
                 && i.Status == InvitationStatus.Pending
                 && i.ExpiresAt > DateTime.UtcNow
-                && o.TenantId == tenantId
-            orderby i.ExpiresAt descending
-            select new { Invitation = i, OrgName = o.Name }
-        );
+                && tenantOrgIds.Contains(i.OrganizationId))
+            .OrderByDescending(i => i.ExpiresAt);
 
         if (request.PageNumber is not null && request.PageSize is not null)
         {
-            var total = await baseQuery.CountAsync(ct);
-            var page = await baseQuery.Skip((request.PageNumber.Value - 1) * request.PageSize.Value).Take(request.PageSize.Value).ToListAsync(ct);
-            return new PaginatedList<InvitationResponse>(page.ConvertAll(r => r.Invitation.MapResponse(r.OrgName)), total, request.PageNumber.Value, request.PageSize.Value);
+            var total = await invitationQuery.CountAsync(ct);
+            var page = await invitationQuery.Skip((request.PageNumber.Value - 1) * request.PageSize.Value).Take(request.PageSize.Value).ToListAsync(ct);
+            return new PaginatedList<InvitationResponse>(page.ConvertAll(i => i.MapResponse(tenantOrgs.GetValueOrDefault(i.OrganizationId, string.Empty))), total, request.PageNumber.Value, request.PageSize.Value);
         }
 
-        var results = await baseQuery.ToListAsync(ct);
-        return new PaginatedList<InvitationResponse>(results.ConvertAll(r => r.Invitation.MapResponse(r.OrgName)), results.Count, 1, results.Count > 0 ? results.Count : 1);
+        var results = await invitationQuery.ToListAsync(ct);
+        return new PaginatedList<InvitationResponse>(results.ConvertAll(i => i.MapResponse(tenantOrgs.GetValueOrDefault(i.OrganizationId, string.Empty))), results.Count, 1, results.Count > 0 ? results.Count : 1);
     }
 }

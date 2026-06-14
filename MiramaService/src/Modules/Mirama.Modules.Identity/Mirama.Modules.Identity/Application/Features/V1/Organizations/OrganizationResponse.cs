@@ -5,7 +5,7 @@ namespace Mirama.Modules.Identity.Application.Features.V1.Organizations;
 
 internal static class OrganizationMapper
 {
-    internal static OrganizationResponse MapResponse(this Organization org) => new()
+    internal static OrganizationResponse MapResponse(this Organization org, int memberCount = 0, int projectCount = 0) => new()
     {
         Id = org.Id.Value,
         Name = org.Name,
@@ -16,7 +16,9 @@ internal static class OrganizationMapper
         Country = org.Country,
         ZipCode = org.ZipCode,
         DateCreated = org.DateCreated,
-        TenantId = org.TenantId
+        TenantId = org.TenantId,
+        MemberCount = memberCount,
+        ProjectCount = projectCount
     };
 }
 
@@ -51,4 +53,10 @@ public sealed record OrganizationResponse
 
     [JsonPropertyName("tenantId")]
     public Guid TenantId { get; init; }
+
+    [JsonPropertyName("memberCount")]
+    public int MemberCount { get; init; }
+
+    [JsonPropertyName("projectCount")]
+    public int ProjectCount { get; init; }
 }

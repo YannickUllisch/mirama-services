@@ -40,11 +40,11 @@ internal class GetMemberPermissionsQueryHandler(
         if (role is null || role.Policies.Count == 0)
             return Array.Empty<string>();
 
-        var policyIdValues = role.Policies.Select(p => p.Value).ToList();
+        var policyIds = role.Policies;
 
         var statements = await dbContext.Policies
             .AsNoTracking()
-            .Where(p => policyIdValues.Contains(p.Id.Value))
+            .Where(p => policyIds.Contains(p.Id))
             .SelectMany(p => p.Statements)
             .ToListAsync(ct);
 

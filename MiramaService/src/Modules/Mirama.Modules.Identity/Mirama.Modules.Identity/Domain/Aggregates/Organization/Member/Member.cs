@@ -8,7 +8,7 @@ public class Member : OrganizationEntity<MemberId>
 {
     public string Name { get; private set; } = string.Empty;
     public string Email { get; private set; } = string.Empty;
-    public UserId? UserId { get; private set; }
+    public UserId UserId { get; private set; } = default!;
     public RoleId IamRoleId { get; private set; } = default!;
 
     private Member(MemberDetails details)

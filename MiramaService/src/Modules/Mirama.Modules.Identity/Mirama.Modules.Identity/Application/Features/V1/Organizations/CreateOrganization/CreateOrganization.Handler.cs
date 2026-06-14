@@ -1,8 +1,12 @@
 using ErrorOr;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Mirama.Modules.Identity.Domain.Aggregates.Organization;
+using Mirama.Modules.Identity.Domain.Aggregates.Organization.Member;
+using Mirama.Modules.Identity.Domain.Aggregates.User;
 using Mirama.Modules.Identity.Infrastructure.Persistence;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
+using Mirama.SharedKernel.Abstractions.Domain.Core;
 using Mirama.SharedKernel.Abstractions.Persistence;
 using Mirama.SharedKernel.Models;
 
@@ -28,11 +32,32 @@ internal class CreateOrganizationCommandHandler(
         if (tenantId is null)
             return Error.Unauthorized("Organization.NoTenant", "Tenant context required.");
 
+        var userId = contextProvider.UserId;
+
+        var user = await dbContext.Users
+            .AsNoTracking()
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(u => u.Id == new UserId(userId), ct);
+
+        if (user is null)
+            return Error.NotFound("User.NotFound", "Current user not found.");
+
+        var ownerRole = await dbContext.Roles
+            .AsNoTracking()
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(r => r.Name == "Owner" && r.TenantId == null, ct);
+
+        if (ownerRole is null)
+            return Error.Unexpected("Role.OwnerNotFound", "Owner role not found.");
+
         var details = new OrganizationDetails(request.Name, request.Street, request.City, request.Country, request.ZipCode, request.Logo);
         var org = Organization.Create(details);
-
         dbContext.Organizations.Add(org);
 
-        return org.MapResponse() with { TenantId = tenantId.Value };
+        var member = Member.Create(new MemberDetails(user.Name, user.Email, ownerRole.Id, new UserId(userId)));
+        ((IOrganizationOwned)member).SetOrganizationId(org.Id.Value);
+        dbContext.Members.Add(member);
+
+        return org.MapResponse(memberCount: 1) with { TenantId = tenantId.Value };
     }
 }

@@ -46,9 +46,17 @@ internal class AcceptInvitationCommandHandler(IdentityDbContext dbContext) : IRe
         if (alreadyMember)
             return Error.Conflict("Member.Duplicate", "A member with this email already exists in the organization.");
 
+        var user = await dbContext.Users
+            .AsNoTracking()
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(u => u.Email == invitation.Email, ct);
+
+        if (user is null)
+            return Error.NotFound("User.NotFound", "No user account found for this invitation email.");
+
         invitation.Accept();
 
-        var member = Member.Create(new MemberDetails(invitation.Name, invitation.Email, invitation.IamRoleId));
+        var member = Member.Create(new MemberDetails(invitation.Name, invitation.Email, invitation.IamRoleId, user.Id));
         ((IOrganizationOwned)member).SetOrganizationId(invitation.OrganizationId);
         await dbContext.Members.AddAsync(member, ct);
 

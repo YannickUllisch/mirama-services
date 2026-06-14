@@ -10,7 +10,7 @@ internal static class AuthUserResponseMapper
     {
         return new()
         {
-            Id = user.Id.Value,
+            UserId = user.Id.Value,
             TenantId = tenantId,
             Name = user.Name,
             Email = user.Email,
@@ -23,8 +23,8 @@ internal static class AuthUserResponseMapper
 
 public sealed record AuthUserResponse
 {
-    [JsonPropertyName("id")]
-    public Guid Id { get; init; }
+    [JsonPropertyName("userId")]
+    public Guid UserId { get; init; }
 
     [JsonPropertyName("tenantId")]
     public Guid TenantId { get; init; }

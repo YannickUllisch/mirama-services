@@ -11,7 +11,8 @@ internal static class AuthOrgMembershipResponseMapper
     {
         return new()
         {
-            Id = org.Id.Value,
+            OrganizationId = org.Id.Value,
+            UserId = member.UserId.Value,
             TenantId = org.TenantId,
             MemberId = member.Id.Value,
             IamRoleId = member.IamRoleId.Value,
@@ -21,8 +22,11 @@ internal static class AuthOrgMembershipResponseMapper
 
 public sealed record AuthOrgMembershipResponse
 {
-    [JsonPropertyName("id")]
-    public Guid Id { get; init; }
+    [JsonPropertyName("organizationId")]
+    public Guid OrganizationId { get; init; }
+
+    [JsonPropertyName("userId")]
+    public Guid UserId { get; init; }
 
     [JsonPropertyName("tenantId")]
     public Guid TenantId { get; init; }

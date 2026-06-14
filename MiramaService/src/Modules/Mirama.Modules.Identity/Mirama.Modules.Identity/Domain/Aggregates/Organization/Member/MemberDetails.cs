@@ -7,5 +7,5 @@ public sealed record MemberDetails(
     string Name,
     string Email,
     RoleId IamRoleId,
-    UserId? UserId = null
+    UserId UserId
 );
