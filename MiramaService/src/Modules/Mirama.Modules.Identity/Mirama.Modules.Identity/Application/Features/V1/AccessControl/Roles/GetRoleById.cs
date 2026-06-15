@@ -6,12 +6,14 @@ using Mirama.Modules.Identity.Domain.Aggregates.Role;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.SharedKernel.Abstractions.Persistence;
 using Mirama.SharedKernel.Models;
+using Mirama.SharedKernel.Models.Permissions;
 
 namespace Mirama.Modules.Identity.Application.Features.V1.AccessControl.Roles;
 
 public class GetRoleByIdController : TenantControllerBase
 {
     [HttpGet("roles/{id:guid}")]
+    [RequirePermission(Permissions.IamRole.Read)]
     public async Task<ActionResult<RoleResponse>> Get([FromRoute] Guid id)
     {
         var res = await this.Dispatcher.Send(new GetRoleByIdQuery(id));

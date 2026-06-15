@@ -12,42 +12,44 @@ public sealed class Role : AggregateRoot<RoleId>
     public Guid? TenantId { get; private set; }
     public AccessScope Scope { get; private set; }
 
-    public bool IsSystemRole => TenantId is null;
+    public bool IsSystemRole => this.TenantId is null;
 
     public List<PolicyId> Policies { get; private set; } = [];
 
     private Role(RoleDetails details)
     {
-        Name = details.Name.Trim();
-        Description = details.Description?.Trim();
-        TenantId = details.TenantId;
-        Scope = details.Scope;
+        this.Name = details.Name.Trim();
+        this.Description = details.Description?.Trim();
+        this.TenantId = details.TenantId;
+        this.Scope = details.Scope;
     }
 
     private Role() { }
 
     public static Role Create(RoleDetails details)
-    {
-        return new Role(details) { Id = new RoleId(Guid.NewGuid()) };
-    }
+        => new Role(details) { Id = new RoleId(Guid.NewGuid()) };
 
     public void Update(RoleDetails details)
     {
-        Name = details.Name.Trim();
-        Description = details.Description?.Trim();
+        this.Name = details.Name.Trim();
+        this.Description = details.Description?.Trim();
     }
 
-    public void AttachPolicy(PolicyId policyId)
+    public ErrorOr<Success> AttachPolicy(PolicyId policyId, AccessScope policyScope)
     {
-        if (!Policies.Contains(policyId))
-            Policies.Add(policyId);
+        if (policyScope != this.Scope)
+            return Error.Validation("Role.Policy.ScopeMismatch",
+                $"Policy scope '{policyScope}' does not match role scope '{this.Scope}'.");
+        if (this.Policies.Contains(policyId))
+            return Error.Conflict("Role.Policy.Duplicate", "Policy already attached to this role.");
+        this.Policies.Add(policyId);
+        return Result.Success;
     }
 
     public ErrorOr<Deleted> DetachPolicy(PolicyId policyId)
     {
-        if (!Policies.Remove(policyId))
+        if (!this.Policies.Remove(policyId))
             return Error.NotFound("Role.Policy.NotFound", "Policy not attached to this role.");
-
         return Result.Deleted;
     }
 }

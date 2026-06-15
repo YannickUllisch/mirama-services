@@ -6,11 +6,13 @@ using Mirama.Modules.Identity.Infrastructure.Persistence;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.SharedKernel.Abstractions.Persistence;
 using Mirama.SharedKernel.Models;
+using Mirama.SharedKernel.Models.Permissions;
 
 namespace Mirama.Modules.Identity.Application.Features.V1.AccessControl.Roles.DeleteRole;
 
 public class DeleteRoleController : TenantControllerBase
 {
+    [RequirePermission(Permissions.IamRole.Manage)]
     [HttpDelete("roles/{id:guid}")]
     public async Task<IActionResult> Delete([FromRoute] Guid id)
     {

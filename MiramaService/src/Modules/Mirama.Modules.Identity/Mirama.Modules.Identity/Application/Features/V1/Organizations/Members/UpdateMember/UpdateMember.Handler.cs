@@ -1,11 +1,12 @@
 using ErrorOr;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using Mirama.Modules.Identity.Application.Common;
 using Mirama.Modules.Identity.Domain.Aggregates.Organization.Member;
 using Mirama.Modules.Identity.Domain.Aggregates.Role;
 using Mirama.Modules.Identity.Infrastructure.Persistence;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
-using Mirama.SharedKernel.Abstractions.Persistence;
 using Mirama.SharedKernel.Models;
 
 namespace Mirama.Modules.Identity.Application.Features.V1.Organizations.Members.UpdateMember;
@@ -21,7 +22,8 @@ public class UpdateMemberController : OrganizationControllerBase
 }
 
 internal class UpdateMemberCommandHandler(
-    IdentityDbContext dbContext) : IRequestHandler<UpdateMemberCommand, ErrorOr<MemberResponse>>
+    IdentityDbContext dbContext,
+    IMemoryCache cache) : IRequestHandler<UpdateMemberCommand, ErrorOr<MemberResponse>>
 {
     public async Task<ErrorOr<MemberResponse>> HandleAsync(UpdateMemberCommand request, CancellationToken ct)
     {
@@ -39,6 +41,8 @@ internal class UpdateMemberCommandHandler(
             return Error.NotFound("Member.Role.NotFound", "Role not found.");
 
         member.SetRole(new RoleId(request.IamRoleId));
+
+        cache.Remove(PermissionCacheKeys.MemberRoles(member.UserId.Value, member.OrganizationId));
 
         return member.MapResponse();
     }

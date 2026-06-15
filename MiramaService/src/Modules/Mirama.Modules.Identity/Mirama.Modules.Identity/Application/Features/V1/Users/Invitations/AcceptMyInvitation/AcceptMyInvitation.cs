@@ -71,14 +71,6 @@ internal class AcceptMyInvitationCommandHandler(
         ((IOrganizationOwned)member).SetOrganizationId(invitation.OrganizationId);
         dbContext.Members.Add(member);
 
-        return new MemberResponse
-        {
-            Id = member.Id.Value,
-            Name = member.Name,
-            Email = member.Email,
-            UserId = userId,
-            IamRoleId = member.IamRoleId.Value,
-            OrganizationId = invitation.OrganizationId,
-        };
+        return member.MapResponse();
     }
 }

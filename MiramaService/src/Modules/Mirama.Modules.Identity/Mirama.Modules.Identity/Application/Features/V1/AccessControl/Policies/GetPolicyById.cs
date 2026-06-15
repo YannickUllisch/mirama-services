@@ -6,11 +6,13 @@ using Mirama.Modules.Identity.Domain.Aggregates.Policy;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.SharedKernel.Abstractions.Persistence;
 using Mirama.SharedKernel.Models;
+using Mirama.SharedKernel.Models.Permissions;
 
 namespace Mirama.Modules.Identity.Application.Features.V1.AccessControl.Policies;
 
 public class GetPolicyByIdController : TenantControllerBase
 {
+    [RequirePermission(Permissions.IamPolicy.Read)]
     [HttpGet("policies/{id:guid}")]
     public async Task<ActionResult<PolicyResponse>> Get([FromRoute] Guid id)
     {

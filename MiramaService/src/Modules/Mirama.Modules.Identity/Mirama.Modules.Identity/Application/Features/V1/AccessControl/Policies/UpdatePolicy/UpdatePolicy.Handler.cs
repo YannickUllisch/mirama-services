@@ -6,11 +6,13 @@ using Mirama.Modules.Identity.Infrastructure.Persistence;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.SharedKernel.Abstractions.Persistence;
 using Mirama.SharedKernel.Models;
+using Mirama.SharedKernel.Models.Permissions;
 
 namespace Mirama.Modules.Identity.Application.Features.V1.AccessControl.Policies.UpdatePolicy;
 
 public class UpdatePolicyController : TenantControllerBase
 {
+    [RequirePermission(Permissions.IamPolicy.Manage)]
     [HttpPut("policies/{id:guid}")]
     public async Task<ActionResult<PolicyResponse>> Update([FromRoute] Guid id, [FromBody] UpdatePolicyCommand command)
     {

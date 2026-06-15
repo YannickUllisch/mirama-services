@@ -3,15 +3,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Mirama.Modules.Identity.Application.Common.Interfaces;
 using Mirama.Modules.Identity.Domain.Aggregates.Role;
-using Mirama.Modules.Identity.Domain.Enums;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.SharedKernel.Abstractions.Persistence;
 using Mirama.SharedKernel.Models;
+using Mirama.SharedKernel.Models.Permissions;
 
 namespace Mirama.Modules.Identity.Application.Features.V1.AccessControl.Roles.UpdateRole;
 
 public class UpdateRoleController : TenantControllerBase
 {
+    [RequirePermission(Permissions.IamRole.Manage)]
     [HttpPut("roles/{id:guid}")]
     public async Task<ActionResult<RoleResponse>> Update([FromRoute] Guid id, [FromBody] UpdateRoleCommand command)
     {

@@ -62,7 +62,7 @@ public static class RoleSeed
             foreach (var policyName in seed.PolicyNames)
             {
                 if (policyLookup.TryGetValue(policyName, out var policyId))
-                    role.AttachPolicy(policyId);
+                    role.AttachPolicy(policyId, seed.Scope);
             }
 
             dbContext.Roles.Add(role);

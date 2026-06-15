@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Mirama.Modules.Identity.Domain.Aggregates.Organization;
+using Mirama.Modules.Identity.Domain.Aggregates.User;
 using Mirama.Modules.Identity.Infrastructure.Persistence;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.SharedKernel.Models;
@@ -44,6 +45,7 @@ internal class GetAuthUserQueryHandler(
         {
             return Error.NotFound("Tenant.NotFound", "Tenant not found.");
         }
+        var tenantRole = user.Id.Value == tenant?.AdminUserId.Value ? TenantRole.Owner : TenantRole.Assumed;
 
         var members = await dbContext.Members
             .AsNoTracking()
@@ -58,12 +60,13 @@ internal class GetAuthUserQueryHandler(
                 .AsNoTracking()
                 .FirstOrDefaultAsync(o => o.Id == new OrganizationId(member.OrganizationId), ct);
 
+            
             if (org is not null)
             {
-                organizationInfo = org.MapOrgMembershipResponse(member);
+                organizationInfo = org.MapOrgMembershipResponse(member, tenantRole);
             }
         }
 
-        return user.MapAuthUserResponse(tenant.Id, organizationInfo);
+        return user.MapAuthUserResponse(tenant!.Id, tenantRole, organizationInfo);
     }
 }

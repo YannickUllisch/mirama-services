@@ -11,7 +11,7 @@ internal static class MemberMapper
         Name = member.Name,
         Email = member.Email,
         UserId = member.UserId?.Value,
-        IamRoleId = member.IamRoleId.Value,
+        IamRoleIds = member.IamRoleIds.ConvertAll(r => r.Value),
         OrganizationId = member.OrganizationId
     };
 }
@@ -30,8 +30,8 @@ public sealed record MemberResponse
     [JsonPropertyName("userId")]
     public Guid? UserId { get; init; }
 
-    [JsonPropertyName("iamRoleId")]
-    public Guid IamRoleId { get; init; }
+    [JsonPropertyName("iamRoleIds")]
+    public List<Guid> IamRoleIds { get; init; } = [];
 
     [JsonPropertyName("organizationId")]
     public Guid OrganizationId { get; init; }

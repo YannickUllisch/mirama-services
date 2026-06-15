@@ -33,30 +33,26 @@ internal class GetMemberPermissionsQueryHandler(
         if (member is null)
             return Error.NotFound("Member.NotFound", "Member not found.");
 
-        var role = await dbContext.Roles
-            .AsNoTracking()
-            .FirstOrDefaultAsync(r => r.Id == member.IamRoleId, ct);
-
-        if (role is null || role.Policies.Count == 0)
+        if (member.IamRoleIds.Count == 0)
             return Array.Empty<string>();
 
-        var policyIds = role.Policies;
+        var roles = await dbContext.Roles
+            .AsNoTracking()
+            .Where(r => member.IamRoleIds.Contains(r.Id))
+            .ToListAsync(ct);
+
+        var allPolicyIds = roles.SelectMany(r => r.Policies).Distinct().ToList();
+        if (allPolicyIds.Count == 0)
+            return Array.Empty<string>();
 
         var statements = await dbContext.Policies
             .AsNoTracking()
-            .Where(p => policyIds.Contains(p.Id))
+            .Where(p => allPolicyIds.Contains(p.Id))
             .SelectMany(p => p.Statements)
             .ToListAsync(ct);
 
-        var allows = statements
-            .Where(s => s.Effect == Effect.Allow)
-            .Select(s => s.Action)
-            .ToHashSet();
-
-        var denies = statements
-            .Where(s => s.Effect == Effect.Deny)
-            .Select(s => s.Action)
-            .ToHashSet();
+        var allows = statements.Where(s => s.Effect == Effect.Allow).Select(s => s.Action).ToHashSet();
+        var denies = statements.Where(s => s.Effect == Effect.Deny).Select(s => s.Action).ToHashSet();
 
         allows.ExceptWith(denies);
         return allows.ToArray();

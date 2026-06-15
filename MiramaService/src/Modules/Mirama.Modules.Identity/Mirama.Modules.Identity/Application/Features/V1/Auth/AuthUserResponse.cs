@@ -6,12 +6,13 @@ namespace Mirama.Modules.Identity.Application.Features.V1.Auth;
 
 internal static class AuthUserResponseMapper
 {
-    internal static AuthUserResponse MapAuthUserResponse(this User user, Guid tenantId, AuthOrgMembershipResponse? orgMembership)
+    internal static AuthUserResponse MapAuthUserResponse(this User user, Guid tenantId, TenantRole tenantRole, AuthOrgMembershipResponse? orgMembership)
     {
         return new()
         {
             UserId = user.Id.Value,
             TenantId = tenantId,
+            TenantRole = Enum.GetName(tenantRole)!,
             Name = user.Name,
             Email = user.Email,
             IsOnboarded = user.IsOnboarded,
@@ -28,6 +29,9 @@ public sealed record AuthUserResponse
 
     [JsonPropertyName("tenantId")]
     public Guid TenantId { get; init; }
+
+    [JsonPropertyName("tenantRole")]
+    public string TenantRole { get; init; } = string.Empty;
 
     [JsonPropertyName("name")]
     public string Name { get; init; } = string.Empty;

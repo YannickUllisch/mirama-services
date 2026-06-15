@@ -7,11 +7,13 @@ using Mirama.Modules.Identity.Infrastructure.Persistence;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.SharedKernel.Abstractions.Persistence;
 using Mirama.SharedKernel.Models;
+using Mirama.SharedKernel.Models.Permissions;
 
 namespace Mirama.Modules.Identity.Application.Features.V1.AccessControl.Policies.CreatePolicy;
 
 public class CreatePolicyController : TenantControllerBase
 {
+    [RequirePermission(Permissions.IamPolicy.Manage)]
     [HttpPost("policies")]
     public async Task<ActionResult<PolicyResponse>> Create([FromBody] CreatePolicyCommand command)
     {

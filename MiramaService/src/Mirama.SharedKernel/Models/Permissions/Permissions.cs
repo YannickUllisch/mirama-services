@@ -280,6 +280,46 @@ public static class Permissions
             ]);
     }
 
+    public static class IamRole
+    {
+        public const string Read = "iam-role:read";
+        public const string Manage = "iam-role:manage";
+        public const string AllActions = "iam-role:*";
+        public const string ResourcePattern = "iam-role/*";
+
+        public static readonly IReadOnlyList<string> All = [Read, Manage];
+
+        public static readonly PermissionGroup Group = new(
+            Label: "IAM Role",
+            Scope: "Organization",
+            ResourcePattern: ResourcePattern,
+            AllActionsPattern: AllActions,
+            Actions: [
+                new(Read,   "Read"),
+                new(Manage, "Manage"),
+            ]);
+    }
+
+    public static class IamPolicy
+    {
+        public const string Read = "iam-policy:read";
+        public const string Manage = "iam-policy:manage";
+        public const string AllActions = "iam-policy:*";
+        public const string ResourcePattern = "iam-policy/*";
+
+        public static readonly IReadOnlyList<string> All = [Read, Manage];
+
+        public static readonly PermissionGroup Group = new(
+            Label: "IAM Policy",
+            Scope: "Organization",
+            ResourcePattern: ResourcePattern,
+            AllActionsPattern: AllActions,
+            Actions: [
+                new(Read,   "Read"),
+                new(Manage, "Manage"),
+            ]);
+    }
+
     public static readonly IReadOnlyList<string> All =
     [
         .. Project.All,
@@ -293,6 +333,8 @@ public static class Permissions
         .. Comment.All,
         .. Expense.All,
         .. Organization.All,
+        .. IamRole.All,
+        .. IamPolicy.All,
     ];
 
     public static readonly IReadOnlyList<PermissionGroup> AllGroups =
@@ -308,5 +350,7 @@ public static class Permissions
         Comment.Group,
         Expense.Group,
         Organization.Group,
+        IamRole.Group,
+        IamPolicy.Group,
     ];
 }

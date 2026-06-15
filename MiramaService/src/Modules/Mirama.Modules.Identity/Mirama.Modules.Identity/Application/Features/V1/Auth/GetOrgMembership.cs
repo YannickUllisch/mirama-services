@@ -1,3 +1,4 @@
+using System.Security.Cryptography.X509Certificates;
 using ErrorOr;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -52,6 +53,13 @@ internal class GetOrgMembershipQueryHandler(
         if (org is null)
             return Error.NotFound("Organization.NotFound", "Organization not found.");
 
-        return org.MapOrgMembershipResponse(member);
+        var tenant = await dbContext.Tenants
+            .AsNoTracking()
+            .Select(x => new { x.Id, x.AdminUserId })
+            .FirstOrDefaultAsync(o => o.Id == org.TenantId, ct);
+
+        var tenantRole = user.Id.Value == tenant?.AdminUserId.Value ? TenantRole.Owner : TenantRole.Assumed;
+
+        return org.MapOrgMembershipResponse(member, tenantRole);
     }
 }

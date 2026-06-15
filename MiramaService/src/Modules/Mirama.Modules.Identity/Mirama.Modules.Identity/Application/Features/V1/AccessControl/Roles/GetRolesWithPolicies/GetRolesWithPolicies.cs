@@ -10,11 +10,13 @@ using Mirama.Modules.Identity.Domain.Enums;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.SharedKernel.Abstractions.Persistence;
 using Mirama.SharedKernel.Models;
+using Mirama.SharedKernel.Models.Permissions;
 
 namespace Mirama.Modules.Identity.Application.Features.V1.AccessControl.Roles.GetRolesWithPolicies;
 
 public class GetRolesWithPoliciesController : TenantControllerBase
 {
+    [RequirePermission(Permissions.IamRole.Read)]
     [HttpGet("roles/{scope}/with-policies")]
     public async Task<ActionResult<PaginatedList<RoleWithPoliciesResponse>>> Get(
         [FromRoute] string scope,

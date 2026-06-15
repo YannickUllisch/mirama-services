@@ -1,4 +1,6 @@
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Mirama.Modules.Identity.Domain.Aggregates.Organization.Member;
 using Mirama.Modules.Identity.Domain.Aggregates.Role;
@@ -21,13 +23,22 @@ public class MemberConfiguration : IEntityTypeConfiguration<Member>
             uid => uid != null ? uid.Value : (Guid?)null,
             val => val.HasValue ? new UserId(val.Value) : null);
 
-        builder.Property(m => m.IamRoleId).HasConversion(
-            rid => rid.Value,
-            val => new RoleId(val))
+        builder.Property(m => m.IamRoleIds)
+            .HasConversion(
+                v => JsonSerializer.Serialize(v.Select(r => r.Value).ToList(), (JsonSerializerOptions?)null),
+                v => (JsonSerializer.Deserialize<List<Guid>>(v, (JsonSerializerOptions?)null) ?? new List<Guid>())
+                                   .Select(g => new RoleId(g)).ToList())
+            .HasColumnType("jsonb")
+            .HasColumnName("IamRoleIds")
             .IsRequired();
+
+        builder.Property(m => m.IamRoleIds).Metadata.SetValueComparer(
+            new ValueComparer<List<RoleId>>(
+                (a, b) => a != null && b != null && a.Select(r => r.Value).SequenceEqual(b.Select(r => r.Value)),
+                v => v.Aggregate(0, (h, r) => HashCode.Combine(h, r.Value.GetHashCode())),
+                v => v.ToList()));
 
         builder.Property(m => m.Name).IsRequired();
         builder.Property(m => m.Email).IsRequired();
-
     }
 }

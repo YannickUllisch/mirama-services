@@ -9,11 +9,13 @@ using Mirama.Modules.Identity.Domain.Enums;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.SharedKernel.Abstractions.Persistence;
 using Mirama.SharedKernel.Models;
+using Mirama.SharedKernel.Models.Permissions;
 
 namespace Mirama.Modules.Identity.Application.Features.V1.AccessControl.Policies;
 
 public class GetPoliciesController : TenantControllerBase
 {
+    [RequirePermission(Permissions.IamPolicy.Read)]
     [HttpGet("policies/{scope}")]
     public async Task<ActionResult<PaginatedList<PolicyResponse>>> Get([FromRoute] string scope, [FromQuery] GetPoliciesQuery query)
     {
