@@ -2,6 +2,7 @@ using ErrorOr;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Mirama.Modules.Identity.Domain.Aggregates.Policy;
+using Mirama.Modules.Identity.Domain.Aggregates.Role;
 using Mirama.Modules.Identity.Infrastructure.Persistence;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.SharedKernel.Abstractions.Persistence;
@@ -29,8 +30,9 @@ internal class DetachPolicyCommandHandler(
     {
         var tenantId = contextProvider.TenantId;
 
+        var roleId = new RoleId(request.RoleId);
         var role = await dbContext.Roles
-            .FirstOrDefaultAsync(r => r.Id.Value == request.RoleId, ct);
+            .FirstOrDefaultAsync(r => r.Id == roleId, ct);
 
         if (role is null)
             return Error.NotFound("Role.NotFound", "Role not found.");

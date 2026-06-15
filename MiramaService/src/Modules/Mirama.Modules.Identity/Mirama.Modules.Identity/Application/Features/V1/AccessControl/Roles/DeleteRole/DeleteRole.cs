@@ -1,6 +1,7 @@
 using ErrorOr;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Mirama.Modules.Identity.Domain.Aggregates.Role;
 using Mirama.Modules.Identity.Infrastructure.Persistence;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.SharedKernel.Abstractions.Persistence;
@@ -26,8 +27,9 @@ internal class DeleteRoleCommandHandler(
 {
     public async Task<ErrorOr<Deleted>> HandleAsync(DeleteRoleCommand request, CancellationToken ct)
     {
+        var roleId = new RoleId(request.Id);
         var role = await dbContext.Roles
-            .FirstOrDefaultAsync(r => r.Id.Value == request.Id, ct);
+            .FirstOrDefaultAsync(r => r.Id == roleId, ct);
 
         if (role is null)
             return Error.NotFound("Role.NotFound", "Role not found.");

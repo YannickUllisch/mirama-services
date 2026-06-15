@@ -16,11 +16,11 @@ public sealed class Policy : AggregateRoot<PolicyId>
 
     private Policy(PolicyDetails details)
     {
-        Name = details.Name.Trim();
-        Description = details.Description?.Trim();
-        TenantId = details.TenantId;
-        Scope = details.Scope;
-        IsManaged = details.IsManaged;
+        this.Name = details.Name.Trim();
+        this.Description = details.Description?.Trim();
+        this.TenantId = details.TenantId;
+        this.Scope = details.Scope;
+        this.IsManaged = details.IsManaged;
     }
 
     private Policy() { }
@@ -30,10 +30,10 @@ public sealed class Policy : AggregateRoot<PolicyId>
         return new Policy(details) { Id = new PolicyId(Guid.NewGuid()) };
     }
 
-    public void Update(PolicyDetails details)
+    public void Update(string name, string? description)
     {
-        Name = details.Name.Trim();
-        Description = details.Description?.Trim();
+        this.Name = name.Trim();
+        this.Description = description?.Trim();
     }
 
     public ErrorOr<PolicyStatement> AddStatement(string action, string resource = "*", Effect effect = Effect.Allow)

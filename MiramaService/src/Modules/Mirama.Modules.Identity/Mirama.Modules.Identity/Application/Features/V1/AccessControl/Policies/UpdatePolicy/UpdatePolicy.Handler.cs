@@ -27,7 +27,7 @@ internal class UpdatePolicyCommandHandler(
     {
         var policy = await dbContext.Policies
             .Include(p => p.Statements)
-            .FirstOrDefaultAsync(p => p.Id.Value == request.Id, ct);
+            .FirstOrDefaultAsync(p => p.Id == new PolicyId(request.Id), ct);
 
         if (policy is null)
             return Error.NotFound("Policy.NotFound", "Policy not found.");
@@ -38,7 +38,24 @@ internal class UpdatePolicyCommandHandler(
         if (policy.TenantId != contextProvider.TenantId)
             return Error.Forbidden("Policy.Ownership", "You can only modify policies in your tenant.");
 
-        policy.Update(new PolicyDetails(request.Name, policy.Scope, policy.TenantId, request.Description));
+        policy.Update(request.Name, request.Description);
+
+        var errors = new List<Error>();
+
+        foreach (var statementId in request.RemoveStatementIds)
+        {
+            var result = policy.RemoveStatement(new PolicyStatementId(statementId));
+            if (result.IsError) errors.AddRange(result.Errors);
+        }
+
+        foreach (var s in request.AddStatements)
+        {
+            Enum.TryParse<Effect>(s.Effect, ignoreCase: true, out var effect);
+            var result = policy.AddStatement(s.Action, s.Resource, effect);
+            if (result.IsError) errors.AddRange(result.Errors);
+        }
+
+        if (errors.Count > 0) return errors;
 
         return policy.MapResponse();
     }

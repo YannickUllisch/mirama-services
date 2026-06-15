@@ -34,13 +34,8 @@ public static class ModelBuilderExtensions
             {
                 var parameter = Expression.Parameter(clrType, "e");
                 var orgProperty = Expression.Property(parameter, nameof(IOrganizationOwned.OrganizationId));
-
-                // Extract the underlying Guid from OrganizationId wrapper
-                var valueProperty = Expression.Property(orgProperty, nameof(Guid));
-
                 var orgIdValue = Expression.Constant(organizationId.Value);
-                var body = Expression.Equal(valueProperty, orgIdValue);
-
+                var body = Expression.Equal(orgProperty, orgIdValue);
                 var lambda = Expression.Lambda(body, parameter);
                 entityType.SetQueryFilter(lambda);
             }

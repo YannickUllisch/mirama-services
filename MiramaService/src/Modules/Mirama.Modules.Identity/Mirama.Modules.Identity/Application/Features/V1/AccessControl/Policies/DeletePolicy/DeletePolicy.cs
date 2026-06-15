@@ -1,6 +1,7 @@
 using ErrorOr;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Mirama.Modules.Identity.Domain.Aggregates.Policy;
 using Mirama.Modules.Identity.Infrastructure.Persistence;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.SharedKernel.Abstractions.Persistence;
@@ -27,7 +28,7 @@ internal class DeletePolicyCommandHandler(
     public async Task<ErrorOr<Deleted>> HandleAsync(DeletePolicyCommand request, CancellationToken ct)
     {
         var policy = await dbContext.Policies
-            .FirstOrDefaultAsync(p => p.Id.Value == request.Id, ct);
+            .FirstOrDefaultAsync(p => p.Id == new PolicyId(request.Id), ct);
 
         if (policy is null)
             return Error.NotFound("Policy.NotFound", "Policy not found.");

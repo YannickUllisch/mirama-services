@@ -31,7 +31,7 @@ internal class GetRoleByIdQueryHandler(
 
         var role = await roleRepository.Query()
             .Where(r => r.TenantId == null || r.TenantId == tenantId)
-            .FirstOrDefaultAsync(r => r.Id.Value == request.Id, ct);
+            .FirstOrDefaultAsync(r => r.Id == new RoleId(request.Id), ct);
 
         if (role is null)
             return Error.NotFound("Role.NotFound", "Role not found.");

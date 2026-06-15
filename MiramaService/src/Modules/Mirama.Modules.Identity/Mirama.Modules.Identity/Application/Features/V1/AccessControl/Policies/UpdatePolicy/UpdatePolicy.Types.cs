@@ -14,4 +14,15 @@ public sealed record UpdatePolicyCommand : ICommand<ErrorOr<PolicyResponse>>
 
     [JsonPropertyName("description")]
     public string? Description { get; init; }
+
+    [JsonPropertyName("addStatements")]
+    public IReadOnlyList<StatementDto> AddStatements { get; init; } = [];
+
+    [JsonPropertyName("removeStatementIds")]
+    public IReadOnlyList<Guid> RemoveStatementIds { get; init; } = [];
 }
+
+public sealed record StatementDto(
+    [property: JsonPropertyName("action")] string Action,
+    [property: JsonPropertyName("resource")] string Resource = "*",
+    [property: JsonPropertyName("effect")] string Effect = "Allow");

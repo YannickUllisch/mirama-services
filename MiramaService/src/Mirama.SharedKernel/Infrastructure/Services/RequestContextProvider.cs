@@ -4,7 +4,7 @@ using Mirama.SharedKernel.Abstractions.Persistence;
 
 namespace Mirama.SharedKernel.Infrastructure.Services;
 
-internal class RequestContextProvider(IHttpContextAccessor httpContextAccessor, ILogger<RequestContextProvider> logger) : IRequestContextProvider
+internal class RequestContextProvider(IHttpContextAccessor httpContextAccessor) : IRequestContextProvider
 {
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
@@ -13,8 +13,6 @@ internal class RequestContextProvider(IHttpContextAccessor httpContextAccessor, 
         get
         {
             var claim = _httpContextAccessor.HttpContext?.User?.FindFirst("sub")?.Value;
-
-            logger.LogWarning($"here with claim: {claim}");
             if (string.IsNullOrEmpty(claim)) throw new UnauthorizedAccessException("ExternalUserId not found");
             return Guid.Parse(claim);
         }
@@ -25,7 +23,6 @@ internal class RequestContextProvider(IHttpContextAccessor httpContextAccessor, 
         get
         {
             var claim = _httpContextAccessor.HttpContext?.User?.FindFirst("userId")?.Value;
-            logger.LogWarning($"here with userclaim: {claim}");
             if (string.IsNullOrEmpty(claim)) throw new UnauthorizedAccessException("UserId not found");
             return Guid.Parse(claim);
         }

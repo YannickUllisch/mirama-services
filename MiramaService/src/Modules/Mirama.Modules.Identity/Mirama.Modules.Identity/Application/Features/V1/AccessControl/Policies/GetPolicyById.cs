@@ -32,7 +32,7 @@ internal class GetPolicyByIdQueryHandler(
         var policy = await policyRepository.Query()
             .Include(p => p.Statements)
             .Where(p => p.TenantId == null || p.TenantId == tenantId)
-            .FirstOrDefaultAsync(p => p.Id.Value == request.Id, ct);
+            .FirstOrDefaultAsync(p => p.Id == new PolicyId(request.Id), ct);
 
         if (policy is null)
             return Error.NotFound("Policy.NotFound", "Policy not found.");

@@ -2,6 +2,7 @@ using ErrorOr;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Mirama.Modules.Identity.Domain.Aggregates.Policy;
+using Mirama.Modules.Identity.Domain.Aggregates.Role;
 using Mirama.Modules.Identity.Infrastructure.Persistence;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.SharedKernel.Abstractions.Persistence;
@@ -29,8 +30,9 @@ internal class AttachPolicyCommandHandler(
     {
         var tenantId = contextProvider.TenantId;
 
+        var roleId = new RoleId(request.RoleId);
         var role = await dbContext.Roles
-            .FirstOrDefaultAsync(r => r.Id.Value == request.RoleId, ct);
+            .FirstOrDefaultAsync(r => r.Id == roleId, ct);
 
         if (role is null)
             return Error.NotFound("Role.NotFound", "Role not found.");
@@ -41,9 +43,10 @@ internal class AttachPolicyCommandHandler(
         if (role.TenantId != tenantId)
             return Error.Forbidden("Role.Ownership", "You can only modify roles in your tenant.");
 
+        var policyId = new PolicyId(request.PolicyId);
         var policyExists = await dbContext.Policies
             .AsNoTracking()
-            .AnyAsync(p => p.Id.Value == request.PolicyId && (p.TenantId == null || p.TenantId == tenantId), ct);
+            .AnyAsync(p => p.Id == policyId && (p.TenantId == null || p.TenantId == tenantId), ct);
 
         if (!policyExists)
             return Error.NotFound("Policy.NotFound", "Policy not found.");

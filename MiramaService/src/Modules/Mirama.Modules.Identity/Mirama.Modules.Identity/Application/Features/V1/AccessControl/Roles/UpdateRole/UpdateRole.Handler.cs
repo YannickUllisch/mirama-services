@@ -27,7 +27,7 @@ internal class UpdateRoleCommandHandler(
     public async Task<ErrorOr<RoleResponse>> HandleAsync(UpdateRoleCommand request, CancellationToken ct)
     {
         var role = await roleRepository.Query()
-            .FirstOrDefaultAsync(r => r.Id.Value == request.Id, ct);
+            .FirstOrDefaultAsync(r => r.Id == new RoleId(request.Id), ct);
 
         if (role is null)
             return Error.NotFound("Role.NotFound", "Role not found.");
