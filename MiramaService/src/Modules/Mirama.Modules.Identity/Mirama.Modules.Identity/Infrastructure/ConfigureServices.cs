@@ -53,6 +53,15 @@ public static class DependencyInjection
 
     private static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
     {
+        var assembly = Assembly.GetExecutingAssembly();
+
+        // Register all IModuleService implementations (cross-module service contracts)
+        services.Scan(scan => scan
+            .FromAssemblies(assembly)
+            .AddClasses(classes => classes.AssignableTo<IModuleService>(), publicOnly: false)
+            .AsImplementedInterfaces()
+            .WithScopedLifetime());
+
         // Services
         services.AddScoped<IPermissionService, PermissionService>();
         services.AddScoped(typeof(IIdentityQueryRepository<,>), typeof(IdentityQueryRepository<,>));
