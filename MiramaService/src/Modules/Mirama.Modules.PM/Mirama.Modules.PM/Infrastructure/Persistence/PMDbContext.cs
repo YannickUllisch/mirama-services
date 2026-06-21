@@ -10,9 +10,9 @@ using Mirama.SharedKernel.Infrastructure.Extensions;
 using Mirama.SharedKernel.Infrastructure.Idempotency;
 using Mirama.SharedKernel.Infrastructure.Messaging.Outbox;
 
-namespace Mirama.Modules.Projects.Infrastructure.Persistence;
+namespace Mirama.Modules.PM.Infrastructure.Persistence;
 
-public sealed class ProjectsDbContext : DbContext, IUnitOfWork
+public sealed class PMDbContext : DbContext, IUnitOfWork
 {
     private readonly IDispatcher _dispatcher = default!;
     private readonly IRequestContextProvider _contextProvider = default!;
@@ -24,8 +24,8 @@ public sealed class ProjectsDbContext : DbContext, IUnitOfWork
     public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
     public DbSet<IdempotencyRecord> IdempotencyRecords => Set<IdempotencyRecord>();
 
-    public ProjectsDbContext(
-        DbContextOptions<ProjectsDbContext> options,
+    public PMDbContext(
+        DbContextOptions<PMDbContext> options,
         IDispatcher dispatcher,
         IRequestContextProvider requestContext) : base(options)
     {
@@ -33,7 +33,7 @@ public sealed class ProjectsDbContext : DbContext, IUnitOfWork
         _contextProvider = requestContext;
     }
 
-    public ProjectsDbContext() { }
+    public PMDbContext() { }
 
     public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
     {

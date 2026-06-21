@@ -2,14 +2,14 @@ using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
-namespace Mirama.Modules.Projects.Infrastructure.Persistence;
+namespace Mirama.Modules.PM.Infrastructure.Persistence;
 
-public class ProjectsDbContextFactory : IDesignTimeDbContextFactory<ProjectsDbContext>
+public class PMDbContextFactory : IDesignTimeDbContextFactory<PMDbContext>
 {
-    public ProjectsDbContext CreateDbContext(string[] args)
+    public PMDbContext CreateDbContext(string[] args)
     {
         Env.TraversePath().Load();
-        var optionsBuilder = new DbContextOptionsBuilder<ProjectsDbContext>();
+        var optionsBuilder = new DbContextOptionsBuilder<PMDbContext>();
         var connection = Environment.GetEnvironmentVariable("Infrastructure__DatabaseConnection");
 
         if (string.IsNullOrWhiteSpace(connection))
@@ -18,9 +18,9 @@ public class ProjectsDbContextFactory : IDesignTimeDbContextFactory<ProjectsDbCo
         optionsBuilder.UseNpgsql(
             connection,
             b => b
-                .MigrationsAssembly(typeof(ProjectsDbContext).Assembly.FullName)
+                .MigrationsAssembly(typeof(PMDbContext).Assembly.FullName)
                 .MigrationsHistoryTable("__EFMigrationsHistory", "projects"));
 
-        return new ProjectsDbContext(optionsBuilder.Options, null!, null!);
+        return new PMDbContext(optionsBuilder.Options, null!, null!);
     }
 }

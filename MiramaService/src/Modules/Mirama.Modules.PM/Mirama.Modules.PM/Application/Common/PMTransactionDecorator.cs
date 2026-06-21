@@ -1,12 +1,12 @@
 using ErrorOr;
-using Mirama.Modules.Projects.Infrastructure.Persistence;
+using Mirama.Modules.PM.Infrastructure.Persistence;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 
 namespace Mirama.Modules.PM.Application.Common;
 
 internal class PMTransactionDecorator<TRequest, TResponse>(
     IRequestHandler<TRequest, TResponse> inner,
-    ProjectsDbContext dbContext)
+    PMDbContext dbContext)
     : IRequestHandler<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
     where TResponse : IErrorOr

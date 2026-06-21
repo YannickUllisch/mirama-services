@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Mirama.Modules.PM.Application.Common;
-using Mirama.Modules.Projects.Infrastructure.Persistence;
+using Mirama.Modules.PM.Infrastructure.Persistence;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.SharedKernel.Abstractions.Persistence;
 using Mirama.SharedKernel.Infrastructure.Options;
@@ -44,17 +44,17 @@ public static class DependencyInjection
 
     private static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
     {
-        services.AddDbContext<ProjectsDbContext>(static (sp, options) =>
+        services.AddDbContext<PMDbContext>(static (sp, options) =>
         {
             var infra = sp.GetRequiredService<IOptions<InfrastructureOptions>>().Value;
             options
                 .UseNpgsql(infra.DatabaseConnection, b => b
-                    .MigrationsAssembly(typeof(ProjectsDbContext).Assembly.FullName)
+                    .MigrationsAssembly(typeof(PMDbContext).Assembly.FullName)
                     .MigrationsHistoryTable("__EFMigrationsHistory", "projects"))
                 .AddInterceptors(sp.GetRequiredService<Mirama.SharedKernel.Infrastructure.Interceptors.AuditSaveChangesInterceptor>());
         });
 
-        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ProjectsDbContext>());
+        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<PMDbContext>());
 
         return services;
     }
