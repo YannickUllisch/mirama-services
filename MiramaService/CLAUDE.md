@@ -8,6 +8,62 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - All GetX list endpoints must return `PaginatedList<T>` (from `Mirama.SharedKernel.Models`). Add `int? PageNumber` and `int? PageSize` to the query record. When both are provided paginate; when omitted return all results wrapped in a single-page `PaginatedList`. Add a validator with `RuleFor(q => q.PageSize).LessThanOrEqualTo(50)`.
 - Always use async variants for all DB and IO operations: `ToListAsync`, `FirstOrDefaultAsync`, `AnyAsync`, `CountAsync`, `AddAsync`, `SaveChangesAsync`, etc. Never use synchronous equivalents.
 
+## Feature Slice Structure
+
+Each feature lives under `Application/Features/V1/<Resource>/`. Every file follows the `<FeatureName>.<Kind>.cs` naming pattern (`Handler`, `Types`, `Validation`).
+
+### Response types and mappers
+
+Response types and their mapper live in the **same file**, colocated under the resource folder:
+
+```
+Projects/
+  ProjectResponse.cs                  # ProjectResponse record + ProjectMapper static class
+  Members/
+    ProjectMemberResponse.cs          # ProjectMemberResponse record + ProjectMemberMapper static class
+    AddProjectMember/
+      AddProjectMember.Handler.cs
+      AddProjectMember.Types.cs
+    ...
+  Teams/
+    ProjectTeamResponse.cs            # ProjectTeamResponse record + ProjectTeamMapper static class
+    ...
+  Milestones/
+    ProjectMilestoneResponse.cs       # ProjectMilestoneResponse record + ProjectMilestoneMapper static class
+    ...
+```
+
+Rules:
+- One `*Response` record and one `*Mapper` static class per file — no mixing of unrelated types.
+- The mapper for the aggregate root (`ProjectMapper`) may call sub-mappers for owned collection entries.
+- Shared sub-resource response types (e.g. `ProjectMemberResponse`) live under their own sub-folder (`Members/`), not in the root resource folder and not inside any individual feature folder.
+
+### Aggregate roots and sub-resource endpoints
+
+The aggregate root owns all mutations. Sub-resource collections (members, teams, milestones, etc.) are managed through the aggregate, never modified directly via their own repository.
+
+REST layout for an aggregate `Project` with owned collection `Members`:
+
+| Method | Route | Notes |
+|---|---|---|
+| `GET` | `/projects` | paginated list |
+| `POST` | `/projects` | create aggregate |
+| `GET` | `/projects/{id}` | full aggregate response incl. sub-collections |
+| `PUT` | `/projects/{id}` | update core fields + tags only — do NOT reconcile sub-collections here |
+| `POST` | `/projects/{id}/archive` | named state transition |
+| `GET` | `/projects/{id}/members` | paginated sub-resource list |
+| `POST` | `/projects/{id}/members` | add member via aggregate method |
+| `PUT` | `/projects/{id}/members/{memberId}` | update member role via aggregate method |
+| `DELETE` | `/projects/{id}/members/{memberId}` | remove member via aggregate method |
+
+General rules:
+- Sub-resource mutations (add/update/remove) get their own vertical slice under `<Resource>/<SubResource>/<FeatureName>/`.
+- Each slice has its own command/query record, handler, and optional validator — never share a command across slices.
+- `PUT /resource/{id}` updates only the aggregate's own scalar fields and simple value collections (e.g. tag IDs). Sub-entity collections are managed through dedicated sub-resource endpoints.
+- Route params (`projectId`, `memberId`) are injected into the command using `command with { ProjectId = projectId }` — the body is the command record with the route fields overridden.
+- Commands that add a sub-entity return the created sub-resource response (`201 Created` with `Location` header). Commands that remove return `204 No Content`.
+- Load only the includes needed for the operation — do not eagerly load all collections on every command.
+
 ## Commands
 
 ```bash

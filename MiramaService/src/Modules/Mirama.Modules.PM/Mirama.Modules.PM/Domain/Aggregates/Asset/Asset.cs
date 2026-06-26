@@ -82,8 +82,6 @@ public sealed class Asset : OrganizationAggregateRoot<AssetId>
 
     public void Archive() => this.Status = AssetStatus.Archived;
 
-    // --- Versioning ---
-
     public AssetVersion AddVersion(AssetVersionDetails details)
     {
         var version = AssetVersion.Create(details, this.Versions.Count + 1);
@@ -99,8 +97,6 @@ public sealed class Asset : OrganizationAggregateRoot<AssetId>
         this.CurrentVersionId = versionId;
         return Result.Success;
     }
-
-    // --- Feedback ---
 
     public ErrorOr<AssetFeedback> AddFeedback(AssetFeedbackDetails details)
     {
@@ -143,8 +139,6 @@ public sealed class Asset : OrganizationAggregateRoot<AssetId>
         return feedback.RemoveReply(replyId, requestingMemberId);
     }
 
-    // --- Connections ---
-
     public ErrorOr<AssetConnection> AddConnection(AssetConnectionDetails details)
     {
         if (this.Connections.Any(c => c.TargetType == details.TargetType && c.TargetId == details.TargetId))
@@ -162,8 +156,6 @@ public sealed class Asset : OrganizationAggregateRoot<AssetId>
         this.Connections.Remove(connection);
         return Result.Deleted;
     }
-
-    // --- Tags ---
 
     public ErrorOr<Success> AddTag(Guid tagId)
     {
