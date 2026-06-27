@@ -1,6 +1,7 @@
 using ErrorOr;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Mirama.Modules.Identity.Contracts.Organizations;
 using Mirama.Modules.PM.Application.Common.Interfaces;
 using Mirama.Modules.PM.Application.Features.V1.Projects.Teams;
 using Mirama.Modules.PM.Domain.Aggregates.Project;
@@ -24,7 +25,8 @@ public class AddProjectTeamController : OrganizationControllerBase
 }
 
 internal class AddProjectTeamCommandHandler(
-    IPMCommandRepository<Project, ProjectId> commandRepo)
+    IPMCommandRepository<Project, ProjectId> commandRepo,
+    ITeamService teamService)
     : IRequestHandler<AddProjectTeamCommand, ErrorOr<ProjectTeamResponse>>
 {
     public async Task<ErrorOr<ProjectTeamResponse>> HandleAsync(AddProjectTeamCommand request, CancellationToken cancellationToken)
@@ -36,12 +38,16 @@ internal class AddProjectTeamCommandHandler(
         if (project is null)
             return Error.NotFound("Project.NotFound", "Project not found.");
 
+        var teamDto = await teamService.GetTeamByIdAsync(request.TeamId, cancellationToken);
+        if (teamDto is null)
+            return Error.NotFound("Team.NotFound", "Team not found.");
+
         var addResult = project.AddTeam(request.TeamId);
         if (addResult.IsError) return addResult.Errors;
 
         commandRepo.Update(project);
 
-        var team = project.Teams.Find(t => t.TeamId == request.TeamId)!;
-        return ProjectTeamMapper.ToResponse(team);
+        var projectTeam = project.Teams.Find(t => t.TeamId == request.TeamId)!;
+        return ProjectTeamMapper.ToResponse(projectTeam, teamDto);
     }
 }

@@ -1,6 +1,5 @@
 using Mirama.Modules.PM.Application.Features.V1.Projects.Members;
 using Mirama.Modules.PM.Application.Features.V1.Projects.Milestones;
-using Mirama.Modules.PM.Application.Features.V1.Projects.Teams;
 using Mirama.Modules.PM.Domain.Aggregates.Project;
 
 namespace Mirama.Modules.PM.Application.Features.V1.Projects;
@@ -19,7 +18,7 @@ public sealed record ProjectResponse(
     DateTime DateCreated,
     List<Guid> TagIds,
     List<ProjectMemberResponse> Members,
-    List<ProjectTeamResponse> Teams,
+    List<Guid> TeamIds,
     List<ProjectMilestoneResponse> Milestones);
 
 internal static class ProjectMapper
@@ -39,6 +38,6 @@ internal static class ProjectMapper
             project.DateCreated,
             project.TagIds,
             project.Members.Select(ProjectMemberMapper.ToResponse).ToList(),
-            project.Teams.Select(ProjectTeamMapper.ToResponse).ToList(),
+            project.Teams.Select(t => t.TeamId).ToList(),
             project.Milestones.Select(ProjectMilestoneMapper.ToResponse).ToList());
 }

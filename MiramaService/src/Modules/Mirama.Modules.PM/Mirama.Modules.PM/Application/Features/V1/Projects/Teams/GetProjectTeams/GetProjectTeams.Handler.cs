@@ -1,6 +1,7 @@
 using ErrorOr;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Mirama.Modules.Identity.Contracts.Organizations;
 using Mirama.Modules.PM.Application.Common.Interfaces;
 using Mirama.Modules.PM.Application.Features.V1.Projects.Teams;
 using Mirama.Modules.PM.Domain.Aggregates.Project;
@@ -24,7 +25,8 @@ public class GetProjectTeamsController : OrganizationControllerBase
 }
 
 internal class GetProjectTeamsQueryHandler(
-    IPMQueryRepository<Project, ProjectId> queryRepo)
+    IPMQueryRepository<Project, ProjectId> queryRepo,
+    ITeamService teamService)
     : IRequestHandler<GetProjectTeamsQuery, ErrorOr<PaginatedList<ProjectTeamResponse>>>
 {
     public async Task<ErrorOr<PaginatedList<ProjectTeamResponse>>> HandleAsync(GetProjectTeamsQuery request, CancellationToken cancellationToken)
@@ -36,17 +38,24 @@ internal class GetProjectTeamsQueryHandler(
         if (project is null)
             return Error.NotFound("Project.NotFound", "Project not found.");
 
-        var teams = project.Teams.Select(ProjectTeamMapper.ToResponse).ToList();
+        var teamIds = project.Teams.Select(t => t.TeamId).Distinct();
+        var teamDtos = await teamService.GetTeamsByIdsAsync(teamIds, cancellationToken);
+        var teamLookup = teamDtos.ToDictionary(t => t.Id);
+
+        var responses = project.Teams
+            .Where(t => teamLookup.ContainsKey(t.TeamId))
+            .Select(t => ProjectTeamMapper.ToResponse(t, teamLookup[t.TeamId]))
+            .ToList();
 
         if (request.PageNumber.HasValue && request.PageSize.HasValue)
         {
-            var paged = teams
+            var paged = responses
                 .Skip((request.PageNumber.Value - 1) * request.PageSize.Value)
                 .Take(request.PageSize.Value)
                 .ToList();
-            return new PaginatedList<ProjectTeamResponse>(paged, teams.Count, request.PageNumber.Value, request.PageSize.Value);
+            return new PaginatedList<ProjectTeamResponse>(paged, responses.Count, request.PageNumber.Value, request.PageSize.Value);
         }
 
-        return new PaginatedList<ProjectTeamResponse>(teams, teams.Count, 1, Math.Max(teams.Count, 1));
+        return new PaginatedList<ProjectTeamResponse>(responses, responses.Count, 1, Math.Max(responses.Count, 1));
     }
 }
