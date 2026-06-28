@@ -1,8 +1,8 @@
 using ErrorOr;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Mirama.Modules.Identity.Contracts.Organizations;
 using Mirama.Modules.PM.Application.Common.Interfaces;
-using Mirama.Modules.PM.Application.Features.V1.Projects.Members;
 using Mirama.Modules.PM.Domain.Aggregates.Project;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.SharedKernel.Models;
@@ -24,7 +24,8 @@ public class GetProjectMembersController : OrganizationControllerBase
 }
 
 internal class GetProjectMembersQueryHandler(
-    IPMQueryRepository<Project, ProjectId> queryRepo)
+    IPMQueryRepository<Project, ProjectId> queryRepo,
+    IMemberService memberService)
     : IRequestHandler<GetProjectMembersQuery, ErrorOr<PaginatedList<ProjectMemberResponse>>>
 {
     public async Task<ErrorOr<PaginatedList<ProjectMemberResponse>>> HandleAsync(GetProjectMembersQuery request, CancellationToken cancellationToken)
@@ -36,17 +37,24 @@ internal class GetProjectMembersQueryHandler(
         if (project is null)
             return Error.NotFound("Project.NotFound", "Project not found.");
 
-        var members = project.Members.Select(ProjectMemberMapper.ToResponse).ToList();
+        var memberIds = project.Members.Select(m => m.MemberId).Distinct();
+        var memberDtos = await memberService.GetMembersByIdsAsync(memberIds, cancellationToken);
+        var memberLookup = memberDtos.ToDictionary(m => m.Id);
+
+        var responses = project.Members
+            .Where(m => memberLookup.ContainsKey(m.MemberId))
+            .Select(m => ProjectMemberMapper.ToResponse(m, memberLookup[m.MemberId]))
+            .ToList();
 
         if (request.PageNumber.HasValue && request.PageSize.HasValue)
         {
-            var paged = members
+            var paged = responses
                 .Skip((request.PageNumber.Value - 1) * request.PageSize.Value)
                 .Take(request.PageSize.Value)
                 .ToList();
-            return new PaginatedList<ProjectMemberResponse>(paged, members.Count, request.PageNumber.Value, request.PageSize.Value);
+            return new PaginatedList<ProjectMemberResponse>(paged, responses.Count, request.PageNumber.Value, request.PageSize.Value);
         }
 
-        return new PaginatedList<ProjectMemberResponse>(members, members.Count, 1, Math.Max(members.Count, 1));
+        return new PaginatedList<ProjectMemberResponse>(responses, responses.Count, 1, Math.Max(responses.Count, 1));
     }
 }

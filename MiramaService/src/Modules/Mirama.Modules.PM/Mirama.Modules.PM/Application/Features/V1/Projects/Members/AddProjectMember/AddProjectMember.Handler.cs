@@ -1,6 +1,7 @@
 using ErrorOr;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Mirama.Modules.Identity.Contracts.Organizations;
 using Mirama.Modules.PM.Application.Common.Interfaces;
 using Mirama.Modules.PM.Application.Features.V1.Projects.Members;
 using Mirama.Modules.PM.Domain.Aggregates.Project;
@@ -25,7 +26,8 @@ public class AddProjectMemberController : OrganizationControllerBase
 }
 
 internal class AddProjectMemberCommandHandler(
-    IPMCommandRepository<Project, ProjectId> commandRepo)
+    IPMCommandRepository<Project, ProjectId> commandRepo,
+    IMemberService memberService)
     : IRequestHandler<AddProjectMemberCommand, ErrorOr<ProjectMemberResponse>>
 {
     public async Task<ErrorOr<ProjectMemberResponse>> HandleAsync(AddProjectMemberCommand request, CancellationToken cancellationToken)
@@ -43,6 +45,12 @@ internal class AddProjectMemberCommandHandler(
         commandRepo.Update(project);
 
         var member = project.Members.Find(m => m.MemberId == request.MemberId)!;
-        return ProjectMemberMapper.ToResponse(member);
+        var memberDto = await memberService.GetMembersByIdsAsync([request.MemberId], cancellationToken);
+        var dto = memberDto.FirstOrDefault(m => m.Id == request.MemberId);
+
+        if (dto is null)
+            return Error.NotFound("Member.NotFound", "Member not found.");
+
+        return ProjectMemberMapper.ToResponse(member, dto);
     }
 }

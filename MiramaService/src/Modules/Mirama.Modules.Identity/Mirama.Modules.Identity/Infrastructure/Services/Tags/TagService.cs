@@ -32,6 +32,25 @@ internal sealed class TagService(IdentityDbContext db) : ITagService
             t.DateCreated)).ToList();
     }
 
+    public async Task<IReadOnlyList<TagDto>> GetTagsByIdsAsync(
+        IEnumerable<Guid> tagIds, CancellationToken ct = default)
+    {
+        var ids = tagIds.ToList();
+        var tags = await db.Tags.AsNoTracking()
+            .Where(t => ids.Contains(t.Id.Value))
+            .ToListAsync(ct);
+
+        return tags.Select(t => new TagDto(
+            t.Id.Value,
+            t.OrganizationId,
+            t.Name,
+            t.Slug,
+            t.Color,
+            t.Description,
+            (TagScopeDto)(int)t.Scope,
+            t.DateCreated)).ToList();
+    }
+
     public async Task<TagDto?> GetTagByIdAsync(
         Guid organizationId, Guid tagId, CancellationToken ct = default)
     {

@@ -7,17 +7,23 @@ namespace Mirama.Modules.PM.Domain.Aggregates.WorkflowConfig;
 
 public sealed class WorkflowConfig : OrganizationAggregateRoot<WorkflowConfigId>
 {
+    public Guid ProjectId { get; private set; }
     public List<StatusConfig> Statuses { get; private set; } = [];
     public List<PriorityConfig> Priorities { get; private set; } = [];
 
     private WorkflowConfig() { }
 
-    public static WorkflowConfig CreateWithDefaults()
+    public static WorkflowConfig CreateWithDefaults(Guid projectId)
     {
-        var config = new WorkflowConfig { Id = new WorkflowConfigId(Guid.NewGuid()) };
+        var config = new WorkflowConfig { Id = new WorkflowConfigId(Guid.NewGuid()), ProjectId = projectId };
         config.SeedDefaultStatuses();
         config.SeedDefaultPriorities();
         return config;
+    }
+
+    public void SetProjectId(Guid projectId)
+    {
+        this.ProjectId = projectId;
     }
 
     // --- Status ---

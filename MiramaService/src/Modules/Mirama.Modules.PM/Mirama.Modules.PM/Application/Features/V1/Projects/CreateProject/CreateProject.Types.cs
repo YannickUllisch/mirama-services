@@ -8,8 +8,6 @@ public sealed record CreateProjectCommand(
     string? Description,
     DateTime StartDate,
     DateTime? EndDate,
-    Guid StatusId,
-    Guid PriorityId,
     int Budget,
     List<Guid> TagIds,
     List<CreateProjectMemberInput> Members,
@@ -23,4 +21,3 @@ public sealed record CreateProjectMilestoneInput(
     DateTime DueDate,
     string? Description = null,
     string? Color = null);
-

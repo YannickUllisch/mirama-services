@@ -11,12 +11,6 @@ internal class CreateProjectCommandValidator : AbstractValidator<CreateProjectCo
             .MinimumLength(1)
             .MaximumLength(200);
 
-        RuleFor(x => x.StatusId)
-            .NotEmpty();
-
-        RuleFor(x => x.PriorityId)
-            .NotEmpty();
-
         RuleFor(x => x.StartDate)
             .NotEmpty();
 
