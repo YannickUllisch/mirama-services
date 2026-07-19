@@ -11,7 +11,7 @@ namespace Mirama.Modules.PM.Application.Features.V1.ProjectTemplates.CycleTempla
 
 public class RemoveCycleTemplateController : OrganizationControllerBase
 {
-    [HttpDelete("/project-templates/{projectTemplateId:guid}/cycles/{cycleTemplateId:guid}")]
+    [HttpDelete("project-templates/{projectTemplateId:guid}/cycles/{cycleTemplateId:guid}")]
     public async Task<IActionResult> Remove(
         [FromRoute] Guid projectTemplateId,
         [FromRoute] Guid cycleTemplateId,

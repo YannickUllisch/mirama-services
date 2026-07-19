@@ -12,7 +12,7 @@ namespace Mirama.Modules.PM.Application.Features.V1.Projects.Teams.AddProjectTea
 
 public class AddProjectTeamController : OrganizationControllerBase
 {
-    [HttpPost("/projects/{projectId:guid}/teams")]
+    [HttpPost("projects/{projectId:guid}/teams")]
     public async Task<IActionResult> AddTeam(
         [FromRoute] Guid projectId,
         [FromBody] AddProjectTeamCommand command,

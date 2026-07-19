@@ -11,7 +11,7 @@ namespace Mirama.Modules.PM.Application.Features.V1.ProjectTemplates.TaskTemplat
 
 public class AddTaskTemplateController : OrganizationControllerBase
 {
-    [HttpPost("/project-templates/{projectTemplateId:guid}/tasks")]
+    [HttpPost("project-templates/{projectTemplateId:guid}/tasks")]
     public async Task<IActionResult> Add(
         [FromRoute] Guid projectTemplateId,
         [FromBody] AddTaskTemplateCommand command,

@@ -2,7 +2,6 @@ using ErrorOr;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Mirama.Modules.PM.Application.Common.Interfaces;
-using Mirama.Modules.PM.Application.Features.V1.Projects.Milestones;
 using Mirama.Modules.PM.Domain.Aggregates.Project;
 using Mirama.Modules.PM.Domain.Aggregates.Project.Milestone;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
@@ -12,7 +11,7 @@ namespace Mirama.Modules.PM.Application.Features.V1.Projects.Milestones.CreatePr
 
 public class CreateProjectMilestoneController : OrganizationControllerBase
 {
-    [HttpPost("/projects/{projectId:guid}/milestones")]
+    [HttpPost("projects/{projectId:guid}/milestones")]
     public async Task<IActionResult> CreateMilestone(
         [FromRoute] Guid projectId,
         [FromBody] CreateProjectMilestoneCommand command,

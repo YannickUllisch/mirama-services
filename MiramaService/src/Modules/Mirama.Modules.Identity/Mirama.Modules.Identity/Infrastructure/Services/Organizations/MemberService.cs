@@ -21,9 +21,9 @@ internal sealed class MemberService(IdentityDbContext db) : IMemberService
     public async Task<IReadOnlyList<MemberDto>> GetMembersByIdsAsync(
         IEnumerable<Guid> memberIds, CancellationToken ct = default)
     {
-        var ids = memberIds.ToList();
+        var ids = memberIds.Select(id => new MemberId(id)).ToList();
         var members = await db.Members.AsNoTracking()
-            .Where(m => ids.Contains(m.Id.Value))
+            .Where(m => ids.Contains(m.Id))
             .ToListAsync(ct);
 
         return [..members.Select(Map)];

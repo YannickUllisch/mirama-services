@@ -10,7 +10,7 @@ namespace Mirama.Modules.PM.Application.Features.V1.ProjectTemplates.GetProjectT
 
 public class GetProjectTemplateByIdController : OrganizationControllerBase
 {
-    [HttpGet("/project-templates/{id:guid}")]
+    [HttpGet("project-templates/{id:guid}")]
     public async Task<IActionResult> GetById([FromRoute] Guid id, CancellationToken ct)
     {
         var result = await Dispatcher.Send(new GetProjectTemplateByIdQuery(id), ct);

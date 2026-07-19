@@ -11,10 +11,10 @@ using System.Security.Cryptography;
 using System.Text;
 using Mirama.Modules.Clients.Infrastructure;
 using Mirama.Modules.Identity;
-using Mirama.Modules.Identity.Infrastructure.Persistence;
-using Mirama.Modules.Identity.Infrastructure.Persistence.Seeding;
-using Mirama.Api.Extensions;
 using Mirama.Modules.Identity.Infrastructure;
+using Mirama.Modules.PM.Infrastructure;
+using Mirama.SharedKernel.Abstractions.Common.Interfaces;
+using Mirama.Api.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,6 +50,7 @@ builder.Services.AddProblemDetails();
 builder.Services
     .AddIdentityModule(builder.Configuration)
     .AddClientsModule(builder.Configuration)
+    .AddProjectsModule(builder.Configuration)
     .AddSharedServices(builder.Configuration);
 
 builder.Services.AddApiVersioning(options =>
@@ -113,29 +114,24 @@ try
 {
     var app = builder.Build();
 
-    // TODO: Make this work for all modules
-    // Applying migrations immediately in Development, handled in CICD pipeline for production
     if (app.Environment.IsDevelopment())
     {
         using var scope = app.Services.CreateScope();
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-        try
+        var migrators = scope.ServiceProvider.GetServices<IModuleMigrator>();
+        foreach (var migrator in migrators)
         {
-            var db = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
-            logger.LogInformation("Applying database migrations...");
-            await db.Database.MigrateAsync();
-            logger.LogInformation("Database migrations applied successfully");
-
-            logger.LogInformation("Seeding database...");
-            await PolicySeed.SeedDataAsync(db);
-            await RoleSeed.SeedDataAsync(db);
-            await PlanSeed.SeedDataAsync(db);
-            logger.LogInformation("Database seeding complete");
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "An error occurred while applying database migrations.");
-            throw;
+            try
+            {
+                logger.LogInformation("Migrating module: {Module}", migrator.ModuleName);
+                await migrator.MigrateAsync();
+                logger.LogInformation("Module migrated: {Module}", migrator.ModuleName);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Migration failed for module: {Module}", migrator.ModuleName);
+                throw;
+            }
         }
     }
 

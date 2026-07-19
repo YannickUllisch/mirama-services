@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Mirama.Modules.Identity.Contracts.Organizations;
 using Mirama.Modules.PM.Application.Common.Interfaces;
-using Mirama.Modules.PM.Application.Features.V1.Projects.Members;
 using Mirama.Modules.PM.Domain.Aggregates.Project;
 using Mirama.Modules.PM.Domain.Aggregates.Project.Member;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
@@ -13,7 +12,7 @@ namespace Mirama.Modules.PM.Application.Features.V1.Projects.Members.AddProjectM
 
 public class AddProjectMemberController : OrganizationControllerBase
 {
-    [HttpPost("/projects/{projectId:guid}/members")]
+    [HttpPost("projects/{projectId:guid}/members")]
     public async Task<IActionResult> AddMember(
         [FromRoute] Guid projectId,
         [FromBody] AddProjectMemberCommand command,

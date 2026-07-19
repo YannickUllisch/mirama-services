@@ -10,7 +10,7 @@ namespace Mirama.Modules.PM.Application.Features.V1.Projects.ArchiveProject;
 
 public class ArchiveProjectController : OrganizationControllerBase
 {
-    [HttpPost("/projects/{id:guid}/archive")]
+    [HttpPost("projects/{id:guid}/archive")]
     public async Task<IActionResult> Archive([FromRoute] Guid id, CancellationToken ct)
     {
         var result = await Dispatcher.Send(new ArchiveProjectCommand(id), ct);

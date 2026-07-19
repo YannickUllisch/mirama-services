@@ -12,7 +12,7 @@ namespace Mirama.Modules.PM.Application.Features.V1.Projects.Teams.GetProjectTea
 
 public class GetProjectTeamsController : OrganizationControllerBase
 {
-    [HttpGet("/projects/{projectId:guid}/teams")]
+    [HttpGet("projects/{projectId:guid}/teams")]
     public async Task<IActionResult> GetTeams(
         [FromRoute] Guid projectId,
         [FromQuery] int? pageNumber,

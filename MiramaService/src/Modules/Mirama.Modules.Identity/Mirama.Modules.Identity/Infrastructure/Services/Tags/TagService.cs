@@ -35,9 +35,9 @@ internal sealed class TagService(IdentityDbContext db) : ITagService
     public async Task<IReadOnlyList<TagDto>> GetTagsByIdsAsync(
         IEnumerable<Guid> tagIds, CancellationToken ct = default)
     {
-        var ids = tagIds.ToList();
+        var ids = tagIds.Select(id => new TagId(id)).ToList();
         var tags = await db.Tags.AsNoTracking()
-            .Where(t => ids.Contains(t.Id.Value))
+            .Where(t => ids.Contains(t.Id))
             .ToListAsync(ct);
 
         return tags.Select(t => new TagDto(

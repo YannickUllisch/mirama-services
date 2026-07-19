@@ -10,7 +10,7 @@ namespace Mirama.Modules.PM.Application.Features.V1.Projects.Members.RemoveProje
 
 public class RemoveProjectMemberController : OrganizationControllerBase
 {
-    [HttpDelete("/projects/{projectId:guid}/members/{memberId:guid}")]
+    [HttpDelete("projects/{projectId:guid}/members/{memberId:guid}")]
     public async Task<IActionResult> RemoveMember(
         [FromRoute] Guid projectId,
         [FromRoute] Guid memberId,

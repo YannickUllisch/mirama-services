@@ -13,7 +13,7 @@ namespace Mirama.Modules.PM.Application.Features.V1.Projects.UpdateProject;
 
 public class UpdateProjectController : OrganizationControllerBase
 {
-    [HttpPut("/projects/{id:guid}")]
+    [HttpPut("projects/{id:guid}")]
     public async Task<IActionResult> Update(
         [FromRoute] Guid id,
         [FromBody] UpdateProjectCommand command,
@@ -61,17 +61,15 @@ internal class UpdateProjectCommandHandler(
         var workflowTask = workflowRepo.Query()
             .Include(wc => wc.Statuses)
             .Include(wc => wc.Priorities)
-            .FirstOrDefaultAsync(wc => wc.ProjectId == project.Id.Value, cancellationToken);
+            .FirstOrDefaultAsync(wc => wc.ProjectId == project.Id, cancellationToken);
 
-        var membersTask = memberService.GetMembersByIdsAsync(
+        var members = await memberService.GetMembersByIdsAsync(
             project.Members.Select(m => m.MemberId).Distinct(), cancellationToken);
 
-        var teamsTask = teamService.GetTeamsByIdsAsync(
+        var teams = await teamService.GetTeamsByIdsAsync(
             project.Teams.Select(t => t.TeamId).Distinct(), cancellationToken);
 
-        var tagsTask = tagService.GetTagsByIdsAsync(project.TagIds, cancellationToken);
-
-        await Task.WhenAll(workflowTask, membersTask, teamsTask, tagsTask);
+        var tags = await tagService.GetTagsByIdsAsync(project.TagIds, cancellationToken);
 
         var workflowConfig = await workflowTask;
         if (workflowConfig is null)
@@ -79,9 +77,9 @@ internal class UpdateProjectCommandHandler(
 
         var statusLookup = workflowConfig.Statuses.ToDictionary(s => s.Id.Value);
         var priorityLookup = workflowConfig.Priorities.ToDictionary(p => p.Id.Value);
-        var memberLookup = (await membersTask).ToDictionary(m => m.Id);
-        var teamLookup = (await teamsTask).ToDictionary(t => t.Id);
-        var tagLookup = (await tagsTask).ToDictionary(t => t.Id);
+        var memberLookup = members.ToDictionary(m => m.Id);
+        var teamLookup = teams.ToDictionary(t => t.Id);
+        var tagLookup = tags.ToDictionary(t => t.Id);
 
         return ProjectMapper.ToResponse(project, statusLookup, priorityLookup, tagLookup, memberLookup, teamLookup);
     }

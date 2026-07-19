@@ -63,6 +63,7 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<PMDbContext>());
+        services.AddScoped<IModuleMigrator, PMModuleMigrator>();
 
         return services;
     }

@@ -11,7 +11,7 @@ namespace Mirama.Modules.PM.Application.Features.V1.Projects.Members.GetProjectM
 
 public class GetProjectMembersController : OrganizationControllerBase
 {
-    [HttpGet("/projects/{projectId:guid}/members")]
+    [HttpGet("projects/{projectId:guid}/members")]
     public async Task<IActionResult> GetMembers(
         [FromRoute] Guid projectId,
         [FromQuery] int? pageNumber,

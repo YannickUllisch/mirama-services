@@ -73,14 +73,30 @@ dotnet build MiramaService.slnx
 # Run API (dev)
 dotnet run --project src/Mirama.Api/Mirama.Api.csproj
 
-# Add EF migration (target a module's Infrastructure project)
+# Add EF migration (replace --project with the target module path)
 dotnet ef migrations add <MigrationName> \
   --project src/Modules/Mirama.Modules.Identity/Mirama.Modules.Identity \
   --startup-project src/Mirama.Api
 
-# Apply migrations manually
+dotnet ef migrations add <MigrationName> \
+  --project src/Modules/Mirama.Modules.PM/Mirama.Modules.PM \
+  --startup-project src/Mirama.Api
+
+dotnet ef migrations add <MigrationName> \
+  --project src/Modules/Mirama.Modules.Clients/Mirama.Modules.Clients \
+  --startup-project src/Mirama.Api
+
+# Apply migrations manually (replace --project with the target module path)
 dotnet ef database update \
   --project src/Modules/Mirama.Modules.Identity/Mirama.Modules.Identity \
+  --startup-project src/Mirama.Api
+
+dotnet ef database update \
+  --project src/Modules/Mirama.Modules.PM/Mirama.Modules.PM \
+  --startup-project src/Mirama.Api
+
+dotnet ef database update \
+  --project src/Modules/Mirama.Modules.Clients/Mirama.Modules.Clients \
   --startup-project src/Mirama.Api
 
 # Docker build

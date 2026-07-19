@@ -2,6 +2,7 @@ using ErrorOr;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Mirama.Modules.PM.Application.Common.Interfaces;
+using Mirama.Modules.PM.Domain.Aggregates.Project;
 using Mirama.Modules.PM.Domain.Aggregates.WorkflowConfig;
 using Mirama.Modules.PM.Domain.Aggregates.WorkflowConfig.Priority;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
@@ -11,7 +12,7 @@ namespace Mirama.Modules.PM.Application.Features.V1.Projects.Priorities.AddProje
 
 public class AddProjectPriorityController : OrganizationControllerBase
 {
-    [HttpPost("/projects/{projectId:guid}/priorities")]
+    [HttpPost("projects/{projectId:guid}/priorities")]
     public async Task<IActionResult> AddPriority(
         [FromRoute] Guid projectId,
         [FromBody] AddProjectPriorityCommand command,
@@ -31,7 +32,7 @@ internal class AddProjectPriorityCommandHandler(
     {
         var workflowConfig = await workflowRepo.Query()
             .Include(wc => wc.Priorities)
-            .FirstOrDefaultAsync(wc => wc.ProjectId == request.ProjectId, cancellationToken);
+            .FirstOrDefaultAsync(wc => wc.ProjectId == new ProjectId(request.ProjectId), cancellationToken);
 
         if (workflowConfig is null)
             return Error.NotFound("WorkflowConfig.NotFound", "Project workflow configuration not found.");

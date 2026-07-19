@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Mirama.Modules.Identity.Contracts.Organizations;
+using Mirama.Modules.Identity.Domain.Aggregates.Organization.Team;
 using Mirama.Modules.Identity.Infrastructure.Persistence;
 
 namespace Mirama.Modules.Identity.Infrastructure.Services.Organizations;
@@ -9,11 +10,11 @@ internal sealed class TeamService(IdentityDbContext db) : ITeamService
     public async Task<IReadOnlyList<TeamDto>> GetTeamsByIdsAsync(
         IEnumerable<Guid> teamIds, CancellationToken ct = default)
     {
-        var ids = teamIds.ToList();
+        var ids = teamIds.Select(id => new TeamId(id)).ToList();
 
         var teams = await db.Teams.AsNoTracking()
             .Include(t => t.Members)
-            .Where(t => ids.Contains(t.Id.Value))
+            .Where(t => ids.Contains(t.Id))
             .ToListAsync(ct);
 
         return [..teams.Select(Map)];
@@ -23,7 +24,7 @@ internal sealed class TeamService(IdentityDbContext db) : ITeamService
     {
         var team = await db.Teams.AsNoTracking()
             .Include(t => t.Members)
-            .FirstOrDefaultAsync(t => t.Id.Value == teamId, ct);
+            .FirstOrDefaultAsync(t => t.Id == new TeamId(teamId), ct);
 
         return team is null ? null : Map(team);
     }

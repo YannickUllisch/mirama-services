@@ -1,4 +1,5 @@
 using ErrorOr;
+using Mirama.Modules.PM.Domain.Aggregates.Project;
 using Mirama.Modules.PM.Domain.Aggregates.WorkflowConfig.Priority;
 using Mirama.Modules.PM.Domain.Aggregates.WorkflowConfig.Status;
 using Mirama.SharedKernel.Abstractions.Domain.Core;
@@ -7,21 +8,21 @@ namespace Mirama.Modules.PM.Domain.Aggregates.WorkflowConfig;
 
 public sealed class WorkflowConfig : OrganizationAggregateRoot<WorkflowConfigId>
 {
-    public Guid ProjectId { get; private set; }
+    public ProjectId ProjectId { get; private set; } = null!;
     public List<StatusConfig> Statuses { get; private set; } = [];
     public List<PriorityConfig> Priorities { get; private set; } = [];
 
     private WorkflowConfig() { }
 
-    public static WorkflowConfig CreateWithDefaults(Guid projectId)
+    public static WorkflowConfig CreateWithDefaults()
     {
-        var config = new WorkflowConfig { Id = new WorkflowConfigId(Guid.NewGuid()), ProjectId = projectId };
+        var config = new WorkflowConfig { Id = new WorkflowConfigId(Guid.NewGuid()) };
         config.SeedDefaultStatuses();
         config.SeedDefaultPriorities();
         return config;
     }
 
-    public void SetProjectId(Guid projectId)
+    public void SetProjectId(ProjectId projectId)
     {
         this.ProjectId = projectId;
     }

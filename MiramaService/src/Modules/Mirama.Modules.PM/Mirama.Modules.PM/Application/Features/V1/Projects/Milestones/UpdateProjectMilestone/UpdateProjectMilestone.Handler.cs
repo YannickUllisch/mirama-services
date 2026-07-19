@@ -2,7 +2,6 @@ using ErrorOr;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Mirama.Modules.PM.Application.Common.Interfaces;
-using Mirama.Modules.PM.Application.Features.V1.Projects.Milestones;
 using Mirama.Modules.PM.Domain.Aggregates.Project;
 using Mirama.Modules.PM.Domain.Aggregates.Project.Milestone;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
@@ -12,7 +11,7 @@ namespace Mirama.Modules.PM.Application.Features.V1.Projects.Milestones.UpdatePr
 
 public class UpdateProjectMilestoneController : OrganizationControllerBase
 {
-    [HttpPut("/projects/{projectId:guid}/milestones/{milestoneId:guid}")]
+    [HttpPut("projects/{projectId:guid}/milestones/{milestoneId:guid}")]
     public async Task<IActionResult> UpdateMilestone(
         [FromRoute] Guid projectId,
         [FromRoute] Guid milestoneId,

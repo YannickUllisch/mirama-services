@@ -11,7 +11,7 @@ namespace Mirama.Modules.PM.Application.Features.V1.ProjectTemplates.GetProjectT
 
 public class GetProjectTemplatesController : OrganizationControllerBase
 {
-    [HttpGet("/project-templates")]
+    [HttpGet("project-templates")]
     public async Task<IActionResult> Get([FromQuery] GetProjectTemplatesQuery query, CancellationToken ct)
     {
         var result = await Dispatcher.Send(query, ct);

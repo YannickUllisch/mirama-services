@@ -11,7 +11,7 @@ namespace Mirama.Modules.PM.Application.Features.V1.ProjectTemplates.TaskTemplat
 
 public class RemoveTaskTemplateController : OrganizationControllerBase
 {
-    [HttpDelete("/project-templates/{projectTemplateId:guid}/tasks/{taskTemplateId:guid}")]
+    [HttpDelete("project-templates/{projectTemplateId:guid}/tasks/{taskTemplateId:guid}")]
     public async Task<IActionResult> Remove(
         [FromRoute] Guid projectTemplateId,
         [FromRoute] Guid taskTemplateId,

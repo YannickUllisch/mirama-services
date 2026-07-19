@@ -11,7 +11,7 @@ namespace Mirama.Modules.PM.Application.Features.V1.ProjectTemplates.MilestoneTe
 
 public class RemoveMilestoneTemplateController : OrganizationControllerBase
 {
-    [HttpDelete("/project-templates/{projectTemplateId:guid}/milestones/{milestoneTemplateId:guid}")]
+    [HttpDelete("project-templates/{projectTemplateId:guid}/milestones/{milestoneTemplateId:guid}")]
     public async Task<IActionResult> Remove(
         [FromRoute] Guid projectTemplateId,
         [FromRoute] Guid milestoneTemplateId,

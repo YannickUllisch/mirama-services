@@ -2,7 +2,6 @@ using ErrorOr;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Mirama.Modules.PM.Application.Common.Interfaces;
-using Mirama.Modules.PM.Application.Features.V1.Projects.Milestones;
 using Mirama.Modules.PM.Domain.Aggregates.Project;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.SharedKernel.Models;
@@ -11,7 +10,7 @@ namespace Mirama.Modules.PM.Application.Features.V1.Projects.Milestones.GetProje
 
 public class GetProjectMilestonesController : OrganizationControllerBase
 {
-    [HttpGet("/projects/{projectId:guid}/milestones")]
+    [HttpGet("projects/{projectId:guid}/milestones")]
     public async Task<IActionResult> GetMilestones(
         [FromRoute] Guid projectId,
         [FromQuery] int? pageNumber,

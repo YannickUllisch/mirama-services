@@ -11,7 +11,7 @@ namespace Mirama.Modules.PM.Application.Features.V1.ProjectTemplates.CycleTempla
 
 public class UpdateCycleTemplateController : OrganizationControllerBase
 {
-    [HttpPut("/project-templates/{projectTemplateId:guid}/cycles/{cycleTemplateId:guid}")]
+    [HttpPut("project-templates/{projectTemplateId:guid}/cycles/{cycleTemplateId:guid}")]
     public async Task<IActionResult> Update(
         [FromRoute] Guid projectTemplateId,
         [FromRoute] Guid cycleTemplateId,

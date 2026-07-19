@@ -10,7 +10,7 @@ namespace Mirama.Modules.PM.Application.Features.V1.ProjectTemplates.DeleteProje
 
 public class DeleteProjectTemplateController : OrganizationControllerBase
 {
-    [HttpDelete("/project-templates/{id:guid}")]
+    [HttpDelete("project-templates/{id:guid}")]
     public async Task<IActionResult> Delete([FromRoute] Guid id, CancellationToken ct)
     {
         var result = await Dispatcher.Send(new DeleteProjectTemplateCommand(id), ct);

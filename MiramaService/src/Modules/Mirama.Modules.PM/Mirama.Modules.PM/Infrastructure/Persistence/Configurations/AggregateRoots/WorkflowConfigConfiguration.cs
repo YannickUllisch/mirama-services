@@ -16,7 +16,9 @@ internal class WorkflowConfigConfiguration : IEntityTypeConfiguration<WorkflowCo
             .IsRequired();
 
         builder.Property(wc => wc.OrganizationId).IsRequired();
-        builder.Property(wc => wc.ProjectId).IsRequired();
+        builder.Property(wc => wc.ProjectId)
+            .HasConversion(id => id.Value, v => new ProjectId(v))
+            .IsRequired();
 
         builder.HasIndex(wc => wc.ProjectId).IsUnique();
         builder.HasIndex(wc => wc.OrganizationId);

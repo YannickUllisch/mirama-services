@@ -11,7 +11,7 @@ namespace Mirama.Modules.PM.Application.Features.V1.ProjectTemplates.MilestoneTe
 
 public class AddMilestoneTemplateController : OrganizationControllerBase
 {
-    [HttpPost("/project-templates/{projectTemplateId:guid}/milestones")]
+    [HttpPost("project-templates/{projectTemplateId:guid}/milestones")]
     public async Task<IActionResult> Add(
         [FromRoute] Guid projectTemplateId,
         [FromBody] AddMilestoneTemplateCommand command,

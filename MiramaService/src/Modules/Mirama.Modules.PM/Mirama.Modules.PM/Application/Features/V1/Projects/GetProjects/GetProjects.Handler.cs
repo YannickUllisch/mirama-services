@@ -13,7 +13,7 @@ namespace Mirama.Modules.PM.Application.Features.V1.Projects.GetProjects;
 
 public class GetProjectsController : OrganizationControllerBase
 {
-    [HttpGet("/projects")]
+    [HttpGet("projects")]
     public async Task<IActionResult> Get([FromQuery] GetProjectsQuery query, CancellationToken ct)
     {
         var result = await Dispatcher.Send(query, ct);
@@ -58,7 +58,7 @@ internal class GetProjectsQueryHandler(
         var allTeamIds = projects.SelectMany(p => p.Teams.Select(t => t.TeamId)).Distinct();
         var allTagIds = projects.SelectMany(p => p.TagIds).Distinct();
 
-        var projectIds = projects.Select(p => p.Id.Value).ToList();
+        var projectIds = projects.Select(p => p.Id).ToList();
 
         var workflowTask = workflowRepo.Query()
             .Include(wc => wc.Statuses)
@@ -66,18 +66,16 @@ internal class GetProjectsQueryHandler(
             .Where(wc => projectIds.Contains(wc.ProjectId))
             .ToListAsync(cancellationToken);
 
-        var membersTask = memberService.GetMembersByIdsAsync(allMemberIds, cancellationToken);
-        var teamsTask = teamService.GetTeamsByIdsAsync(allTeamIds, cancellationToken);
-        var tagsTask = tagService.GetTagsByIdsAsync(allTagIds, cancellationToken);
-
-        await Task.WhenAll(workflowTask, membersTask, teamsTask, tagsTask);
+        var members = await memberService.GetMembersByIdsAsync(allMemberIds, cancellationToken);
+        var teams = await teamService.GetTeamsByIdsAsync(allTeamIds, cancellationToken);
+        var tags = await tagService.GetTagsByIdsAsync(allTagIds, cancellationToken);
 
         var workflowConfigs = await workflowTask;
         var statusLookup = workflowConfigs.SelectMany(wc => wc.Statuses).ToDictionary(s => s.Id.Value);
         var priorityLookup = workflowConfigs.SelectMany(wc => wc.Priorities).ToDictionary(p => p.Id.Value);
-        var memberLookup = (await membersTask).ToDictionary(m => m.Id);
-        var teamLookup = (await teamsTask).ToDictionary(t => t.Id);
-        var tagLookup = (await tagsTask).ToDictionary(t => t.Id);
+        var memberLookup = members.ToDictionary(m => m.Id);
+        var teamLookup = teams.ToDictionary(t => t.Id);
+        var tagLookup = tags.ToDictionary(t => t.Id);
 
         var items = projects
             .Select(p => ProjectMapper.ToResponse(p, statusLookup, priorityLookup, tagLookup, memberLookup, teamLookup))

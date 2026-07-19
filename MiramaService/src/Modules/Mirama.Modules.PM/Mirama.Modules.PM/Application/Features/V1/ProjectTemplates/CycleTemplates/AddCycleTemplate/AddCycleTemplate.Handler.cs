@@ -11,7 +11,7 @@ namespace Mirama.Modules.PM.Application.Features.V1.ProjectTemplates.CycleTempla
 
 public class AddCycleTemplateController : OrganizationControllerBase
 {
-    [HttpPost("/project-templates/{projectTemplateId:guid}/cycles")]
+    [HttpPost("project-templates/{projectTemplateId:guid}/cycles")]
     public async Task<IActionResult> Add(
         [FromRoute] Guid projectTemplateId,
         [FromBody] AddCycleTemplateCommand command,

@@ -1,6 +1,5 @@
 using ErrorOr;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Mirama.Modules.Identity.Contracts.Organizations;
 using Mirama.Modules.Identity.Contracts.Tags;
 using Mirama.Modules.PM.Application.Common.Interfaces;
@@ -15,7 +14,7 @@ namespace Mirama.Modules.PM.Application.Features.V1.Projects.CreateProject;
 
 public class CreateProjectController : OrganizationControllerBase
 {
-    [HttpPost("/projects")]
+    [HttpPost("projects")]
     public async Task<IActionResult> Create([FromBody] CreateProjectCommand command, CancellationToken ct)
     {
         var result = await Dispatcher.Send(command, ct);
@@ -33,7 +32,7 @@ internal class CreateProjectCommandHandler(
 {
     public async Task<ErrorOr<ProjectResponse>> HandleAsync(CreateProjectCommand request, CancellationToken cancellationToken)
     {
-        var workflowConfig = WorkflowConfig.CreateWithDefaults(Guid.Empty);
+        var workflowConfig = WorkflowConfig.CreateWithDefaults();
 
         var defaultStatus = workflowConfig.Statuses.First(s => s.IsDefault);
         var defaultPriority = workflowConfig.Priorities.First(p => p.IsDefault);
@@ -47,7 +46,7 @@ internal class CreateProjectCommandHandler(
             request.EndDate,
             request.Budget));
 
-        workflowConfig.SetProjectId(project.Id.Value);
+        workflowConfig.SetProjectId(project.Id);
 
         foreach (var tagId in request.TagIds)
         {
@@ -79,21 +78,19 @@ internal class CreateProjectCommandHandler(
         repo.Add(project);
         workflowRepo.Add(workflowConfig);
 
-        var membersTask = memberService.GetMembersByIdsAsync(
+        var members = await memberService.GetMembersByIdsAsync(
             project.Members.Select(m => m.MemberId).Distinct(), cancellationToken);
 
-        var teamsTask = teamService.GetTeamsByIdsAsync(
+        var teams = await teamService.GetTeamsByIdsAsync(
             project.Teams.Select(t => t.TeamId).Distinct(), cancellationToken);
 
-        var tagsTask = tagService.GetTagsByIdsAsync(project.TagIds, cancellationToken);
-
-        await Task.WhenAll(membersTask, teamsTask, tagsTask);
+        var tags = await tagService.GetTagsByIdsAsync(project.TagIds, cancellationToken);
 
         var statusLookup = workflowConfig.Statuses.ToDictionary(s => s.Id.Value);
         var priorityLookup = workflowConfig.Priorities.ToDictionary(p => p.Id.Value);
-        var memberLookup = (await membersTask).ToDictionary(m => m.Id);
-        var teamLookup = (await teamsTask).ToDictionary(t => t.Id);
-        var tagLookup = (await tagsTask).ToDictionary(t => t.Id);
+        var memberLookup = members.ToDictionary(m => m.Id);
+        var teamLookup = teams.ToDictionary(t => t.Id);
+        var tagLookup = tags.ToDictionary(t => t.Id);
 
         return ProjectMapper.ToResponse(project, statusLookup, priorityLookup, tagLookup, memberLookup, teamLookup);
     }

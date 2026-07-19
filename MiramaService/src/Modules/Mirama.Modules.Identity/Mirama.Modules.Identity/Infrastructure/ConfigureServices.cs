@@ -77,6 +77,8 @@ public static class DependencyInjection
                 .AddInterceptors(sp.GetRequiredService<Mirama.SharedKernel.Infrastructure.Interceptors.AuditSaveChangesInterceptor>());
         });
 
+        services.AddScoped<IModuleMigrator, IdentityModuleMigrator>();
+
         return services;
     }
 }

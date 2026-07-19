@@ -2,6 +2,7 @@ using ErrorOr;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Mirama.Modules.PM.Application.Common.Interfaces;
+using Mirama.Modules.PM.Domain.Aggregates.Project;
 using Mirama.Modules.PM.Domain.Aggregates.WorkflowConfig;
 using Mirama.Modules.PM.Domain.Aggregates.WorkflowConfig.Status;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
@@ -11,7 +12,7 @@ namespace Mirama.Modules.PM.Application.Features.V1.Projects.Statuses.RemoveProj
 
 public class RemoveProjectStatusController : OrganizationControllerBase
 {
-    [HttpDelete("/projects/{projectId:guid}/statuses/{statusId:guid}")]
+    [HttpDelete("projects/{projectId:guid}/statuses/{statusId:guid}")]
     public async Task<IActionResult> RemoveStatus(
         [FromRoute] Guid projectId,
         [FromRoute] Guid statusId,
@@ -30,7 +31,7 @@ internal class RemoveProjectStatusCommandHandler(
     {
         var workflowConfig = await workflowRepo.Query()
             .Include(wc => wc.Statuses)
-            .FirstOrDefaultAsync(wc => wc.ProjectId == request.ProjectId, cancellationToken);
+            .FirstOrDefaultAsync(wc => wc.ProjectId == new ProjectId(request.ProjectId), cancellationToken);
 
         if (workflowConfig is null)
             return Error.NotFound("WorkflowConfig.NotFound", "Project workflow configuration not found.");

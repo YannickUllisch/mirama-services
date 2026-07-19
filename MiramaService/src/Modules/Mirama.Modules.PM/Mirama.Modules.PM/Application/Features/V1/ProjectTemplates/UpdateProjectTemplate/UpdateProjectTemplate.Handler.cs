@@ -10,7 +10,7 @@ namespace Mirama.Modules.PM.Application.Features.V1.ProjectTemplates.UpdateProje
 
 public class UpdateProjectTemplateController : OrganizationControllerBase
 {
-    [HttpPut("/project-templates/{id:guid}")]
+    [HttpPut("project-templates/{id:guid}")]
     public async Task<IActionResult> Update(
         [FromRoute] Guid id,
         [FromBody] UpdateProjectTemplateCommand command,

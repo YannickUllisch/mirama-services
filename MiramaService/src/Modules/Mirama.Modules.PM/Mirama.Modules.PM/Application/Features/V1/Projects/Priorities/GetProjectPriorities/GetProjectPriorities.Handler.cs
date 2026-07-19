@@ -2,6 +2,7 @@ using ErrorOr;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Mirama.Modules.PM.Application.Common.Interfaces;
+using Mirama.Modules.PM.Domain.Aggregates.Project;
 using Mirama.Modules.PM.Domain.Aggregates.WorkflowConfig;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.SharedKernel.Models;
@@ -10,7 +11,7 @@ namespace Mirama.Modules.PM.Application.Features.V1.Projects.Priorities.GetProje
 
 public class GetProjectPrioritiesController : OrganizationControllerBase
 {
-    [HttpGet("/projects/{projectId:guid}/priorities")]
+    [HttpGet("projects/{projectId:guid}/priorities")]
     public async Task<IActionResult> GetPriorities(
         [FromRoute] Guid projectId,
         [FromQuery] int? pageNumber,
@@ -30,7 +31,7 @@ internal class GetProjectPrioritiesQueryHandler(
     {
         var workflowConfig = await workflowRepo.Query()
             .Include(wc => wc.Priorities)
-            .FirstOrDefaultAsync(wc => wc.ProjectId == request.ProjectId, cancellationToken);
+            .FirstOrDefaultAsync(wc => wc.ProjectId == new ProjectId(request.ProjectId), cancellationToken);
 
         if (workflowConfig is null)
             return Error.NotFound("WorkflowConfig.NotFound", "Project workflow configuration not found.");

@@ -11,7 +11,7 @@ namespace Mirama.Modules.PM.Application.Features.V1.ProjectTemplates.MilestoneTe
 
 public class UpdateMilestoneTemplateController : OrganizationControllerBase
 {
-    [HttpPut("/project-templates/{projectTemplateId:guid}/milestones/{milestoneTemplateId:guid}")]
+    [HttpPut("project-templates/{projectTemplateId:guid}/milestones/{milestoneTemplateId:guid}")]
     public async Task<IActionResult> Update(
         [FromRoute] Guid projectTemplateId,
         [FromRoute] Guid milestoneTemplateId,

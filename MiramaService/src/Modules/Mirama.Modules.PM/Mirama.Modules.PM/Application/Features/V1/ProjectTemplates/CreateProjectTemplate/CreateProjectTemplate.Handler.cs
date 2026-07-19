@@ -9,7 +9,7 @@ namespace Mirama.Modules.PM.Application.Features.V1.ProjectTemplates.CreateProje
 
 public class CreateProjectTemplateController : OrganizationControllerBase
 {
-    [HttpPost("/project-templates")]
+    [HttpPost("project-templates")]
     public async Task<IActionResult> Create([FromBody] CreateProjectTemplateCommand command, CancellationToken ct)
     {
         var result = await Dispatcher.Send(command, ct);
