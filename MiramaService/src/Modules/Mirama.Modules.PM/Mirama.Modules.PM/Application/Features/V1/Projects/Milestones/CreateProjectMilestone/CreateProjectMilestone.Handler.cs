@@ -19,7 +19,7 @@ public class CreateProjectMilestoneController : OrganizationControllerBase
     {
         var cmd = command with { ProjectId = projectId };
         var result = await Dispatcher.Send(cmd, ct);
-        return result.Match(r => Created($"/projects/{projectId}/milestones/{r.MilestoneId}", r), Problem);
+        return result.Match(r => Created($"/projects/{projectId}/milestones/{r.Id}", r), Problem);
     }
 }
 

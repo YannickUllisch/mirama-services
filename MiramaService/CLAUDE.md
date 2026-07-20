@@ -37,6 +37,9 @@ Rules:
 - One `*Response` record and one `*Mapper` static class per file — no mixing of unrelated types.
 - The mapper for the aggregate root (`ProjectMapper`) may call sub-mappers for owned collection entries.
 - Shared sub-resource response types (e.g. `ProjectMemberResponse`) live under their own sub-folder (`Members/`), not in the root resource folder and not inside any individual feature folder.
+- **Mapper goes first, response record goes below** — always in this order within the file.
+- **Every property on every response record must have `[JsonPropertyName("camelCaseName")]`** — use the object-initializer style (`new() { ... }`) in mappers, not positional record constructors, so properties are explicit. See `OrganizationResponse.cs` as the canonical example.
+- **The root entity's own ID is always serialized as `"id"`** — never `"projectId"`, `"milestoneId"`, `"tagId"`, etc. Foreign-key references to other resources keep their descriptive name (e.g. `"teamId"`, `"memberId"`).
 
 ### Aggregate roots and sub-resource endpoints
 

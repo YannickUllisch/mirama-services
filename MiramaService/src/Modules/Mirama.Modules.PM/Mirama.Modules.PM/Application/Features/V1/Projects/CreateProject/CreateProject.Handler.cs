@@ -18,7 +18,7 @@ public class CreateProjectController : OrganizationControllerBase
     public async Task<IActionResult> Create([FromBody] CreateProjectCommand command, CancellationToken ct)
     {
         var result = await Dispatcher.Send(command, ct);
-        return result.Match(r => CreatedAtAction(nameof(Create), new { id = r.ProjectId }, r), Problem);
+        return result.Match(r => CreatedAtAction(nameof(Create), new { id = r.Id }, r), Problem);
     }
 }
 
@@ -33,6 +33,18 @@ internal class CreateProjectCommandHandler(
     public async Task<ErrorOr<ProjectResponse>> HandleAsync(CreateProjectCommand request, CancellationToken cancellationToken)
     {
         var workflowConfig = WorkflowConfig.CreateWithDefaults();
+
+        if (request.DefaultProjectStatusName is not null)
+        {
+            var setStatus = workflowConfig.SetDefaultStatusByName(request.DefaultProjectStatusName);
+            if (setStatus.IsError) return setStatus.Errors;
+        }
+
+        if (request.DefaultProjectPriorityName is not null)
+        {
+            var setPriority = workflowConfig.SetDefaultPriorityByName(request.DefaultProjectPriorityName);
+            if (setPriority.IsError) return setPriority.Errors;
+        }
 
         var defaultStatus = workflowConfig.Statuses.First(s => s.IsDefault);
         var defaultPriority = workflowConfig.Priorities.First(p => p.IsDefault);

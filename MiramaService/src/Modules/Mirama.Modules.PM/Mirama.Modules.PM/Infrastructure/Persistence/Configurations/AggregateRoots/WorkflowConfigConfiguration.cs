@@ -38,5 +38,15 @@ internal class WorkflowConfigConfiguration : IEntityTypeConfiguration<WorkflowCo
             .WithOne()
             .HasForeignKey("WorkflowConfigId")
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(wc => wc.TaskStatuses)
+            .WithOne()
+            .HasForeignKey("WorkflowConfigIdForTaskStatus")
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(wc => wc.TaskPriorities)
+            .WithOne()
+            .HasForeignKey("WorkflowConfigIdForTaskPriority")
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

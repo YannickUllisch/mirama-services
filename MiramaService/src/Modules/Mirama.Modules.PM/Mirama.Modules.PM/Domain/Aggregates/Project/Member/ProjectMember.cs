@@ -20,10 +20,10 @@ public sealed class ProjectMember : OrganizationEntity<ProjectMemberId>
     private ProjectMember() { }
 
     internal static ProjectMember Create(ProjectMemberDetails details) =>
-        new ProjectMember(details) { Id = new ProjectMemberId(Guid.NewGuid()) };
+        new(details) { Id = new ProjectMemberId(Guid.NewGuid()) };
 
     internal static ProjectMember CreateInherited(Guid memberId, Guid roleId, Guid teamId) =>
-        new ProjectMember(new ProjectMemberDetails(memberId, roleId, IsInherited: true, TeamId: teamId))
+        new(new ProjectMemberDetails(memberId, roleId, IsInherited: true, TeamId: teamId))
         {
             Id = new ProjectMemberId(Guid.NewGuid())
         };

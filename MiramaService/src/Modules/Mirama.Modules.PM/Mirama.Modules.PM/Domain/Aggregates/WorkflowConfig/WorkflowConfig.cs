@@ -11,6 +11,8 @@ public sealed class WorkflowConfig : OrganizationAggregateRoot<WorkflowConfigId>
     public ProjectId ProjectId { get; private set; } = null!;
     public List<StatusConfig> Statuses { get; private set; } = [];
     public List<PriorityConfig> Priorities { get; private set; } = [];
+    public List<StatusConfig> TaskStatuses { get; private set; } = [];
+    public List<PriorityConfig> TaskPriorities { get; private set; } = [];
 
     private WorkflowConfig() { }
 
@@ -19,7 +21,25 @@ public sealed class WorkflowConfig : OrganizationAggregateRoot<WorkflowConfigId>
         var config = new WorkflowConfig { Id = new WorkflowConfigId(Guid.NewGuid()) };
         config.SeedDefaultStatuses();
         config.SeedDefaultPriorities();
+        config.SeedDefaultTaskStatuses();
+        config.SeedDefaultTaskPriorities();
         return config;
+    }
+
+    public ErrorOr<Success> SetDefaultStatusByName(string name)
+    {
+        var status = this.Statuses.Find(s => s.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        if (status is null)
+            return Error.NotFound("WorkflowConfig.Status.NotFound", $"No project status named '{name}' exists.");
+        return this.SetDefaultStatus(status.Id);
+    }
+
+    public ErrorOr<Success> SetDefaultPriorityByName(string name)
+    {
+        var priority = this.Priorities.Find(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        if (priority is null)
+            return Error.NotFound("WorkflowConfig.Priority.NotFound", $"No project priority named '{name}' exists.");
+        return this.SetDefaultPriority(priority.Id);
     }
 
     public void SetProjectId(ProjectId projectId)
@@ -161,6 +181,110 @@ public sealed class WorkflowConfig : OrganizationAggregateRoot<WorkflowConfigId>
         return Result.Success;
     }
 
+    // --- Task Status ---
+
+    public ErrorOr<StatusConfig> AddTaskStatus(StatusDetails details)
+    {
+        if (this.TaskStatuses.Any(s => s.Name.Equals(details.Name, StringComparison.OrdinalIgnoreCase)))
+            return Error.Conflict("WorkflowConfig.TaskStatus.Duplicate", "A task status with this name already exists.");
+
+        if (details.IsDefault)
+            this.TaskStatuses.ForEach(s => s.SetDefault(false));
+
+        var status = StatusConfig.Create(details, this.TaskStatuses.Count);
+        this.TaskStatuses.Add(status);
+        return status;
+    }
+
+    public ErrorOr<Success> UpdateTaskStatus(StatusConfigId id, StatusDetails details)
+    {
+        var status = this.TaskStatuses.Find(s => s.Id == id);
+        if (status is null)
+            return Error.NotFound("WorkflowConfig.TaskStatus.NotFound", "Task status not found.");
+
+        if (this.TaskStatuses.Any(s => s.Id != id && s.Name.Equals(details.Name, StringComparison.OrdinalIgnoreCase)))
+            return Error.Conflict("WorkflowConfig.TaskStatus.Duplicate", "A task status with this name already exists.");
+
+        status.Update(details);
+        return Result.Success;
+    }
+
+    public ErrorOr<Deleted> RemoveTaskStatus(StatusConfigId id)
+    {
+        var status = this.TaskStatuses.Find(s => s.Id == id);
+        if (status is null)
+            return Error.NotFound("WorkflowConfig.TaskStatus.NotFound", "Task status not found.");
+        if (status.IsDefault)
+            return Error.Validation("WorkflowConfig.TaskStatus.DefaultRemoval", "Cannot remove the default task status. Set another as default first.");
+
+        this.TaskStatuses.Remove(status);
+        return Result.Deleted;
+    }
+
+    public ErrorOr<Success> SetDefaultTaskStatus(StatusConfigId id)
+    {
+        var status = this.TaskStatuses.Find(s => s.Id == id);
+        if (status is null)
+            return Error.NotFound("WorkflowConfig.TaskStatus.NotFound", "Task status not found.");
+        if (status.IsTerminal)
+            return Error.Validation("WorkflowConfig.TaskStatus.TerminalDefault", "A terminal status cannot be the default.");
+
+        this.TaskStatuses.ForEach(s => s.SetDefault(false));
+        status.SetDefault(true);
+        return Result.Success;
+    }
+
+    // --- Task Priority ---
+
+    public ErrorOr<PriorityConfig> AddTaskPriority(PriorityDetails details)
+    {
+        if (this.TaskPriorities.Any(p => p.Name.Equals(details.Name, StringComparison.OrdinalIgnoreCase)))
+            return Error.Conflict("WorkflowConfig.TaskPriority.Duplicate", "A task priority with this name already exists.");
+
+        if (details.IsDefault)
+            this.TaskPriorities.ForEach(p => p.SetDefault(false));
+
+        var priority = PriorityConfig.Create(details);
+        this.TaskPriorities.Add(priority);
+        return priority;
+    }
+
+    public ErrorOr<Success> UpdateTaskPriority(PriorityConfigId id, PriorityDetails details)
+    {
+        var priority = this.TaskPriorities.Find(p => p.Id == id);
+        if (priority is null)
+            return Error.NotFound("WorkflowConfig.TaskPriority.NotFound", "Task priority not found.");
+
+        if (this.TaskPriorities.Any(p => p.Id != id && p.Name.Equals(details.Name, StringComparison.OrdinalIgnoreCase)))
+            return Error.Conflict("WorkflowConfig.TaskPriority.Duplicate", "A task priority with this name already exists.");
+
+        priority.Update(details);
+        return Result.Success;
+    }
+
+    public ErrorOr<Deleted> RemoveTaskPriority(PriorityConfigId id)
+    {
+        var priority = this.TaskPriorities.Find(p => p.Id == id);
+        if (priority is null)
+            return Error.NotFound("WorkflowConfig.TaskPriority.NotFound", "Task priority not found.");
+        if (priority.IsDefault)
+            return Error.Validation("WorkflowConfig.TaskPriority.DefaultRemoval", "Cannot remove the default task priority. Set another as default first.");
+
+        this.TaskPriorities.Remove(priority);
+        return Result.Deleted;
+    }
+
+    public ErrorOr<Success> SetDefaultTaskPriority(PriorityConfigId id)
+    {
+        var priority = this.TaskPriorities.Find(p => p.Id == id);
+        if (priority is null)
+            return Error.NotFound("WorkflowConfig.TaskPriority.NotFound", "Task priority not found.");
+
+        this.TaskPriorities.ForEach(p => p.SetDefault(false));
+        priority.SetDefault(true);
+        return Result.Success;
+    }
+
     // --- Seeding ---
 
     private void SeedDefaultStatuses()
@@ -189,5 +313,33 @@ public sealed class WorkflowConfig : OrganizationAggregateRoot<WorkflowConfigId>
         };
         foreach (var d in defaults)
             this.Priorities.Add(PriorityConfig.Create(d));
+    }
+
+    private void SeedDefaultTaskStatuses()
+    {
+        var defaults = new StatusDetails[]
+        {
+            new("Backlog",     StatusCategory.NotStarted, "#94a3b8", IsDefault: false, IsTerminal: false),
+            new("Todo",        StatusCategory.NotStarted, "#64748b", IsDefault: true,  IsTerminal: false),
+            new("In Progress", StatusCategory.Active,     "#3b82f6", IsDefault: false, IsTerminal: false),
+            new("In Review",   StatusCategory.Active,     "#8b5cf6", IsDefault: false, IsTerminal: false),
+            new("Done",        StatusCategory.Done,       "#22c55e", IsDefault: false, IsTerminal: true),
+            new("Cancelled",   StatusCategory.Cancelled,  "#ef4444", IsDefault: false, IsTerminal: true),
+        };
+        for (var i = 0; i < defaults.Length; i++)
+            this.TaskStatuses.Add(StatusConfig.Create(defaults[i], i));
+    }
+
+    private void SeedDefaultTaskPriorities()
+    {
+        var defaults = new PriorityDetails[]
+        {
+            new("Low",      Level: 0, Color: "#94a3b8", IsDefault: true),
+            new("Medium",   Level: 1, Color: "#f59e0b"),
+            new("High",     Level: 2, Color: "#f97316"),
+            new("Critical", Level: 3, Color: "#ef4444"),
+        };
+        foreach (var d in defaults)
+            this.TaskPriorities.Add(PriorityConfig.Create(d));
     }
 }

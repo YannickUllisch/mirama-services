@@ -12,7 +12,9 @@ public sealed record CreateProjectCommand(
     List<Guid> TagIds,
     List<CreateProjectMemberInput> Members,
     List<Guid> TeamIds,
-    List<CreateProjectMilestoneInput> Milestones) : ICommand<ErrorOr<ProjectResponse>>;
+    List<CreateProjectMilestoneInput> Milestones,
+    string? DefaultProjectStatusName = null,
+    string? DefaultProjectPriorityName = null) : ICommand<ErrorOr<ProjectResponse>>;
 
 public sealed record CreateProjectMemberInput(Guid MemberId, Guid RoleId);
 
