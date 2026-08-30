@@ -8,6 +8,8 @@ public class ClientPortalInvitation : OrganizationEntity<ClientPortalInvitationI
 {
     public ClientId ClientId { get; init; } = null!;
     public Guid ContactId { get; init; }
+    public ClientPortalRole Role { get; private set; }
+    public Guid InvitedByMemberId { get; init; }
     public Guid Token { get; private set; }
     public PortalInvitationStatus Status { get; private set; }
     public DateTime ExpiresAt { get; private set; }
@@ -15,18 +17,20 @@ public class ClientPortalInvitation : OrganizationEntity<ClientPortalInvitationI
 
     private ClientPortalInvitation() { }
 
-    private ClientPortalInvitation(Guid contactId)
+    private ClientPortalInvitation(Guid contactId, ClientPortalRole role, Guid invitedByMemberId)
     {
         this.ContactId = contactId;
+        this.Role = role;
+        this.InvitedByMemberId = invitedByMemberId;
         this.Token = Guid.NewGuid();
         this.Status = PortalInvitationStatus.Pending;
         this.SentAt = DateTime.UtcNow;
         this.ExpiresAt = DateTime.UtcNow.AddDays(7);
     }
 
-    public static ClientPortalInvitation Create(Guid contactId)
+    public static ClientPortalInvitation Create(Guid contactId, ClientPortalRole role, Guid invitedByMemberId)
     {
-        return new ClientPortalInvitation(contactId)
+        return new ClientPortalInvitation(contactId, role, invitedByMemberId)
         {
             Id = new ClientPortalInvitationId(Guid.NewGuid())
         };
@@ -39,4 +43,6 @@ public class ClientPortalInvitation : OrganizationEntity<ClientPortalInvitationI
     public void Revoke() => Status = PortalInvitationStatus.Revoked;
 
     public void MarkExpired() => Status = PortalInvitationStatus.Expired;
+
+    public void ChangeRole(ClientPortalRole role) => Role = role;
 }

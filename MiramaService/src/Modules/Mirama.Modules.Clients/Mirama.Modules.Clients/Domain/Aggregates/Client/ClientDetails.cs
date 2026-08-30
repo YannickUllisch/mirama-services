@@ -7,4 +7,6 @@ public record ClientDetails(
     ClientType Type,
     string? Website,
     string? Industry,
-    string? Notes);
+    string? Notes,
+    Guid OwnerMemberId,
+    string? LeadSource = null);
