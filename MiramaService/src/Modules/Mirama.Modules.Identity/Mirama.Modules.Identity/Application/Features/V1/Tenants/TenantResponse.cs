@@ -11,15 +11,8 @@ internal static class TenantMapper
     {
         Id = tenant.Id,
         AdminUserId = tenant.AdminUserId.Value,
-        Settings = new TenantSettingsResponse
-        {
-            Name = tenant.Settings.Name,
-            IsActive = tenant.Settings.IsActive,
-            Timezone = tenant.Settings.Timezone,
-            BrandingColor = tenant.Settings.BrandingColor,
-            LogoUrl = tenant.Settings.LogoUrl,
-            ReceiveNotifications = tenant.Settings.ReceiveNotifications,
-        },
+        Name = tenant.Name,
+        IsActive = tenant.IsActive,
         Subscription = new SubscriptionResponse
         {
             Status = tenant.Subscription.Status.ToString(),
@@ -47,32 +40,14 @@ public sealed record TenantResponse
     [JsonPropertyName("adminUserId")]
     public Guid AdminUserId { get; init; }
 
-    [JsonPropertyName("settings")]
-    public TenantSettingsResponse Settings { get; init; } = default!;
-
-    [JsonPropertyName("subscription")]
-    public SubscriptionResponse Subscription { get; init; } = default!;
-}
-
-public sealed record TenantSettingsResponse
-{
     [JsonPropertyName("name")]
     public string Name { get; init; } = string.Empty;
 
     [JsonPropertyName("isActive")]
     public bool IsActive { get; init; }
 
-    [JsonPropertyName("timezone")]
-    public string Timezone { get; init; } = string.Empty;
-
-    [JsonPropertyName("brandingColor")]
-    public string? BrandingColor { get; init; }
-
-    [JsonPropertyName("logoUrl")]
-    public string? LogoUrl { get; init; }
-
-    [JsonPropertyName("receiveNotifications")]
-    public bool ReceiveNotifications { get; init; }
+    [JsonPropertyName("subscription")]
+    public SubscriptionResponse Subscription { get; init; } = default!;
 }
 
 public sealed record SubscriptionResponse

@@ -5,7 +5,7 @@ namespace Mirama.Modules.Identity.Application.Features.V1.Organizations;
 
 internal static class OrganizationMapper
 {
-    internal static OrganizationResponse MapResponse(this Organization org, int memberCount = 0, int projectCount = 0) => new()
+    internal static OrganizationResponse MapResponse(this Organization org) => new()
     {
         Id = org.Id.Value,
         Name = org.Name,
@@ -15,10 +15,13 @@ internal static class OrganizationMapper
         City = org.City,
         Country = org.Country,
         ZipCode = org.ZipCode,
+        Region = Enum.GetName(org.Region)!,
+        RegionValue = (int)org.Region,
+        PrimaryColor = org.PrimaryColor,
+        AccentColor = org.AccentColor,
         DateCreated = org.DateCreated,
         TenantId = org.TenantId,
-        MemberCount = memberCount,
-        ProjectCount = projectCount
+
     };
 }
 
@@ -47,6 +50,18 @@ public sealed record OrganizationResponse
 
     [JsonPropertyName("zipCode")]
     public string ZipCode { get; init; } = string.Empty;
+
+    [JsonPropertyName("region")]
+    public string Region { get; init; } = string.Empty;
+
+    [JsonPropertyName("regionValue")]
+    public int RegionValue { get; init; }
+
+    [JsonPropertyName("primaryColor")]
+    public string? PrimaryColor { get; init; }
+
+    [JsonPropertyName("accentColor")]
+    public string? AccentColor { get; init; }
 
     [JsonPropertyName("dateCreated")]
     public DateTime DateCreated { get; init; }

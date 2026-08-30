@@ -4,5 +4,6 @@ public sealed record UserDetails(
     string Name,
     string Email,
     TenantRole Role,
-    string? Image = null
+    string? Image = null,
+    string? Title = null
 );

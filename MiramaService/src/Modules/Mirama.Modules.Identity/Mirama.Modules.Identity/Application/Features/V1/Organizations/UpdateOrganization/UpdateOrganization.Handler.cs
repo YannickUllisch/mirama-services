@@ -35,7 +35,16 @@ internal class UpdateOrganizationCommandHandler(
         if (org is null)
             return Error.NotFound("Organization.NotFound", "Organization not found.");
 
-        var details = new OrganizationDetails(request.Name, request.Street, request.City, request.Country, request.ZipCode, request.Logo);
+        var details = new OrganizationDetails(
+            request.Name,
+            request.Street,
+            request.City,
+            request.Country,
+            request.ZipCode,
+            (OrganizationRegion)request.Region,
+            request.Logo,
+            request.PrimaryColor,
+            request.AccentColor);
         org.Update(details);
 
         return org.MapResponse();

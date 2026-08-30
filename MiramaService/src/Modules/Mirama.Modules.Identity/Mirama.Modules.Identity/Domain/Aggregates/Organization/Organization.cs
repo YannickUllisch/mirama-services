@@ -15,6 +15,9 @@ public class Organization : AggregateRoot<OrganizationId>, ITenantOwned
     public string City { get; private set; } = string.Empty;
     public string Country { get; private set; } = string.Empty;
     public string ZipCode { get; private set; } = string.Empty;
+    public OrganizationRegion Region { get; private set; }
+    public string? PrimaryColor { get; private set; }
+    public string? AccentColor { get; private set; }
     public DateTime DateCreated { get; private set; }
     public Guid TenantId { get; private set; } = Guid.Empty;
 
@@ -30,6 +33,9 @@ public class Organization : AggregateRoot<OrganizationId>, ITenantOwned
         City = details.City.Trim();
         Country = details.Country.Trim();
         ZipCode = details.ZipCode.Trim();
+        Region = details.Region;
+        PrimaryColor = details.PrimaryColor;
+        AccentColor = details.AccentColor;
         DateCreated = DateTime.UtcNow;
     }
 
@@ -73,6 +79,9 @@ public class Organization : AggregateRoot<OrganizationId>, ITenantOwned
         City = details.City.Trim();
         Country = details.Country.Trim();
         ZipCode = details.ZipCode.Trim();
+        Region = details.Region;
+        PrimaryColor = details.PrimaryColor;
+        AccentColor = details.AccentColor;
     }
 
     void ITenantOwned.SetTenantId(Guid tenantId)

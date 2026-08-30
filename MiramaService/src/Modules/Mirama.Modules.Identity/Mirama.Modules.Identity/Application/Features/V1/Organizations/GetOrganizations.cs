@@ -44,10 +44,10 @@ internal class GetOrganizationsQueryHandler(
         {
             var total = await query.CountAsync(ct);
             var page = await query.Skip((request.PageNumber.Value - 1) * request.PageSize.Value).Take(request.PageSize.Value).ToListAsync(ct);
-            return new PaginatedList<OrganizationResponse>(page.ConvertAll(p => p.Org.MapResponse(memberCount: p.MemberCount)), total, request.PageNumber.Value, request.PageSize.Value);
+            return new PaginatedList<OrganizationResponse>(page.ConvertAll(p => p.Org.MapResponse()), total, request.PageNumber.Value, request.PageSize.Value);
         }
 
         var items = await query.ToListAsync(ct);
-        return new PaginatedList<OrganizationResponse>(items.ConvertAll(p => p.Org.MapResponse(memberCount: p.MemberCount)), items.Count, 1, items.Count > 0 ? items.Count : 1);
+        return new PaginatedList<OrganizationResponse>(items.ConvertAll(p => p.Org.MapResponse()), items.Count, 1, items.Count > 0 ? items.Count : 1);
     }
 }

@@ -21,6 +21,9 @@ public class TenantConfiguration : IEntityTypeConfiguration<Tenant>
 
         builder.HasIndex(t => t.AdminUserId).IsUnique();
 
+        builder.Property(t => t.Name).IsRequired().HasMaxLength(100);
+        builder.Property(t => t.IsActive).IsRequired();
+
         builder.HasOne<User>()
             .WithOne()
             .HasForeignKey<Tenant>(t => t.AdminUserId)
@@ -65,19 +68,6 @@ public class TenantConfiguration : IEntityTypeConfiguration<Tenant>
             sub.Property(s => s.CancelAtPeriodEnd)
                 .HasColumnName("SubscriptionCancelAtPeriodEnd")
                 .IsRequired();
-        });
-
-        builder.OwnsOne(t => t.Settings, s =>
-        {
-            s.Property(x => x.Id)
-                .HasConversion(id => id.Value, v => new TenantSettingsId(v))
-                .HasColumnName("SettingsId");
-            s.Property(x => x.Name).HasColumnName("SettingsName");
-            s.Property(x => x.IsActive).HasColumnName("SettingsIsActive");
-            s.Property(x => x.Timezone).HasColumnName("SettingsTimezone");
-            s.Property(x => x.BrandingColor).HasColumnName("BrandingColor");
-            s.Property(x => x.LogoUrl).HasColumnName("LogoUrl");
-            s.Property(x => x.ReceiveNotifications).HasColumnName("ReceiveNotifications");
         });
     }
 }

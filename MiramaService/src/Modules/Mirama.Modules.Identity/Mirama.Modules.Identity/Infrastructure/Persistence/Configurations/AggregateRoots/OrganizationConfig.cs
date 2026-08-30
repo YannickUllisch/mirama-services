@@ -22,6 +22,9 @@ public class OrganizationConfiguration : IEntityTypeConfiguration<Organization>
         builder.Property(o => o.City).IsRequired();
         builder.Property(o => o.Country).IsRequired();
         builder.Property(o => o.ZipCode).IsRequired();
+        builder.Property(o => o.Region).IsRequired();
+        builder.Property(o => o.PrimaryColor).HasMaxLength(7);
+        builder.Property(o => o.AccentColor).HasMaxLength(7);
         builder.Property(o => o.DateCreated).IsRequired();
     }
 }

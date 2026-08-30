@@ -22,6 +22,7 @@ internal static class UserMapper
             Image = userModel.Image,
             Name = userModel.Name,
             Role = role,
+            Title = userModel.Title,
         };
     }
 }
@@ -39,6 +40,9 @@ public sealed record UserResponse
 
     [JsonPropertyName("image")]
     public string? Image { get; init; } = null;
+
+    [JsonPropertyName("title")]
+    public string? Title { get; init; }
 
     [JsonPropertyName("role")]
     public string Role { get; init; } = string.Empty;

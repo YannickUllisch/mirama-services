@@ -5,6 +5,7 @@ using Mirama.Modules.Identity.Domain.Aggregates.User;
 using Mirama.Modules.Identity.Application.Common.Interfaces;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.SharedKernel.Models;
+using Mirama.Modules.Identity.Domain.Aggregates.Organization;
 
 namespace Mirama.Modules.Identity.Application.Features.V1.Users.UpdateUser;
 
@@ -40,6 +41,11 @@ internal class UpdateUserCommandHandler(IIdentityCommandRepository<User, UserId>
         }
 
         user.Update(new UserDetails(request.Name, request.Email, parsedRole, request.Image));
+
+        if (request.DefaultOrganizationId != null)
+        {
+            user.SetDefaultOrganization(new OrganizationId(request.DefaultOrganizationId.Value));
+        }
 
         return user.MapResponse();
     }

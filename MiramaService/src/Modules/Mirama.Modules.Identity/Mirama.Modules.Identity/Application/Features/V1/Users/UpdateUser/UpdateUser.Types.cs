@@ -18,6 +18,12 @@ public sealed record UpdateUserCommand : ICommand<ErrorOr<UserResponse>>
     [JsonPropertyName("image")]
     public string? Image { get; init; }
 
+    [JsonPropertyName("title")]
+    public string? Title { get; init; }
+
     [JsonPropertyName("role")]
     public string Role { get; init; } = string.Empty;
+
+    [JsonPropertyName("defaultOrganizationId")]
+    public Guid? DefaultOrganizationId { get; init; }
 }

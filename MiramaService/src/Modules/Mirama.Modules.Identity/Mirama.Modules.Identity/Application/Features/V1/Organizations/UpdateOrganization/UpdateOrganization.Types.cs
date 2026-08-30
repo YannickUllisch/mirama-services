@@ -24,6 +24,15 @@ public sealed record UpdateOrganizationCommand : ICommand<ErrorOr<OrganizationRe
     [JsonPropertyName("zipCode")]
     public string ZipCode { get; init; } = string.Empty;
 
+    [JsonPropertyName("region")]
+    public int Region { get; init; }
+
     [JsonPropertyName("logo")]
     public string? Logo { get; init; }
+
+    [JsonPropertyName("primaryColor")]
+    public string? PrimaryColor { get; init; }
+
+    [JsonPropertyName("accentColor")]
+    public string? AccentColor { get; init; }
 }

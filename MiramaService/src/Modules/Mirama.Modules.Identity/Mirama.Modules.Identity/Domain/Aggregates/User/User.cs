@@ -12,6 +12,7 @@ public class User : AggregateRoot<UserId>
     public DateTime? EmailVerified { get; private set; }
     public TenantRole Role { get; private set; }
     public OrganizationId? DefaultOrganization { get; private set; }
+    public string? Title { get; private set; }
     public List<Guid> LinkedExternalIds { get; private set; } = [];
 
     private User(UserDetails details)
@@ -20,6 +21,7 @@ public class User : AggregateRoot<UserId>
         this.Email = details.Email.Trim();
         this.Role = details.Role;
         this.Image = details.Image;
+        this.Title = details.Title?.Trim();
     }
 
     private User() { }
@@ -43,6 +45,7 @@ public class User : AggregateRoot<UserId>
         this.Email = details.Email.Trim();
         this.Role = details.Role;
         this.Image = details.Image;
+        this.Title = details.Title;
     }
 
         public void SetDefaultOrganization(OrganizationId orgId)

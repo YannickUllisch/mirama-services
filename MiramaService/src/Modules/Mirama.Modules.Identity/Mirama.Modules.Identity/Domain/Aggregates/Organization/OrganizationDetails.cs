@@ -6,5 +6,8 @@ public sealed record OrganizationDetails(
     string City,
     string Country,
     string ZipCode,
-    string? Logo = null
+    OrganizationRegion Region,
+    string? Logo = null,
+    string? PrimaryColor = null,
+    string? AccentColor = null
 );

@@ -50,7 +50,16 @@ internal class CreateOrganizationCommandHandler(
         if (ownerRole is null)
             return Error.Unexpected("Role.OwnerNotFound", "Owner role not found.");
 
-        var details = new OrganizationDetails(request.Name, request.Street, request.City, request.Country, request.ZipCode, request.Logo);
+        var details = new OrganizationDetails(
+            request.Name,
+            request.Street,
+            request.City,
+            request.Country,
+            request.ZipCode,
+            (OrganizationRegion)request.Region,
+            request.Logo,
+            request.PrimaryColor,
+            request.AccentColor);
         var org = Organization.Create(details);
         dbContext.Organizations.Add(org);
 
@@ -58,6 +67,6 @@ internal class CreateOrganizationCommandHandler(
         ((IOrganizationOwned)member).SetOrganizationId(org.Id.Value);
         dbContext.Members.Add(member);
 
-        return org.MapResponse(memberCount: 1) with { TenantId = tenantId.Value, };
+        return org.MapResponse() with { TenantId = tenantId.Value, };
     }
 }

@@ -52,7 +52,7 @@ internal class SetupUserCommandHandler(
         var now = DateTime.UtcNow;
         var tenant = Tenant.Create(
             user.Id.Value,
-            new TenantSettingsDetails(request.Name, ReceiveNotifications: true, BrandingColor: null, LogoUrl: null),
+            request.Name,
             new SubscriptionDetails(freePlan.Id, now, now.AddYears(100)));
 
         dbContext.Users.Add(user);

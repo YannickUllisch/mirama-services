@@ -10,28 +10,33 @@ public sealed class Tenant : AggregateRoot<Guid>
 {
     public UserId AdminUserId { get; init; } = default!;
     public SubscriptionEntity Subscription { get; private set; } = default!;
-    public TenantSettings Settings { get; private set; } = default!;
+    public string Name { get; private set; } = string.Empty;
+    public bool IsActive { get; private set; } = true;
 
     private Tenant() { }
 
-    private Tenant(UserId adminUserId, TenantSettings settings, SubscriptionEntity subscription)
+    private Tenant(UserId adminUserId, string name, SubscriptionEntity subscription)
     {
         this.AdminUserId = adminUserId;
-        this.Settings = settings;
+        this.Name = name;
         this.Subscription = subscription;
     }
 
-    public static Tenant Create(Guid adminUserId, TenantSettingsDetails settings, SubscriptionDetails details)
+    public static Tenant Create(Guid adminUserId, string name, SubscriptionDetails details)
     {
         if (adminUserId == Guid.Empty)
         {
             throw new ArgumentException("Admin required");
         }
 
-        var settingsObj = TenantSettings.Create(settings);
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("Tenant Name cannot be empty.", nameof(name));
+        }
+
         var subscription = SubscriptionEntity.Create(details);
 
-        return new Tenant(new UserId(adminUserId), settingsObj, subscription);
+        return new Tenant(new UserId(adminUserId), name.Trim(), subscription);
     }
 
     public void SetSubscription(SubscriptionDetails details)
@@ -39,8 +44,18 @@ public sealed class Tenant : AggregateRoot<Guid>
         this.Subscription = SubscriptionEntity.Create(details);
     }
 
-    public void UpdateSettings(TenantSettingsDetails details)
+    public void UpdateName(string name)
     {
-        this.Settings.Update(details);
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("Name is required.");
+        }
+
+        this.Name = name.Trim();
+    }
+
+    public void SetActive(bool isActive)
+    {
+        this.IsActive = isActive;
     }
 }
