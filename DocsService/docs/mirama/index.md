@@ -10,13 +10,13 @@ Unique Identifier: `mirama-platform`
 
 ## Project Description
 
-Mirama is an end-to-end client and project operating system for freelancers and service-based teams. The platform's core proposition is covering the entire engagement lifecycle in one place: acquiring a client through an intake form, executing the project with visual task boards and asset proofing, collaborating with the client through a protected portal, and closing the engagement with automatic Stripe billing - without switching tools at any stage.
+Mirama is an end-to-end client and project operating system for freelancers and micro-agencies who delegate paid client work to subcontractors. The platform's core proposition is covering the entire engagement lifecycle in one place: acquiring a client through an intake form, executing the project with visual task boards and asset proofing, bringing in trusted subcontractors without exposing client budgets or other people's rates, collaborating with the client through a protected portal, and closing the engagement with automatic Stripe billing and split payouts - without switching tools at any stage.
 
-The niche is intentionally focused. Mirama is built for service businesses that deliver visual output to clients on a project-by-project basis - where the project, the client relationship, and the invoice are all connected. It is visual-first by default but works equally well as a pure project and task management tool for teams that don't need the asset layer.
+The niche is intentionally focused. Mirama is built for the moment a solo operator stops working alone: a designer bringing in a motion artist, a dev lead bringing in a backend contractor, a fractional CMO bringing in a paid-media freelancer. The project, the client relationship, the subcontractor's slice of the work, and the invoice are all connected. It is visual-first by default but works equally well as a pure project and task management tool for non-visual, non-creative work such as fractional executive or consulting engagements.
 
-The target space spans several industries that share the same underlying pain points:
+The target space spans creative and non-creative disciplines that share the same underlying pain points:
 
-| Vertical | What they deliver |
+| Discipline | What they deliver |
 |---|---|
 | Design & brand studios | Logos, identity systems, brand guidelines, print and digital assets |
 | Web development agencies | Websites, web applications, landing pages, interactive prototypes |
@@ -25,33 +25,36 @@ The target space spans several industries that share the same underlying pain po
 | Architecture & interior design firms | Renders, blueprints, mood boards, material palettes, presentation decks |
 | Motion & animation studios | Explainer videos, motion graphics, title sequences, animated ads |
 | Photography studios | Photo galleries, retouched images, lookbooks, editorial shoots |
+| Fractional executives & consultants | Retainer-based strategy, technical, marketing or financial execution, often blended with subcontracted specialist work |
 
-Across all of these, the operational problem is the same: client intake is handled in email, projects are tracked in one tool, files are shared through another, client review happens in a third, and billing is assembled manually at the end. Mirama replaces that patchwork.
+Across all of these, the operational problem is the same: client intake is handled in email, projects are tracked in one tool, files are shared through another, client review happens in a third, subcontractors are paid from memory once the client has paid, and billing is assembled manually at the end. Mirama replaces that patchwork.
 
 A key part of Mirama's development was close collaboration with **Mirage.xyz**, a creative design studio based in London. Working directly with them grounded the feature set in real operational problems rather than developer assumptions.
 
-The platform is designed to serve four tiers with meaningfully different needs:
+The MVP targets two tiers, the ones the research in [Market Analysis](market-analysis.md) actually validated as the near-term buyer:
 
 - **Solo Freelancers** - professional client intake, a built-in timer for billable work, Stripe-connected invoicing, and a client portal that makes a one-person operation look and run like a full agency.
-- **Boutique Studios & Small Teams (2-20)** - project templates, cross-project workload visibility, collaborative client portals, and shared billing workflows without the overhead of stitching together multiple tools.
-- **Mid-Size Agencies (20-75)** - multi-team capacity planning, structured approval workflows, detailed per-client profitability reporting, and the ability to run multiple client organizations under one account without losing isolation between them.
-- **Established Studios & Firms (75-200+)** - fine-grained access control across departments, audit trails for compliance and accountability, organization-level analytics, and the scale to onboard new clients and projects without adding operational overhead.
+- **Delegating Leads & Boutique Studios (1-20)** - project templates, cross-project workload visibility, collaborative client portals, and a scoped subcontractor identity so bringing in help doesn't mean exposing client budgets or other people's rates.
 
-The platform is structured around six interconnected capabilities:
+The underlying data model and permission system are not tier-limited, an organization does not hit a wall or need a migration if it grows past twenty people, but building specifically for a 75 to 200-plus person firm, department-level access control, organization-wide analytics, multi-team capacity planning across dozens of people, is deliberately not part of the near-term build. See [Requirements](requirements.md) section 0 for what is actually implemented today against this narrower scope.
+
+The platform is structured around seven interconnected capabilities:
 
 - **Client & Intake Management (CRM):** A relational client object linking intake briefs, projects, time records and invoices from day one - the foundation that makes billing and reporting possible without retrofitting.
 - **Visual Project & Task Execution:** N-level task hierarchies, Kanban boards, Gantt timelines, task dependencies and custom production statuses designed around service delivery workflows.
 - **Asset Collaboration & Proofing:** Native annotation on images, PDFs and video; stacked version history; automatic watermarking and low-quality proxy generation so clients can review and approve work without receiving full-resolution files they haven't paid for.
+- **Delegated Work & Subcontractor Payouts:** A scoped access tier for subcontractors that only exposes their assigned tasks and their own payout status, automatic split payouts on milestone approval via Stripe Connect, and scope guardrails that flag out-of-boundary client requests before they turn into unpaid work.
 - **Billing & Financial Visibility:** Stripe-connected automatic invoicing tied to tracked time and project milestones, billable/non-billable time classification, budget burn alerts and project profitability snapshots.
-- **Analytics & Audit:** Project health dashboards, utilization reports, client revenue tracking and an immutable audit trail covering all destructive or sensitive actions.
+- **Analytics & Audit:** Project health dashboards, utilization reports, client revenue tracking and an immutable audit trail covering all destructive or sensitive actions, including subcontractor payouts.
 - **AI Platform Intelligence:** LLM and generative AI capabilities embedded across the engagement lifecycle. Brief parsing extracts deliverables and suggests project templates from client intake submissions. Vision AI auto-tags and indexes uploaded assets for richer search. Annotation summarization aggregates client feedback across asset versions into structured revision notes. Predictive risk detection surfaces budget and deadline overruns before they escalate. A conversational copilot lets operators query projects, tasks and assets in natural language.
 
 Key objectives and purposes of Mirama:
 
-- **Visual-First, Not Visual-Only:** Every board and dashboard treats visual output as the primary object. The same platform works as a plain task tracker for teams that don't need the asset layer.
-- **End-to-End Engagement Flow:** The platform covers the full client lifecycle - lead intake, project execution, client collaboration, billing - so operators run their business from one tool instead of five.
+- **Delegation-Aware by Design:** The moment a lead brings in a subcontractor, access and payouts scope down automatically. Client financials and other collaborators' rates stay private without the lead having to manage that separation by hand.
+- **Visual-First, Not Visual-Only:** Every board and dashboard treats visual output as the primary object. The same platform works as a plain task tracker for non-visual, non-creative delivery work.
+- **End-to-End Engagement Flow:** The platform covers the full client lifecycle - lead intake, project execution, client collaboration, billing and payout - so operators run their business from one tool instead of five.
 - **Asset Protection by Default:** Client previews are automatically watermarked and served at reduced quality. Full-resolution delivery happens as a deliberate action, not a default.
-- **Freelancer-First Scaling:** Every feature makes sense for a single-person operation. Adding team members or clients doesn't require restructuring; the underlying model already supports it.
+- **Freelancer-First Scaling:** Every feature makes sense for a single-person operation. Adding a subcontractor, a team member or a client doesn't require restructuring; the underlying model already supports it.
 - **Scalability & Security:** Multi-tenant architecture with strict data isolation, PBAC authorization and audit trails that hold up as the team grows.
 - **AI-Augmented Operations:** AI is not a bolt-on feature layer but a set of targeted capabilities embedded in the workflows where they create the most leverage - intake, asset management, client feedback and project risk.
 
