@@ -1,4 +1,5 @@
 using ErrorOr;
+using Mirama.Modules.Identity.Domain.Aggregates.Organization;
 using Mirama.SharedKernel.Abstractions.Domain.Core;
 
 namespace Mirama.Modules.Identity.Domain.Aggregates.User;
@@ -10,6 +11,7 @@ public class User : AggregateRoot<UserId>
     public string? Image { get; private set; }
     public DateTime? EmailVerified { get; private set; }
     public TenantRole Role { get; private set; }
+    public OrganizationId? DefaultOrganization { get; private set; }
     public List<Guid> LinkedExternalIds { get; private set; } = [];
 
     private User(UserDetails details)
@@ -41,6 +43,11 @@ public class User : AggregateRoot<UserId>
         this.Email = details.Email.Trim();
         this.Role = details.Role;
         this.Image = details.Image;
+    }
+
+        public void SetDefaultOrganization(OrganizationId orgId)
+    {
+        this.DefaultOrganization = orgId;
     }
 
     public void VerifyEmail()

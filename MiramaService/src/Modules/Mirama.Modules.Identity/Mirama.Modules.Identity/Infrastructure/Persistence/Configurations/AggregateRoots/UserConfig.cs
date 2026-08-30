@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Mirama.Modules.Identity.Domain.Aggregates.Organization;
 using Mirama.Modules.Identity.Domain.Aggregates.User;
 
 namespace Mirama.Modules.Identity.Infrastructure.Persistence.Configurations.AggregateRoots;
@@ -15,6 +16,10 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.Id).HasConversion(
             uid => uid.Value,
             val => new UserId(val));
+
+        builder.Property(u => u.DefaultOrganization).HasConversion(
+            uid => uid == null ? (Guid?)null : uid.Value,
+            val => val == null ? null : new OrganizationId(val.Value));
 
         builder.Property(u => u.Name).IsRequired();
         builder.Property(u => u.Email).IsRequired();
