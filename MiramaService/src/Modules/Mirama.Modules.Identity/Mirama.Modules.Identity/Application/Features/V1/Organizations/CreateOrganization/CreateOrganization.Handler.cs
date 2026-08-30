@@ -58,6 +58,6 @@ internal class CreateOrganizationCommandHandler(
         ((IOrganizationOwned)member).SetOrganizationId(org.Id.Value);
         dbContext.Members.Add(member);
 
-        return org.MapResponse(memberCount: 1) with { TenantId = tenantId.Value };
+        return org.MapResponse(memberCount: 1) with { TenantId = tenantId.Value, };
     }
 }

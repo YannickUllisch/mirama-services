@@ -47,23 +47,24 @@ internal class GetAuthUserQueryHandler(
         }
         var tenantRole = user.Id.Value == tenant?.AdminUserId.Value ? TenantRole.Owner : TenantRole.Assumed;
 
+        // TODO: should use a favorite, frontend localstorage or default approach instead of most-recent-first.
         var members = await dbContext.Members
             .AsNoTracking()
             .Where(m => m.UserId == user.Id)
+            .OrderByDescending(m => m.Created)
             .ToListAsync(ct);
 
         AuthOrgMembershipResponse? organizationInfo = null;
-        if (members.Count == 1)
+        foreach (var member in members)
         {
-            var member = members[0];
             var org = await dbContext.Organizations
                 .AsNoTracking()
                 .FirstOrDefaultAsync(o => o.Id == new OrganizationId(member.OrganizationId), ct);
 
-            
             if (org is not null)
             {
                 organizationInfo = org.MapOrgMembershipResponse(member, tenantRole);
+                break;
             }
         }
 

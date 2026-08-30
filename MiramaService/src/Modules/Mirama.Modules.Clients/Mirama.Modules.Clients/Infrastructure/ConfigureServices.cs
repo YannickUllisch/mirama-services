@@ -61,6 +61,7 @@ public static class ConfigureServices
         });
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ClientsDbContext>());
+        services.AddScoped<IModuleMigrator, ClientsModuleMigrator>();
 
         return services;
     }

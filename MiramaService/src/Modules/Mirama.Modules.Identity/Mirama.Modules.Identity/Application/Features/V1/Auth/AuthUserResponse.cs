@@ -15,7 +15,6 @@ internal static class AuthUserResponseMapper
             TenantRole = Enum.GetName(tenantRole)!,
             Name = user.Name,
             Email = user.Email,
-            IsOnboarded = user.IsOnboarded,
             OrganizationInfo = orgMembership,
             Image = user.Image,
         };
@@ -38,9 +37,6 @@ public sealed record AuthUserResponse
 
     [JsonPropertyName("email")]
     public string Email { get; init; } = string.Empty;
-
-    [JsonPropertyName("isOnboarded")]
-    public bool IsOnboarded { get; init; }
 
     [JsonPropertyName("organizationInfo")]
     public AuthOrgMembershipResponse? OrganizationInfo { get; init; }

@@ -10,7 +10,6 @@ public class User : AggregateRoot<UserId>
     public string? Image { get; private set; }
     public DateTime? EmailVerified { get; private set; }
     public TenantRole Role { get; private set; }
-    public bool IsOnboarded { get; private set; } = false;
     public List<Guid> LinkedExternalIds { get; private set; } = [];
 
     private User(UserDetails details)
@@ -19,7 +18,6 @@ public class User : AggregateRoot<UserId>
         this.Email = details.Email.Trim();
         this.Role = details.Role;
         this.Image = details.Image;
-        this.IsOnboarded = false;
     }
 
     private User() { }
@@ -48,11 +46,6 @@ public class User : AggregateRoot<UserId>
     public void VerifyEmail()
     {
         this.EmailVerified = DateTime.UtcNow;
-    }
-
-    public void HasBeenOnboarded()
-    {
-        this.IsOnboarded = true;
     }
 
     public ErrorOr<Success> LinkExternalId(Guid externalId)

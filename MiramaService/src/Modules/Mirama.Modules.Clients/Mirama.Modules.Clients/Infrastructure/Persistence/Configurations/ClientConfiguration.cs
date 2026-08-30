@@ -38,5 +38,15 @@ internal class ClientConfiguration : IEntityTypeConfiguration<Client>
             .WithOne()
             .HasForeignKey(u => u.ClientId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(c => c.ActivityLog)
+            .WithOne()
+            .HasForeignKey(e => e.ClientId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(c => c.PipelineHistory)
+            .WithOne()
+            .HasForeignKey(e => e.ClientId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
