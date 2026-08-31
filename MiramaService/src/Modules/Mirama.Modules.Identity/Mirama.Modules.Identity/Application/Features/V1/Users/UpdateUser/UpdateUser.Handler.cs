@@ -28,7 +28,7 @@ internal class UpdateUserCommandHandler(IIdentityCommandRepository<User, UserId>
     public async Task<ErrorOr<UserResponse>> HandleAsync(UpdateUserCommand request, CancellationToken cancellationToken)
     {
         var user = await _repo.Query()
-            .FirstOrDefaultAsync(u => u.Id.Value == request.Id, cancellationToken);
+            .FirstOrDefaultAsync(u => u.Id == new UserId(request.Id) || u.LinkedExternalIds.Contains(request.Id), cancellationToken);
 
         if (user == null)
         {
