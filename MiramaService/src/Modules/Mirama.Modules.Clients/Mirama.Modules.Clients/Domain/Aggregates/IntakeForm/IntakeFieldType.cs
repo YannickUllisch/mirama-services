@@ -6,7 +6,11 @@ public enum IntakeFieldType
     LongText,
     Email,
     Phone,
+    Url,
     Number,
+    Currency,
     Date,
-    Select
+    Checkbox,
+    Select,
+    MultiSelect
 }
