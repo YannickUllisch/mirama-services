@@ -7,7 +7,6 @@ using Mirama.SharedKernel.Abstractions.Domain.Core;
 using Mirama.SharedKernel.Abstractions.Domain.Events;
 using Mirama.SharedKernel.Abstractions.Persistence;
 using Mirama.SharedKernel.Infrastructure.Extensions;
-using Mirama.SharedKernel.Infrastructure.Idempotency;
 using Mirama.SharedKernel.Infrastructure.Messaging.Outbox;
 
 namespace Mirama.Modules.PM.Infrastructure.Persistence;
@@ -22,7 +21,6 @@ public sealed class PMDbContext : DbContext, IUnitOfWork
     private Guid? OrganizationId => _contextProvider?.OrganizationId;
 
     public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
-    public DbSet<IdempotencyRecord> IdempotencyRecords => Set<IdempotencyRecord>();
 
     public PMDbContext(
         DbContextOptions<PMDbContext> options,

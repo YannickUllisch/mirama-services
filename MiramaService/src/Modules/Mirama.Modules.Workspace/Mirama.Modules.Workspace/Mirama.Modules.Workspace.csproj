@@ -25,6 +25,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\Mirama.SharedKernel\Mirama.SharedKernel.csproj" />
     <ProjectReference Include="..\Mirama.Modules.Workspace.Contracts\Mirama.Modules.Workspace.Contracts.csproj" />
+    <ProjectReference Include="..\..\Mirama.Modules.Clients\Mirama.Modules.Clients.Contracts\Mirama.Modules.Clients.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

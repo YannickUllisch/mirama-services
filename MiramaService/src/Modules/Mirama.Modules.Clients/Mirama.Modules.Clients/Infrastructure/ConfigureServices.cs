@@ -47,6 +47,16 @@ public static class ConfigureServices
 
     private static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
     {
+        var assembly = Assembly.GetExecutingAssembly();
+
+        // Register all IModuleService implementations (cross-module service contracts),
+        // e.g. IClientService for other modules to read an organization's clients synchronously.
+        services.Scan(scan => scan
+            .FromAssemblies(assembly)
+            .AddClasses(classes => classes.AssignableTo<IModuleService>(), publicOnly: false)
+            .AsImplementedInterfaces()
+            .WithScopedLifetime());
+
         services.AddScoped(typeof(IClientsQueryRepository<,>), typeof(ClientsQueryRepository<,>));
         services.AddScoped(typeof(IClientsCommandRepository<,>), typeof(ClientsCommandRepository<,>));
 

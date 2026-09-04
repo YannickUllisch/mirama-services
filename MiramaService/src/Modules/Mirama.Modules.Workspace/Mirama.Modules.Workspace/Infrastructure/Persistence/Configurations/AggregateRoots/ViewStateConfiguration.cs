@@ -39,6 +39,11 @@ internal class ViewStateConfiguration : IEntityTypeConfiguration<Domain.Aggregat
         // Guards against a lost update when a user has two tabs open and both fire a save in
         // quick succession (e.g. a drag reorder racing a filter change). Npgsql's system xmin
         // column gives us this for free - no extra column, no application-managed version.
-        builder.UseXminAsConcurrencyToken();
+        // UseXminAsConcurrencyToken() was removed from Npgsql.EntityFrameworkCore.PostgreSQL;
+        // this is the shadow-property mapping it used to generate under the hood.
+        builder.Property<uint>("xmin")
+            .HasColumnName("xmin")
+            .IsRowVersion()
+            .ValueGeneratedOnAddOrUpdate();
     }
 }

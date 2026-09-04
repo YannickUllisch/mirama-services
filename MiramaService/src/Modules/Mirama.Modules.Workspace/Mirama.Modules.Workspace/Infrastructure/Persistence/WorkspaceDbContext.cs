@@ -7,7 +7,6 @@ using Mirama.SharedKernel.Abstractions.Domain.Core;
 using Mirama.SharedKernel.Abstractions.Domain.Events;
 using Mirama.SharedKernel.Abstractions.Persistence;
 using Mirama.SharedKernel.Infrastructure.Extensions;
-using Mirama.SharedKernel.Infrastructure.Idempotency;
 using Mirama.SharedKernel.Infrastructure.Messaging.Outbox;
 
 namespace Mirama.Modules.Workspace.Infrastructure.Persistence;
@@ -23,7 +22,6 @@ public sealed class WorkspaceDbContext : DbContext, IUnitOfWork
 
     public DbSet<Domain.Aggregates.ViewState.ViewState> ViewStates => Set<Domain.Aggregates.ViewState.ViewState>();
     public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
-    public DbSet<IdempotencyRecord> IdempotencyRecords => Set<IdempotencyRecord>();
 
     public WorkspaceDbContext(
         DbContextOptions<WorkspaceDbContext> options,

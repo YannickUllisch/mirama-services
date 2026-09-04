@@ -161,7 +161,6 @@ try
 
     app.UseRouting();
     app.UseCors();
-    // app.UseIdempotency();
     app.UseAuthentication();
     app.UseAuthorization();
 
