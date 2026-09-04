@@ -15,6 +15,7 @@ declare -A MODULES=(
   ["Identity"]="src/Modules/Mirama.Modules.Identity/Mirama.Modules.Identity"
   ["Clients"]="src/Modules/Mirama.Modules.Clients/Mirama.Modules.Clients"
   ["PM"]="src/Modules/Mirama.Modules.PM/Mirama.Modules.PM"
+  ["Workspace"]="src/Modules/Mirama.Modules.Workspace/Mirama.Modules.Workspace"
 )
 
 SUCCESS=()
