@@ -1,0 +1,102 @@
+%% =====================================================================
+%% Mirama Domain Model — Clients module (Client level).
+%% Owns the Client space — Linear "Team" equivalent. Intake, CRM, portal
+%% access, and contracts. Organization is shown only as an external stub
+%% (referenced by Guid, never a direct object reference) to keep this
+%% module independently loadable.
+%% See docs/mirama/domain-model.md for the full write-up.
+%% =====================================================================
+
+classDiagram
+    direction TB
+
+    class Organization {
+        <<external>>
+        +OrganizationId Id
+    }
+
+    namespace Clients_Module {
+        class Client {
+            <<AggregateRoot>>
+            +ClientId Id
+            +Guid OrganizationId
+            +ClientStatus Status
+            +ClientType Type
+            +Guid OwnerMemberId
+        }
+        class Contact {
+            <<Entity>>
+            +ContactId Id
+            +ClientId ClientId
+        }
+        class ClientPortalUser {
+            <<Entity>>
+            +ClientPortalUserId Id
+            +ClientId ClientId
+            +Guid ContactId
+        }
+        class ClientPortalInvitation {
+            <<Entity>>
+            +ClientPortalInvitationId Id
+            +ClientId ClientId
+            +Guid ContactId
+        }
+        class ClientActivityLogEntry {
+            <<Entity>>
+            +ClientActivityLogEntryId Id
+            +ClientId ClientId
+        }
+        class PipelineStageHistoryEntry {
+            <<Entity>>
+            +PipelineStageHistoryEntryId Id
+            +ClientId ClientId
+        }
+        class Contract {
+            <<AggregateRoot>>
+            +ContractId Id
+            +Guid OrganizationId
+            +Guid PartyId
+            +ContractPartyType PartyType
+            +ContractStatus Status
+        }
+        class ContractTerm {
+            <<Entity>>
+            +ContractTermId Id
+            +ContractTermType Type
+        }
+        class IntakeForm {
+            <<AggregateRoot>>
+            +IntakeFormId Id
+            +Guid OrganizationId
+        }
+        class IntakeFormField {
+            <<Entity>>
+            +IntakeFieldType Type
+        }
+        class IntakeFormSubmission {
+            <<AggregateRoot>>
+            +IntakeFormSubmissionId Id
+            +IntakeFormId IntakeFormId
+            +ClientId? ConvertedToClientId
+            +IntakeFormSubmissionStatus Status
+        }
+    }
+
+    Organization "1" --> "0..*" Client : scopes (OrganizationId)
+    Client "1" *-- "0..*" Contact : has
+    Client "1" *-- "0..*" ClientPortalUser : has
+    Client "1" *-- "0..*" ClientPortalInvitation : has
+    Client "1" *-- "0..*" ClientActivityLogEntry : has
+    Client "1" *-- "0..*" PipelineStageHistoryEntry : has
+    ClientPortalUser "0..*" ..> Contact : ContactId
+    ClientPortalInvitation "0..*" ..> Contact : ContactId
+    Organization "1" --> "0..*" Contract : scopes
+    Contract "1" *-- "0..*" ContractTerm : has
+    Contract "0..*" ..> Client : PartyId (when PartyType=Client)
+    Organization "1" --> "0..*" IntakeForm : scopes
+    IntakeForm "1" *-- "0..*" IntakeFormField : has
+    IntakeForm "1" --> "0..*" IntakeFormSubmission : receives
+    IntakeFormSubmission "0..1" ..> Client : ConvertedToClientId
+
+    note for Client "'Client' = Linear 'Team'. Owns intake, portal access, CRM history — isolated per client."
+    note for Organization "External stub — owned by the Identity module. Referenced here only by Guid."

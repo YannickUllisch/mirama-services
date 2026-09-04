@@ -1,0 +1,41 @@
+%% =====================================================================
+%% Mirama Domain Model — high-level hierarchy overview.
+%% Linear-style pipeline: Workspace -> Team -> Project -> Cycle -> Issue
+%% adapted to: Organization -> Client -> Project -> Milestone -> Deliverable
+%%
+%% This is the simplified top-level view. Each level that is its own
+%% module has a detailed diagram:
+%%   - Identity module  -> DomainModel-Identity.mmd  (Organization level)
+%%   - Clients module   -> DomainModel-Clients.mmd   (Client level)
+%%   - PM module        -> DomainModel-PM.mmd         (Project/Milestone/Deliverable)
+%% See docs/mirama/domain-model.md for the full write-up.
+%% =====================================================================
+
+flowchart TB
+    Tenant["Tenant\n(hidden platform root)"]
+
+    subgraph IdentityMod["Identity module"]
+        Organization["Organization\nThe Studio\nLinear: Workspace"]
+    end
+
+    subgraph ClientsMod["Clients module"]
+        Client["Client\nIsolated client space\nLinear: Team"]
+    end
+
+    subgraph PMMod["PM module"]
+        Project["Project\nContract / job\nLinear: Project"]
+        Milestone["Milestone (Cycle)\nPhase, sign-off\nLinear: Cycle"]
+        Deliverable["Deliverable (Asset)\nFeedback item\nLinear: Issue"]
+        Project --> Milestone --> Deliverable
+    end
+
+    Tenant -. owns .-> Organization
+    Organization -->|scopes| Client
+    Organization -->|scopes, current code| Project
+    Client -. target link — NOT YET in code .-> Project
+
+    classDef hidden fill:#eee,stroke:#999,stroke-dasharray: 4 4,color:#666;
+    class Tenant hidden;
+
+    note1["Gap: Project is scoped to Organization today, not Client.\nIntakeFormSubmission.ConvertedToClientId is the only\nexisting bridge between Clients and PM."]
+    style note1 fill:#fff8dc,stroke:#c9b458,color:#665c1e

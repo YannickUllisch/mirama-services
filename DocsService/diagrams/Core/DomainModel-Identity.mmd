@@ -1,0 +1,104 @@
+%% =====================================================================
+%% Mirama Domain Model — Identity module (Organization level).
+%% Owns Tenant (hidden platform root) and Organization (the user-facing
+%% root — Linear "Workspace" equivalent) plus everything about who can act.
+%% See docs/mirama/domain-model.md for the full write-up.
+%% =====================================================================
+
+classDiagram
+    direction TB
+
+    namespace Platform_Hidden {
+        class Tenant {
+            <<AggregateRoot>>
+            +Guid Id
+            +UserId AdminUserId
+            +string Name
+            +bool IsActive
+        }
+    }
+
+    namespace Identity_Module {
+        class Organization {
+            <<AggregateRoot>>
+            +OrganizationId Id
+            +Guid TenantId
+            +string Name
+            +string Slug
+            +OrganizationRegion Region
+        }
+        class Member {
+            <<Entity>>
+            +MemberId Id
+            +UserId UserId
+            +List~RoleId~ IamRoleIds
+        }
+        class User {
+            <<AggregateRoot>>
+            +UserId Id
+            +OrganizationId? DefaultOrganization
+        }
+        class Team {
+            <<AggregateRoot>>
+            +TeamId Id
+        }
+        class TeamMember {
+            <<Entity>>
+            +TeamMemberId Id
+            +MemberId MemberId
+        }
+        class Invitation {
+            <<Entity>>
+            +InvitationId Id
+            +RoleId IamRoleId
+            +InvitationStatus Status
+        }
+        class Tag {
+            <<AggregateRoot>>
+            +TagId Id
+            +TagScope Scope
+        }
+        class Role {
+            <<AggregateRoot>>
+            +RoleId Id
+            +Guid? TenantId
+            +List~PolicyId~ Policies
+        }
+        class Policy {
+            <<AggregateRoot>>
+            +PolicyId Id
+            +Guid? TenantId
+            +List~PolicyStatement~ Statements
+        }
+        class Plan {
+            <<AggregateRoot>>
+            +PlanId Id
+        }
+        class Subscription {
+            <<Entity>>
+            +SubscriptionId Id
+            +PlanId PlanId
+            +SubscriptionStatus Status
+        }
+    }
+
+    Tenant "1" *-- "1" Subscription : owns
+    Subscription "0..*" --> "1" Plan : subscribes to
+    Tenant "1" --> "0..*" Organization : owns (TenantId)
+    Tenant "1" --> "0..*" Role : issues tenant-custom roles
+    Tenant "1" --> "0..*" Policy : issues tenant-custom policies
+    Tenant "1" --> "1" User : AdminUserId
+
+    Organization "1" *-- "0..*" Member : has
+    Organization "1" *-- "0..*" Team : has
+    Organization "1" *-- "0..*" Invitation : has
+    Organization "1" *-- "0..*" Tag : has
+    Member "0..1" --> "1" User : linked account
+    Member "0..*" --> "0..*" Role : IamRoleIds
+    Team "1" *-- "0..*" TeamMember : has
+    TeamMember "0..*" --> "1" Member : references
+    Invitation "0..*" --> "1" Role : grants
+    Role "0..*" --> "0..*" Policy : Policies
+
+    note for Tenant "Hidden platform root — not surfaced to end users.\nExists for scaling/ops (billing, multi-org, future subcontractor mgmt)."
+    note for Organization "'Organization' = Linear 'Workspace'. The freelancer/agency's studio — highest level a user actually sees."

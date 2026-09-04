@@ -7,6 +7,7 @@ arrange:
   - system-architecture.md
   - ai
   - modules
+  - domain-model.md
   - database-design.md
   - api-design.md
   - frontend

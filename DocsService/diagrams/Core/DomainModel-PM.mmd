@@ -1,0 +1,175 @@
+%% =====================================================================
+%% Mirama Domain Model — PM module (Project / Milestone / Deliverable level).
+%% Owns Project execution — Linear "Project/Cycle/Issue" equivalent.
+%% Cycle = Milestone, Asset = Deliverable. Organization and Client are
+%% shown only as external stubs (referenced by Guid) to keep this module
+%% independently loadable.
+%% See docs/mirama/domain-model.md for the full write-up.
+%% =====================================================================
+
+classDiagram
+    direction TB
+
+    class Organization {
+        <<external>>
+        +OrganizationId Id
+    }
+    class Client {
+        <<external>>
+        +ClientId Id
+    }
+
+    namespace PM_Module {
+        class Project {
+            <<AggregateRoot>>
+            +ProjectId Id
+            +Guid OrganizationId
+            +Guid StatusId
+            +Guid PriorityId
+        }
+        class ProjectMilestone {
+            <<Entity>>
+            +ProjectMilestoneId Id
+            +MilestoneStatus Status
+        }
+        class ProjectMember {
+            <<Entity>>
+            +ProjectMemberId Id
+        }
+        class ProjectTeam {
+            <<Entity>>
+            +ProjectTeamId Id
+        }
+        class Cycle {
+            <<AggregateRoot>>
+            +CycleId Id
+            +Guid ProjectId
+            +CycleStatus Status
+        }
+        class KanbanBoard {
+            <<AggregateRoot>>
+            +KanbanBoardId Id
+            +Guid ProjectId
+        }
+        class KanbanColumn {
+            <<Entity>>
+            +KanbanColumnId Id
+        }
+        class WorkflowConfig {
+            <<AggregateRoot>>
+            +WorkflowConfigId Id
+            +ProjectId ProjectId
+        }
+        class StatusConfig {
+            <<Entity>>
+            +StatusConfigId Id
+            +StatusCategory Category
+        }
+        class PriorityConfig {
+            <<Entity>>
+            +PriorityConfigId Id
+        }
+        class Task {
+            <<AggregateRoot>>
+            +TaskId Id
+            +Guid ProjectId
+            +TaskId? ParentTaskId
+            +TaskType Type
+            +Guid StatusId
+            +Guid PriorityId
+        }
+        class TaskComment {
+            <<Entity>>
+            +TaskCommentId Id
+            +TaskId TaskId
+        }
+        class TaskDependency {
+            <<Entity>>
+            +TaskDependencyId Id
+            +TaskId BlockingTaskId
+            +DependencyType Type
+        }
+        class TimeLog {
+            <<Entity>>
+            +TimeLogId Id
+        }
+        class Asset {
+            <<AggregateRoot>>
+            +AssetId Id
+            +Guid? ProjectId
+            +AssetVersionId? CurrentVersionId
+            +AssetType Type
+            +AssetStatus Status
+        }
+        class AssetVersion {
+            <<Entity>>
+            +AssetVersionId Id
+        }
+        class AssetFeedback {
+            <<Entity>>
+            +AssetFeedbackId Id
+            +AssetFeedbackStatus Status
+        }
+        class FeedbackReply {
+            <<Entity>>
+            +FeedbackReplyId Id
+        }
+        class FeedbackAnnotation {
+            <<Entity>>
+        }
+        class AssetConnection {
+            <<Entity>>
+            +AssetConnectionId Id
+            +AssetConnectionTarget Target
+        }
+        class ProjectTemplate {
+            <<AggregateRoot>>
+            +ProjectTemplateId Id
+            +Guid OrganizationId
+        }
+        class MilestoneTemplate {
+            <<Entity>>
+            +MilestoneTemplateId Id
+        }
+        class TaskTemplate {
+            <<Entity>>
+            +TaskTemplateId Id
+        }
+        class CycleTemplate {
+            <<Entity>>
+            +CycleTemplateId Id
+        }
+    }
+
+    Organization "1" --> "0..*" Project : scopes (OrganizationId)
+    Client "0..*" ..> Project : target link — NOT YET in code
+    Project "1" *-- "0..*" ProjectMilestone : has
+    Project "1" *-- "0..*" ProjectMember : has
+    Project "1" *-- "0..*" ProjectTeam : has
+    Project "1" --> "0..1" WorkflowConfig : configures via
+    WorkflowConfig "1" *-- "0..*" StatusConfig : has
+    WorkflowConfig "1" *-- "0..*" PriorityConfig : has
+    Project "1" --> "0..*" Cycle : ProjectId
+    Project "1" --> "0..*" KanbanBoard : ProjectId
+    KanbanBoard "1" *-- "0..*" KanbanColumn : has
+    Project "1" --> "0..*" Task : ProjectId
+    Task "0..1" --> "0..*" Task : ParentTaskId (subtasks)
+    Task "1" *-- "0..*" TaskComment : has
+    Task "1" *-- "0..*" TaskDependency : has
+    Task "1" *-- "0..*" TimeLog : has
+    Cycle "0..*" --> "0..*" Task : contains
+    Project "0..1" --> "0..*" Asset : ProjectId (deliverables)
+    Asset "1" *-- "0..*" AssetVersion : has
+    Asset "1" *-- "0..*" AssetFeedback : has
+    AssetFeedback "1" *-- "0..*" FeedbackAnnotation : has
+    AssetFeedback "1" *-- "0..*" FeedbackReply : has
+    Asset "1" *-- "0..*" AssetConnection : has
+    Organization "1" --> "0..*" ProjectTemplate : scopes
+    ProjectTemplate "1" *-- "0..*" MilestoneTemplate : has
+    ProjectTemplate "1" *-- "0..*" TaskTemplate : has
+    ProjectTemplate "1" *-- "0..*" CycleTemplate : has
+
+    note for Cycle "'Cycle' = plan's 'Milestone'. Time-boxed, client-facing phase focused on sign-off."
+    note for Asset "'Asset' = plan's 'Deliverable'. Task = internal work item (closer to Linear 'Issue')."
+    note for Organization "External stub — owned by the Identity module. Referenced here only by Guid."
+    note for Client "External stub — owned by the Clients module. Target link not yet implemented."
