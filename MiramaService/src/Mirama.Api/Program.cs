@@ -13,6 +13,7 @@ using Mirama.Modules.Clients.Infrastructure;
 using Mirama.Modules.Identity;
 using Mirama.Modules.Identity.Infrastructure;
 using Mirama.Modules.PM.Infrastructure;
+using Mirama.Modules.Workspace.Infrastructure;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.Api.Extensions;
 
@@ -51,6 +52,7 @@ builder.Services
     .AddIdentityModule(builder.Configuration)
     .AddClientsModule(builder.Configuration)
     .AddProjectsModule(builder.Configuration)
+    .AddWorkspaceModule(builder.Configuration)
     .AddSharedServices(builder.Configuration);
 
 builder.Services.AddApiVersioning(options =>

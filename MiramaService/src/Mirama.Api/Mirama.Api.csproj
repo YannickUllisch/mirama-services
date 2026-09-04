@@ -31,6 +31,7 @@
     <ProjectReference Include="..\Modules\Mirama.Modules.Identity\Mirama.Modules.Identity\Mirama.Modules.Identity.csproj" />
     <ProjectReference Include="..\Modules\Mirama.Modules.Clients\Mirama.Modules.Clients\Mirama.Modules.Clients.csproj" />
     <ProjectReference Include="..\Modules\Mirama.Modules.PM\Mirama.Modules.PM\Mirama.Modules.PM.csproj" />
+    <ProjectReference Include="..\Modules\Mirama.Modules.Workspace\Mirama.Modules.Workspace\Mirama.Modules.Workspace.csproj" />
     <ProjectReference Include="..\Mirama.SharedKernel\Mirama.SharedKernel.csproj" />
   </ItemGroup>
 </Project>
