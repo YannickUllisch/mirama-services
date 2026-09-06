@@ -9,6 +9,9 @@ public sealed record CreateOrganizationCommand : ICommand<ErrorOr<OrganizationRe
     [JsonPropertyName("name")]
     public string Name { get; init; } = string.Empty;
 
+    [JsonPropertyName("slug")]
+    public string Slug { get; init; } = string.Empty;
+
     [JsonPropertyName("street")]
     public string Street { get; init; } = string.Empty;
 

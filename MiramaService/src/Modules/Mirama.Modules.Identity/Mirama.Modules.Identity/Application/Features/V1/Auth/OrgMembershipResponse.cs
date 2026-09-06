@@ -12,6 +12,7 @@ internal static class AuthOrgMembershipResponseMapper
         return new()
         {
             OrganizationId = org.Id.Value,
+            OrganizationSlug = org.Slug,
             UserId = member.UserId.Value,
             TenantId = org.TenantId,
             TenantRole = Enum.GetName(tenantRole)!,
@@ -25,6 +26,9 @@ public sealed record AuthOrgMembershipResponse
 {
     [JsonPropertyName("organizationId")]
     public Guid OrganizationId { get; init; }
+
+    [JsonPropertyName("organizationSlug")]
+    public string OrganizationSlug { get; init; } = string.Empty;
 
     [JsonPropertyName("userId")]
     public Guid UserId { get; init; }

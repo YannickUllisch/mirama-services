@@ -8,6 +8,14 @@ internal class CreateOrganizationCommandValidator : AbstractValidator<CreateOrga
     public CreateOrganizationCommandValidator()
     {
         RuleFor(c => c.Name).NotEmpty().MinimumLength(2).MaximumLength(100);
+
+        RuleFor(c => c.Slug)
+            .NotEmpty()
+            .MinimumLength(3)
+            .MaximumLength(63)
+            .Matches(@"^[a-z0-9]+(-[a-z0-9]+)*$")
+            .WithMessage("URL can only contain lowercase letters, numbers and hyphens, and can't start or end with a hyphen.");
+
         RuleFor(c => c.Street).NotEmpty().MaximumLength(200);
         RuleFor(c => c.City).NotEmpty().MaximumLength(100);
         RuleFor(c => c.Country).NotEmpty().MaximumLength(100);

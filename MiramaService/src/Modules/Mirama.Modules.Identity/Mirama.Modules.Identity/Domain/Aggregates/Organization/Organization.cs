@@ -27,7 +27,7 @@ public class Organization : AggregateRoot<OrganizationId>, ITenantOwned
     private Organization(OrganizationDetails details)
     {
         Name = details.Name.Trim();
-        Slug = GenerateSlug(details.Name);
+        Slug = NormalizeSlug(details.Slug);
         Logo = details.Logo;
         Street = details.Street.Trim();
         City = details.City.Trim();
@@ -70,10 +70,13 @@ public class Organization : AggregateRoot<OrganizationId>, ITenantOwned
         return Members.Any(m => m.Id == memberId);
     }
 
+    // Slug is intentionally NOT touched here - it's chosen once at creation (it's part of
+    // the organization's URL) and frozen from then on. Silently changing it on every rename
+    // would break bookmarked/shared links; a deliberate "change URL" action can be added
+    // later if needed, distinct from a plain name edit.
     public void Update(OrganizationDetails details)
     {
         Name = details.Name.Trim();
-        Slug = GenerateSlug(details.Name);
         Logo = details.Logo;
         Street = details.Street.Trim();
         City = details.City.Trim();
@@ -92,6 +95,5 @@ public class Organization : AggregateRoot<OrganizationId>, ITenantOwned
         TenantId = tenantId;
     }
 
-    private static string GenerateSlug(string input) =>
-        input.Trim().ToLower().Replace(" ", "-");
+    private static string NormalizeSlug(string input) => input.Trim().ToLowerInvariant();
 }

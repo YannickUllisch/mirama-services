@@ -2,6 +2,7 @@ namespace Mirama.Modules.Identity.Domain.Aggregates.Organization;
 
 public sealed record OrganizationDetails(
     string Name,
+    string Slug,
     string Street,
     string City,
     string Country,

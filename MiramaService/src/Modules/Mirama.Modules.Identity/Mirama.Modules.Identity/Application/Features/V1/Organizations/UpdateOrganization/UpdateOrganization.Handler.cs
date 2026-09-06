@@ -35,8 +35,11 @@ internal class UpdateOrganizationCommandHandler(
         if (org is null)
             return Error.NotFound("Organization.NotFound", "Organization not found.");
 
+        // Slug is immutable post-creation (see Organization.Update) - passing the
+        // organization's current value here just satisfies the record shape.
         var details = new OrganizationDetails(
             request.Name,
+            org.Slug,
             request.Street,
             request.City,
             request.Country,

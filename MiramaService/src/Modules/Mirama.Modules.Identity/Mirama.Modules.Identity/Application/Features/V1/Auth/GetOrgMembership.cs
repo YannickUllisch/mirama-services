@@ -1,4 +1,3 @@
-using System.Security.Cryptography.X509Certificates;
 using ErrorOr;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,20 +10,25 @@ using Mirama.SharedKernel.Models;
 
 namespace Mirama.Modules.Identity.Application.Features.V1.Auth;
 
+// Looked up by slug rather than the organization's Guid: this is the endpoint NextAuth calls
+// (both on explicit "switch organization" and when resolving /organization/{slug}/... routes)
+// to verify membership and mint fresh session claims. The Guid this returns is what actually
+// ends up in the JWT/session (RequestContextProvider, EF global filters, etc. still key
+// everything off it) - the slug is purely how the caller identifies which organization it means.
 [AllowAnonymous]
 public class GetOrgMembershipController : ApiControllerBase
 {
-    [HttpGet("auth/user/{externalId:guid}/organization/{organizationId:guid}")]
+    [HttpGet("auth/user/{externalId:guid}/organization/{slug}")]
     public async Task<ActionResult<AuthOrgMembershipResponse>> Get(
         [FromRoute] Guid externalId,
-        [FromRoute] Guid organizationId)
+        [FromRoute] string slug)
     {
-        var res = await this.Dispatcher.Send(new GetOrgMembershipQuery(externalId, organizationId));
+        var res = await this.Dispatcher.Send(new GetOrgMembershipQuery(externalId, slug));
         return res.Match(Ok, Problem);
     }
 }
 
-public sealed record GetOrgMembershipQuery(Guid ExternalId, Guid OrganizationId)
+public sealed record GetOrgMembershipQuery(Guid ExternalId, string Slug)
     : IQuery<ErrorOr<AuthOrgMembershipResponse>>;
 
 internal class GetOrgMembershipQueryHandler(
@@ -39,19 +43,26 @@ internal class GetOrgMembershipQueryHandler(
         if (user is null)
             return Error.NotFound("User.NotFound", "User not found.");
 
-        var member = await dbContext.Members
-            .AsNoTracking()
-            .FirstOrDefaultAsync(m => m.UserId == user.Id && m.OrganizationId == request.OrganizationId, ct);
+        var normalizedSlug = request.Slug.Trim().ToLowerInvariant();
 
-        if (member is null)
-            return Error.NotFound("Member.NotFound", "Membership not found.");
-
+        // Slug is globally unique (see OrganizationConfig), so this alone identifies the
+        // organization - no tenant/org filter can be applied yet at this point anyway, since
+        // resolving it is exactly how we find out which tenant/org the caller means.
         var org = await dbContext.Organizations
             .AsNoTracking()
-            .FirstOrDefaultAsync(o => o.Id == new OrganizationId(request.OrganizationId), ct);
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(o => o.Slug == normalizedSlug, ct);
 
         if (org is null)
             return Error.NotFound("Organization.NotFound", "Organization not found.");
+
+        var member = await dbContext.Members
+            .AsNoTracking()
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(m => m.UserId == user.Id && m.OrganizationId == org.Id.Value, ct);
+
+        if (member is null)
+            return Error.NotFound("Member.NotFound", "Membership not found.");
 
         var tenant = await dbContext.Tenants
             .AsNoTracking()

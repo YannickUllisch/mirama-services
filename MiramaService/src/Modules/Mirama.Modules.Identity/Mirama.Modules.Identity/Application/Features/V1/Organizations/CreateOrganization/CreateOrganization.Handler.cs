@@ -50,8 +50,19 @@ internal class CreateOrganizationCommandHandler(
         if (ownerRole is null)
             return Error.Unexpected("Role.OwnerNotFound", "Owner role not found.");
 
+        var slug = request.Slug.Trim().ToLowerInvariant();
+
+        var slugTaken = await dbContext.Organizations
+            .AsNoTracking()
+            .IgnoreQueryFilters()
+            .AnyAsync(o => o.Slug == slug, ct);
+
+        if (slugTaken)
+            return Error.Conflict("Organization.SlugTaken", "This URL is already taken. Please choose a different one.");
+
         var details = new OrganizationDetails(
             request.Name,
+            slug,
             request.Street,
             request.City,
             request.Country,
