@@ -10,9 +10,9 @@ Unique Identifier: `mirama-platform`
 
 ## Project Description
 
-Mirama is an end-to-end client and project operating system for freelancers and micro-agencies who delegate paid client work to subcontractors. The platform's core proposition is covering the entire engagement lifecycle in one place: acquiring a client through an intake form, executing the project with visual task boards and asset proofing, bringing in trusted subcontractors without exposing client budgets or other people's rates, collaborating with the client through a protected portal, and closing the engagement with automatic Stripe billing and split payouts - without switching tools at any stage.
+Mirama is a visual-first client and project operating system for creative freelancers, boutique agencies and independent studios. Today, running a single client project means stitching together four to six disconnected tools: one for moodboards and ideation, one for tasks and timelines, one for asset review and versioning, one for file storage, and email or chat for client communication. Mirama unifies free-form visual brainstorming, rigorous asset versioning, structured project management (Kanban and Gantt), and client-facing delivery portals into one cohesive workspace, and covers the full engagement lifecycle: acquiring a client through an intake form, executing the project with visual task boards and asset proofing, collaborating with the client through a protected portal, and closing the engagement with automatic Stripe billing - without switching tools at any stage.
 
-The niche is intentionally focused. Mirama is built for the moment a solo operator stops working alone: a designer bringing in a motion artist, a dev lead bringing in a backend contractor, a fractional CMO bringing in a paid-media freelancer. The project, the client relationship, the subcontractor's slice of the work, and the invoice are all connected. It is visual-first by default but works equally well as a pure project and task management tool for non-visual, non-creative work such as fractional executive or consulting engagements.
+That same connected data model is also what makes Mirama hold up the moment a solo operator stops working alone. A designer bringing in a motion artist, a dev lead bringing in a backend contractor, a fractional CMO bringing in a paid-media freelancer: the project, the client relationship, the subcontractor's slice of the work, and the invoice all stay connected, with client budgets and other people's rates scoped away from the subcontractor by construction rather than by convention. Delegation is a feature that falls out of the core model, not a separate product mode. Mirama is visual-first by default but works equally well as a pure project and task management tool for non-visual, non-creative work such as fractional executive or consulting engagements.
 
 The target space spans creative and non-creative disciplines that share the same underlying pain points:
 
@@ -41,6 +41,7 @@ The underlying data model and permission system are not tier-limited, an organiz
 The platform is structured around seven interconnected capabilities:
 
 - **Client & Intake Management (CRM):** A relational client object linking intake briefs, projects, time records and invoices from day one - the foundation that makes billing and reporting possible without retrofitting.
+- **Visual Brainstorming & Moodboards:** Free-form visual ideation linked directly to execution - a task can be spawned from a piece of inspiration on a moodboard, keeping project work tied to creative intent instead of living in a disconnected tool.
 - **Visual Project & Task Execution:** N-level task hierarchies, Kanban boards, Gantt timelines, task dependencies and custom production statuses designed around service delivery workflows.
 - **Asset Collaboration & Proofing:** Native annotation on images, PDFs and video; stacked version history; automatic watermarking and low-quality proxy generation so clients can review and approve work without receiving full-resolution files they haven't paid for.
 - **Delegated Work & Subcontractor Payouts:** A scoped access tier for subcontractors that only exposes their assigned tasks and their own payout status, automatic split payouts on milestone approval via Stripe Connect, and scope guardrails that flag out-of-boundary client requests before they turn into unpaid work.
@@ -74,7 +75,6 @@ Key characteristics:
 
 - **Next.js App Router** for SSR, API route handling and edge middleware
 - **React Query (TanStack)** for optimistic UI updates and server state synchronization
-- **Prisma ORM** for database access
 - **NextAuth** for authentication and session management
 - **Permission Matrix** passed from the backend and stored in React Context for zero-round-trip authorization checks in the UI
 
@@ -93,8 +93,6 @@ Key characteristics:
 - **Clean Architecture** with vertical slice organization per feature
 - **Domain-Driven Design (DDD)** within module boundaries
 - **Inter-module communication** via direct in-process interfaces (no HTTP overhead between domains)
-- **OpenIddict** as a self-hosted OIDC authority for centralized token issuance
-- Deployed as a single containerized application
 
 ### Infrastructure
 
