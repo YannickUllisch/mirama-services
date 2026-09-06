@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.SharedKernel.Abstractions.Persistence;
-using Mirama.SharedKernel.Infrastructure.Messaging.Inbox;
 using Mirama.SharedKernel.Infrastructure.Messaging.Outbox;
 
 namespace Mirama.SharedKernel.Infrastructure.Interceptors;
@@ -40,7 +39,7 @@ public sealed class AuditSaveChangesInterceptor(
             if (entry.State is not (EntityState.Added or EntityState.Modified or EntityState.Deleted))
                 continue;
 
-            if (entry.Entity is OutboxMessage or InboxMessage)
+            if (entry.Entity is OutboxMessage)
                 continue;
 
             var entityType = entry.Entity.GetType().Name;

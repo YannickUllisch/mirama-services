@@ -15,6 +15,7 @@ internal static class DefaultSidebarState
                 new { route = "inbox", order = 0, visible = true },
                 new { route = "my-work", order = 1, visible = true },
                 new { route = "agent", order = 2, visible = true },
+                new { route = "dashboard", order = 3, visible = true },
             },
             groups = new object[]
             {
@@ -25,6 +26,7 @@ internal static class DefaultSidebarState
                     items = new object[]
                     {
                         new { route = "projects", order = 0, visible = true },
+                        new { route = "boards", order = 0, visible = true },
                         new { route = "members", order = 1, visible = false },
                         new { route = "teams", order = 2, visible = false },
                     },
