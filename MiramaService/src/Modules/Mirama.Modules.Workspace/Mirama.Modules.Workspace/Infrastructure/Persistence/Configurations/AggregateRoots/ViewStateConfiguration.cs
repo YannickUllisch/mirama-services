@@ -4,9 +4,9 @@ using Mirama.Modules.Workspace.Domain.Aggregates.ViewState;
 
 namespace Mirama.Modules.Workspace.Infrastructure.Persistence.Configurations.AggregateRoots;
 
-internal class ViewStateConfiguration : IEntityTypeConfiguration<Domain.Aggregates.ViewState.ViewState>
+internal class ViewStateConfiguration : IEntityTypeConfiguration<ViewState>
 {
-    public void Configure(EntityTypeBuilder<Domain.Aggregates.ViewState.ViewState> builder)
+    public void Configure(EntityTypeBuilder<ViewState> builder)
     {
         builder.HasKey(v => v.Id);
 
@@ -24,9 +24,6 @@ internal class ViewStateConfiguration : IEntityTypeConfiguration<Domain.Aggregat
             .IsRequired()
             .HasMaxLength(50);
 
-        // View configuration only (column order, filters, collapsed groups) - never business
-        // rows - so this stays a small jsonb payload no matter how large the underlying
-        // table/board grows. Same jsonb convention as Project.TagIds in the PM module.
         builder.Property(v => v.StateJson)
             .HasColumnType("jsonb")
             .IsRequired();
@@ -36,11 +33,6 @@ internal class ViewStateConfiguration : IEntityTypeConfiguration<Domain.Aggregat
         builder.HasIndex(v => new { v.OrganizationId, v.UserId, v.SurfaceKey }).IsUnique();
         builder.HasIndex(v => v.OrganizationId);
 
-        // Guards against a lost update when a user has two tabs open and both fire a save in
-        // quick succession (e.g. a drag reorder racing a filter change). Npgsql's system xmin
-        // column gives us this for free - no extra column, no application-managed version.
-        // UseXminAsConcurrencyToken() was removed from Npgsql.EntityFrameworkCore.PostgreSQL;
-        // this is the shadow-property mapping it used to generate under the hood.
         builder.Property<uint>("xmin")
             .HasColumnName("xmin")
             .IsRowVersion()

@@ -4,8 +4,6 @@ using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 
 namespace Mirama.Modules.Workspace.Application.Common;
 
-// Module-specific decorator (mirrors PMTransactionDecorator / IdentityTransactionDecorator) -
-// keeps IUnitOfWork resolution from being overridden by another module's registration.
 internal class WorkspaceTransactionDecorator<TRequest, TResponse>(
     IRequestHandler<TRequest, TResponse> inner,
     WorkspaceDbContext dbContext)

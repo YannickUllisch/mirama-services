@@ -1,8 +1,4 @@
-
-using System.Reflection;
-using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Mirama.Modules.Identity.Domain.Aggregates.Organization;
 using Mirama.Modules.Identity.Domain.Aggregates.Organization.Invitation;
 using Mirama.Modules.Identity.Domain.Aggregates.Organization.Member;
@@ -13,26 +9,15 @@ using Mirama.Modules.Identity.Domain.Aggregates.Policy;
 using Mirama.Modules.Identity.Domain.Aggregates.Role;
 using Mirama.Modules.Identity.Domain.Aggregates.Tenant;
 using Mirama.Modules.Identity.Domain.Aggregates.User;
-using Mirama.SharedKernel.Abstractions.Persistence;
-using Mirama.SharedKernel.Infrastructure.Messaging.Outbox;
-using Mirama.SharedKernel.Abstractions.Domain.Core;
-using Mirama.SharedKernel.Abstractions.Domain.Events;
-using Mirama.SharedKernel.Infrastructure.Extensions;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.Extensions.Logging;
+using Mirama.SharedKernel.Abstractions.Persistence;
+using Mirama.SharedKernel.Infrastructure.Persistence;
 
 namespace Mirama.Modules.Identity.Infrastructure.Persistence;
 
-public sealed class IdentityDbContext : DbContext, IUnitOfWork
+public sealed class IdentityDbContext : AuditableUnitOfWorkDbContext
 {
-    private readonly IDispatcher _dispatcher = default!;
-    private readonly IRequestContextProvider _contextProvider = default!;
-    private IDbContextTransaction? _currentTransaction;
-    private Guid? TenantId => _contextProvider?.TenantId;
-    private Guid? OrganizationId => _contextProvider?.OrganizationId;
-    private readonly ILogger<DbContext> _logger = default!;
-
+    protected override string SchemaName => "identity";
 
     public DbSet<Organization> Organizations => Set<Organization>();
     public DbSet<User> Users => Set<User>();
@@ -46,164 +31,13 @@ public sealed class IdentityDbContext : DbContext, IUnitOfWork
     public DbSet<PolicyStatement> PolicyStatements => Set<PolicyStatement>();
     public DbSet<Plan> Plans => Set<Plan>();
     public DbSet<Tag> Tags => Set<Tag>();
-    public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
 
     public IdentityDbContext(
         DbContextOptions<IdentityDbContext> options,
-        ILogger<DbContext> logger,
         IDispatcher dispatcher,
-        IRequestContextProvider requestContext) : base(options)
+        IRequestContextProvider requestContext) : base(options, dispatcher, requestContext)
     {
-        _logger = logger;
-        _dispatcher = dispatcher;
-        _contextProvider = requestContext;
     }
 
     public IdentityDbContext() { }
-
-    public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
-    {
-        _currentTransaction ??= await Database.BeginTransactionAsync(cancellationToken);
-    }
-
-    public async Task CommitTransactionAsync(CancellationToken cancellationToken = default)
-    {
-        _logger.LogError("made it to commit tran");
-        if (_currentTransaction is null) return;
-        _logger.LogError("made it to commit trans and trans exists");
-
-        await _currentTransaction.CommitAsync(cancellationToken);
-        await _currentTransaction.DisposeAsync();
-        _currentTransaction = null;
-    }
-
-    public async Task RollbackTransactionAsync(CancellationToken cancellationToken = default)
-    {
-        _logger.LogError("made it to rollback");
-
-        if (_currentTransaction is null) return;
-        await _currentTransaction.RollbackAsync(cancellationToken);
-        await _currentTransaction.DisposeAsync();
-        _currentTransaction = null;
-    }
-
-    protected override void OnModelCreating(ModelBuilder builder)
-    {
-        builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-        builder.HasDefaultSchema("identity");
-
-        builder.ApplyGlobalFilters(TenantId, OrganizationId);
-
-        base.OnModelCreating(builder);
-    }
-
-    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-        var entries = ChangeTracker.Entries<IAuditable>();
-        _logger.LogWarning(entries.ToString());
-        string actorId;
-        try { actorId = _contextProvider.UserId.ToString(); }
-        catch { actorId = "system"; }
-
-        // Handling Auditable Entities
-        foreach (var entry in entries)
-        {
-            switch (entry.State)
-            {
-                case EntityState.Added:
-                    entry.Entity.SetCreated(DateTime.UtcNow, actorId);
-                    break;
-                case EntityState.Modified:
-                    Console.WriteLine("here in modified");
-                    entry.Entity.SetModified(DateTime.UtcNow, actorId);
-                    break;
-                default:
-                    break;
-            }
-
-            HandleEntityOwnership(entry);
-        }
-
-        // Persisting and Publishing Domain events in current transaction
-        var domainEvents = ChangeTracker.Entries<IDomainEventEntity>()
-            .Select(e => e.Entity)
-            .SelectMany(aggregate =>
-            {
-                var events = aggregate.GetDomainEvents();
-                aggregate.ClearDomainEvents();
-                return events;
-            })
-            .ToList();
-
-        foreach (var domainEvent in domainEvents)
-        {
-            await _dispatcher.Publish(domainEvent, cancellationToken);
-        }
-
-        var outboxMessages = domainEvents
-            .Select(domainEvent => new OutboxMessage
-            {
-                Id = Guid.NewGuid(),
-                OccurredAtUtc = domainEvent.OccurredAt,
-                Type = domainEvent.GetType().Name,
-                Content = JsonSerializer.Serialize(domainEvent)
-            })
-            .ToList();
-
-        if (outboxMessages.Count != 0)
-        {
-            OutboxMessages.AddRange(outboxMessages);
-        }
-
-        return await base.SaveChangesAsync(cancellationToken);
-    }
-
-    /// <summary>
-    /// Validates that ownership properties (<see cref="TenantId"/> and <see cref="OrganizationId"/>) 
-    /// are present and correct for auditable entities before they are persisted.
-    /// Also automatically sets the tenant or organization IDs on newly added entities.
-    /// </summary>
-    /// <param name="entry">The IAuditable entity being validated</param>
-    /// <exception cref="UnauthorizedAccessException">
-    /// Thrown if a required TenantId is missing for a TenantOwned entity.
-    /// </exception>
-    /// <exception cref="InvalidOperationException">
-    /// Thrown if an TenantOwned entity attempts to change its TenantId>,
-    /// or if an OrganizationOwned entity is persisted without a valid OrganizationId/>.
-    /// </exception>
-    /// <remarks>
-    /// This method provides a second layer of security beyond authorization policies that 
-    /// enforce tenant and organization claims in JWTs. It ensures that persisted entities
-    /// cannot be written without valid multi-tenant/organization context.
-    /// </remarks>
-
-    private void HandleEntityOwnership(EntityEntry<IAuditable> entry)
-    {
-        if (entry.Entity is ITenantOwned tenantOwned)
-        {
-            if (TenantId is null)
-            {
-                throw new UnauthorizedAccessException($"TenantId is required to persist {entry.Entity.GetType().Name}");
-            }
-
-            if (entry.State == EntityState.Added)
-            {
-                tenantOwned.SetTenantId(TenantId.Value);
-            }
-            else if (entry.State == EntityState.Modified && tenantOwned.TenantId != TenantId)
-            {
-                throw new InvalidOperationException("Changing TenantId is not allowed");
-            }
-        }
-
-        if (entry.Entity is IOrganizationOwned orgOwned && entry.State == EntityState.Added)
-        {
-            if (orgOwned.OrganizationId == Guid.Empty)
-            {
-                if (OrganizationId is null)
-                    throw new InvalidOperationException($"OrganizationId is required to add {entry.Entity.GetType().Name}");
-                orgOwned.SetOrganizationId(OrganizationId.Value);
-            }
-        }
-    }
 }
