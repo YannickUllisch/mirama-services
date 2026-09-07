@@ -23,7 +23,7 @@ public static class OutboxServiceCollectionExtensions
         services.AddSingleton<IHostedService>(sp => new OutboxProcessor<TDbContext>(
             sp.GetRequiredService<IServiceScopeFactory>(),
             sp.GetRequiredService<IOptionsMonitor<OutboxOptions>>(),
-            new IntegrationEventDeserializer(contractsAssembly),
+            new EventTypeResolver(contractsAssembly),
             sp.GetRequiredService<IModuleSchemaRegistry>(),
             sp.GetRequiredService<ILogger<OutboxProcessor<TDbContext>>>(),
             moduleName));

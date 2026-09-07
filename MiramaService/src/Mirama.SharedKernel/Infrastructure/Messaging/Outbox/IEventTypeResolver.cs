@@ -1,7 +1,6 @@
-
 namespace Mirama.SharedKernel.Infrastructure.Messaging.Outbox;
 
-public interface IIntegrationEventDeserializer
+public interface IEventTypeResolver
 {
     Type Resolve(string typeName);
 

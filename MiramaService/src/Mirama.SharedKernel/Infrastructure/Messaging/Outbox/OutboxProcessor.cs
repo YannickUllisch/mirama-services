@@ -12,7 +12,7 @@ namespace Mirama.SharedKernel.Infrastructure.Messaging.Outbox;
 public sealed class OutboxProcessor<TDbContext>(
     IServiceScopeFactory scopeFactory,
     IOptionsMonitor<OutboxOptions> optionsMonitor,
-    IIntegrationEventDeserializer typeResolver,
+    IEventTypeResolver typeResolver,
     IModuleSchemaRegistry schemaRegistry,
     ILogger<OutboxProcessor<TDbContext>> logger,
     string moduleName) : BackgroundService
@@ -20,7 +20,7 @@ public sealed class OutboxProcessor<TDbContext>(
 {
     private readonly IServiceScopeFactory _scopeFactory = scopeFactory;
     private readonly IOptionsMonitor<OutboxOptions> _optionsMonitor = optionsMonitor;
-    private readonly IIntegrationEventDeserializer _typeResolver = typeResolver;
+    private readonly IEventTypeResolver _typeResolver = typeResolver;
     private readonly IModuleSchemaRegistry _schemaRegistry = schemaRegistry;
     private readonly ILogger<OutboxProcessor<TDbContext>> _logger = logger;
     private readonly string _moduleName = moduleName;

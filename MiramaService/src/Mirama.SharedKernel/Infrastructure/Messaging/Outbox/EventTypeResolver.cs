@@ -4,11 +4,11 @@ using Mirama.SharedKernel.Abstractions.Domain.Events;
 
 namespace Mirama.SharedKernel.Infrastructure.Messaging.Outbox;
 
-public sealed class IntegrationEventDeserializer : IIntegrationEventDeserializer
+public sealed class EventTypeResolver : IEventTypeResolver
 {
     private readonly Dictionary<string, Type> _typesByName;
 
-    public IntegrationEventDeserializer(Assembly contractsAssembly)
+    public EventTypeResolver(Assembly contractsAssembly)
     {
         _typesByName = contractsAssembly.GetTypes()
             .Where(t => t is { IsClass: true, IsAbstract: false } && typeof(IIntegrationEvent).IsAssignableFrom(t))
