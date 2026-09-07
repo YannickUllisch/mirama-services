@@ -164,7 +164,7 @@ Resources implement `ITenantOwned` and/or `IOrganizationOwned`, `OrganizationAgg
 
 ### Outbox / Inbox
 
-`OutboxMessage` and `InboxMessage` models exist in SharedKernel - infrastructure for reliable async messaging between modules (not yet fully wired).
+`Mirama.SharedKernel.Infrastructure.Messaging` implements reliable async cross-module messaging via a mapper-driven outbox + per-module inbox: a domain event's `IIntegrationEventMapper<T>` produces integration events written to `OutboxMessage` in the same transaction as the business change; `OutboxProcessor<TDbContext>` fans each message out to one `InboxMessage` row per registered handler, in that handler's owning module's own schema; each module's `InboxProcessor<TDbContext>` then drains its own inbox and invokes its own handlers, with retry/backoff/dead-lettering tracked per `(event, handler)` pair, independent of every other handler and of the publisher. See `docs/design/background-jobs-outbox-design.md` (event creation through fan-out) and `docs/design/background-jobs-inbox-design.md` (handler execution, retry, dead-lettering) plus their accompanying sequence diagrams. Wired for PM and Clients; Identity and Workspace have not registered a `DbContext` yet.
 
 ### Permissions
 

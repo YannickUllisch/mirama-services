@@ -4,9 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
+using Mirama.SharedKernel.Abstractions.Domain.Events;
 using Mirama.SharedKernel.Abstractions.Permissions;
 using Mirama.SharedKernel.Abstractions.Persistence;
 using Mirama.SharedKernel.Infrastructure.Interceptors;
+using Mirama.SharedKernel.Infrastructure.Messaging;
+using Mirama.SharedKernel.Infrastructure.Messaging.Outbox;
 using Mirama.SharedKernel.Infrastructure.Options;
 using Mirama.SharedKernel.Infrastructure.Services;
 using Mirama.SharedKernel.Models;
@@ -33,10 +36,15 @@ public static class DependencyInjection
                       "Valid Database Connection string is required.")
             .ValidateOnStart();
 
+        services.AddScoped<IAmbientMessageContext, AmbientMessageContext>();
         services.AddScoped<IRequestContextProvider, RequestContextProvider>();
         services.AddScoped<IDispatcher, Dispatcher>();
+        services.AddScoped<IIntegrationEventMapperResolver, IntegrationEventMapperResolver>();
+        services.AddSingleton<IModuleSchemaRegistry, ModuleSchemaRegistry>();
         services.AddScoped<IAuditLogger, SerilogAuditLogger>();
         services.AddScoped<AuditSaveChangesInterceptor>();
+        services.AddScoped<AuditStampingInterceptor>();
+        services.AddScoped<DomainEventDispatchInterceptor>();
 
         services.Scan(scan => scan
             .FromAssemblies(Assembly.GetExecutingAssembly())

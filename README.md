@@ -37,5 +37,3 @@ The project specific documentation can be found here - [Documentation](https://d
     ```sh
     docker compose up
     ```
-
-If you are having issues, you can find relevant documentation at [.NET Docs](https://learn.microsoft.com/en-us/aspnet/core/security/docker-compose-https?view=aspnetcore-10.0)

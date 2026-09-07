@@ -21,6 +21,6 @@ public class PMDbContextFactory : IDesignTimeDbContextFactory<PMDbContext>
                 .MigrationsAssembly(typeof(PMDbContext).Assembly.FullName)
                 .MigrationsHistoryTable("__EFMigrationsHistory", "projects"));
 
-        return new PMDbContext(optionsBuilder.Options, null!, null!);
+        return new PMDbContext(optionsBuilder.Options, null!);
     }
 }

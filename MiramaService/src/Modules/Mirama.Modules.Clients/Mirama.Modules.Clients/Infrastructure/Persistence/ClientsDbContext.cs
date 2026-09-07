@@ -3,7 +3,6 @@ using Mirama.Modules.Clients.Domain.Aggregates.Client;
 using Mirama.Modules.Clients.Domain.Aggregates.Client.ClientPortalInvitation;
 using Mirama.Modules.Clients.Domain.Aggregates.Client.ClientPortalUser;
 using Mirama.Modules.Clients.Domain.Aggregates.Client.Contact;
-using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.SharedKernel.Abstractions.Persistence;
 using Mirama.SharedKernel.Infrastructure.Persistence;
 
@@ -20,8 +19,7 @@ public sealed class ClientsDbContext : AuditableUnitOfWorkDbContext
 
     public ClientsDbContext(
         DbContextOptions<ClientsDbContext> options,
-        IDispatcher dispatcher,
-        IRequestContextProvider requestContext) : base(options, dispatcher, requestContext)
+        IRequestContextProvider requestContext) : base(options, requestContext)
     {
     }
 

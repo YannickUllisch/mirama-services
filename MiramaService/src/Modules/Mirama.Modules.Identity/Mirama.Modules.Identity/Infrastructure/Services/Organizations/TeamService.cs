@@ -17,7 +17,7 @@ internal sealed class TeamService(IdentityDbContext db) : ITeamService
             .Where(t => ids.Contains(t.Id))
             .ToListAsync(ct);
 
-        return [..teams.Select(Map)];
+        return [.. teams.Select(Map)];
     }
 
     public async Task<TeamDto?> GetTeamByIdAsync(Guid teamId, CancellationToken ct = default)
@@ -34,5 +34,5 @@ internal sealed class TeamService(IdentityDbContext db) : ITeamService
         t.OrganizationId,
         t.Name,
         t.Slug,
-        [..t.Members.Select(m => m.MemberId.Value)]);
+        [.. t.Members.Select(m => m.MemberId.Value)]);
 }

@@ -9,7 +9,6 @@ using Mirama.Modules.Identity.Domain.Aggregates.Policy;
 using Mirama.Modules.Identity.Domain.Aggregates.Role;
 using Mirama.Modules.Identity.Domain.Aggregates.Tenant;
 using Mirama.Modules.Identity.Domain.Aggregates.User;
-using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.SharedKernel.Abstractions.Persistence;
 using Mirama.SharedKernel.Infrastructure.Persistence;
 
@@ -34,8 +33,7 @@ public sealed class IdentityDbContext : AuditableUnitOfWorkDbContext
 
     public IdentityDbContext(
         DbContextOptions<IdentityDbContext> options,
-        IDispatcher dispatcher,
-        IRequestContextProvider requestContext) : base(options, dispatcher, requestContext)
+        IRequestContextProvider requestContext) : base(options, requestContext)
     {
     }
 

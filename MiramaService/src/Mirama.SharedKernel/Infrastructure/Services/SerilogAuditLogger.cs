@@ -18,15 +18,15 @@ internal sealed class SerilogAuditLogger(ILogger<AuditLogEntry> logger) : IAudit
     {
         using (logger.BeginScope(new Dictionary<string, object?>
         {
-            ["IsAuditLog"]     = true,
-            ["AuditKind"]      = "Read",
-            ["OperationName"]  = operationName,
-            ["UserId"]         = userId,
-            ["TenantId"]       = tenantId,
+            ["IsAuditLog"] = true,
+            ["AuditKind"] = "Read",
+            ["OperationName"] = operationName,
+            ["UserId"] = userId,
+            ["TenantId"] = tenantId,
             ["OrganizationId"] = organizationId,
-            ["ProjectId"]      = projectId,
-            ["Outcome"]        = outcome,
-            ["TraceId"]        = traceId,
+            ["ProjectId"] = projectId,
+            ["Outcome"] = outcome,
+            ["TraceId"] = traceId,
         }))
         {
             logger.LogInformation(
@@ -48,17 +48,17 @@ internal sealed class SerilogAuditLogger(ILogger<AuditLogEntry> logger) : IAudit
     {
         using (logger.BeginScope(new Dictionary<string, object?>
         {
-            ["IsAuditLog"]     = true,
-            ["AuditKind"]      = "Write",
-            ["EntityType"]     = entityType,
-            ["EntityId"]       = entityId,
-            ["Operation"]      = operation,
-            ["UserId"]         = userId,
-            ["TenantId"]       = tenantId,
+            ["IsAuditLog"] = true,
+            ["AuditKind"] = "Write",
+            ["EntityType"] = entityType,
+            ["EntityId"] = entityId,
+            ["Operation"] = operation,
+            ["UserId"] = userId,
+            ["TenantId"] = tenantId,
             ["OrganizationId"] = organizationId,
-            ["ProjectId"]      = projectId,
-            ["Changes"]        = changes,
-            ["TraceId"]        = traceId,
+            ["ProjectId"] = projectId,
+            ["Changes"] = changes,
+            ["TraceId"] = traceId,
         }))
         {
             logger.LogInformation(

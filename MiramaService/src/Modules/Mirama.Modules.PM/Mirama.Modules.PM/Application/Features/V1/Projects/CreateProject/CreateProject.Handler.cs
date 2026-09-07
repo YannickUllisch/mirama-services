@@ -49,14 +49,15 @@ internal class CreateProjectCommandHandler(
         var defaultStatus = workflowConfig.Statuses.First(s => s.IsDefault);
         var defaultPriority = workflowConfig.Priorities.First(p => p.IsDefault);
 
-        var project = Project.Create(new ProjectDetails(
-            request.Name,
-            request.StartDate,
-            defaultStatus.Id.Value,
-            defaultPriority.Id.Value,
-            request.Description,
-            request.EndDate,
-            request.Budget));
+        var project = Project.Create(
+            new ProjectDetails(
+                request.Name,
+                request.StartDate,
+                defaultStatus.Id.Value,
+                defaultPriority.Id.Value,
+                request.Description,
+                request.EndDate,
+                request.Budget));
 
         workflowConfig.SetProjectId(project.Id);
 

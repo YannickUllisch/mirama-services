@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Mirama.SharedKernel.Abstractions.Common.Interfaces;
 using Mirama.SharedKernel.Abstractions.Persistence;
 using Mirama.SharedKernel.Infrastructure.Persistence;
 
@@ -13,8 +12,7 @@ public sealed class WorkspaceDbContext : AuditableUnitOfWorkDbContext
 
     public WorkspaceDbContext(
         DbContextOptions<WorkspaceDbContext> options,
-        IDispatcher dispatcher,
-        IRequestContextProvider requestContext) : base(options, dispatcher, requestContext)
+        IRequestContextProvider requestContext) : base(options, requestContext)
     {
     }
 

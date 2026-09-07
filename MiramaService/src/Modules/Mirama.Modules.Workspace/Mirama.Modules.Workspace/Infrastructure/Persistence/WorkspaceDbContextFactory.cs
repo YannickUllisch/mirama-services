@@ -21,6 +21,6 @@ public class WorkspaceDbContextFactory : IDesignTimeDbContextFactory<WorkspaceDb
                 .MigrationsAssembly(typeof(WorkspaceDbContext).Assembly.FullName)
                 .MigrationsHistoryTable("__EFMigrationsHistory", "workspace"));
 
-        return new WorkspaceDbContext(optionsBuilder.Options, null!, null!);
+        return new WorkspaceDbContext(optionsBuilder.Options, null!);
     }
 }

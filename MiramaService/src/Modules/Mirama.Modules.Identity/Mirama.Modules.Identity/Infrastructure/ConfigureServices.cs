@@ -3,15 +3,17 @@ using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Mirama.Modules.Identity.Contracts.Organizations;
 using Mirama.Modules.Identity.Infrastructure.Persistence;
 using Mirama.Modules.Identity.Infrastructure.Persistence.Repositories;
 using Mirama.Modules.Identity.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
+using Mirama.SharedKernel.Abstractions.Domain.Events;
 using Mirama.SharedKernel.Abstractions.Permissions;
-using Mirama.SharedKernel.Abstractions.Persistence;
-using Mirama.Modules.Identity.Application.Common.Models;
 using Mirama.Modules.Identity.Application.Common.Interfaces;
+using Mirama.SharedKernel.Infrastructure.Messaging.Inbox;
+using Mirama.SharedKernel.Infrastructure.Messaging.Outbox;
 using Mirama.SharedKernel.Infrastructure.Options;
 using Mirama.Modules.Identity.Application.Common;
 
@@ -29,8 +31,6 @@ public static class DependencyInjection
 
     private static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration config)
     {
-        services.AddSingleton<IGlobalRoleProvider, GlobalRoleProvider>();
-
         var assembly = Assembly.GetExecutingAssembly();
 
         services.Scan(scan => scan
@@ -42,6 +42,12 @@ public static class DependencyInjection
         services.Scan(scan => scan
             .FromAssemblies(assembly)
             .AddClasses(classes => classes.AssignableTo(typeof(INotificationHandler<>)), publicOnly: false)
+            .AsImplementedInterfaces()
+            .WithScopedLifetime());
+
+        services.Scan(scan => scan
+            .FromAssemblies(assembly)
+            .AddClasses(classes => classes.AssignableTo(typeof(IIntegrationEventMapper<>)), publicOnly: false)
             .AsImplementedInterfaces()
             .WithScopedLifetime());
 
@@ -74,10 +80,16 @@ public static class DependencyInjection
                 .UseNpgsql(infra.DatabaseConnection, b => b
                     .MigrationsAssembly(typeof(IdentityDbContext).Assembly.FullName)
                     .MigrationsHistoryTable(tableName: "__EFMigrationsHistory", schema: "identity"))
-                .AddInterceptors(sp.GetRequiredService<Mirama.SharedKernel.Infrastructure.Interceptors.AuditSaveChangesInterceptor>());
+                .AddInterceptors(
+                    sp.GetRequiredService<Mirama.SharedKernel.Infrastructure.Interceptors.AuditStampingInterceptor>(),
+                    sp.GetRequiredService<Mirama.SharedKernel.Infrastructure.Interceptors.DomainEventDispatchInterceptor>(),
+                    sp.GetRequiredService<Mirama.SharedKernel.Infrastructure.Interceptors.AuditSaveChangesInterceptor>());
         });
 
         services.AddScoped<IModuleMigrator, IdentityModuleMigrator>();
+
+        services.AddOutboxProcessor<IdentityDbContext>(config, moduleName: "Identity", typeof(IOrganizationService).Assembly);
+        services.AddInboxProcessor<IdentityDbContext>(config, moduleName: "Identity");
 
         return services;
     }

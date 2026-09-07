@@ -15,7 +15,7 @@ internal sealed class MemberService(IdentityDbContext db) : IMemberService
             .Where(m => m.OrganizationId == organizationId)
             .ToListAsync(ct);
 
-        return [..members.Select(Map)];
+        return [.. members.Select(Map)];
     }
 
     public async Task<IReadOnlyList<MemberDto>> GetMembersByIdsAsync(
@@ -26,7 +26,7 @@ internal sealed class MemberService(IdentityDbContext db) : IMemberService
             .Where(m => ids.Contains(m.Id))
             .ToListAsync(ct);
 
-        return [..members.Select(Map)];
+        return [.. members.Select(Map)];
     }
 
     public async Task<MemberDto?> GetMemberByUserIdAsync(
@@ -45,5 +45,5 @@ internal sealed class MemberService(IdentityDbContext db) : IMemberService
         m.UserId.Value,
         m.Name,
         m.Email,
-        [..m.IamRoleIds.Select(r => r.Value)]);
+        [.. m.IamRoleIds.Select(r => r.Value)]);
 }

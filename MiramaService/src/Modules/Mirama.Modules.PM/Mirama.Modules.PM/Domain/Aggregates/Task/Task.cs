@@ -201,10 +201,10 @@ public sealed class Task : OrganizationAggregateRoot<TaskId>
     public static bool CanBeParentOf(TaskType parent, TaskType child) =>
         parent switch
         {
-            TaskType.Epic    => child is TaskType.Story or TaskType.Feature
+            TaskType.Epic => child is TaskType.Story or TaskType.Feature
                                         or TaskType.Task or TaskType.Issue or TaskType.Test,
-            TaskType.Story   => child is TaskType.Task or TaskType.Issue,
+            TaskType.Story => child is TaskType.Task or TaskType.Issue,
             TaskType.Feature => child is TaskType.Task or TaskType.Issue,
-            _                => false
+            _ => false
         };
 }

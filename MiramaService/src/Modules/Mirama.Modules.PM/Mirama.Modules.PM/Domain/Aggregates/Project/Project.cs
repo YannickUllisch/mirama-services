@@ -2,6 +2,7 @@ using ErrorOr;
 using Mirama.Modules.PM.Domain.Aggregates.Project.Member;
 using Mirama.Modules.PM.Domain.Aggregates.Project.Milestone;
 using Mirama.Modules.PM.Domain.Aggregates.Project.Team;
+using Mirama.Modules.PM.Domain.Events;
 using Mirama.SharedKernel.Abstractions.Domain.Core;
 
 namespace Mirama.Modules.PM.Domain.Aggregates.Project;
@@ -40,8 +41,16 @@ public sealed class Project : OrganizationAggregateRoot<ProjectId>
 
     private Project() { }
 
-    public static Project Create(ProjectDetails details) =>
-        new Project(details) { Id = new ProjectId(Guid.NewGuid()) };
+    public static Project Create(ProjectDetails details)
+    {
+        var project = new Project(details) { Id = new ProjectId(Guid.NewGuid()) };
+
+        project.AddDomainEvent(new ProjectCreated(
+            ProjectId: project.Id.Value,
+            Name: project.Name));
+
+        return project;
+    }
 
     public void Update(ProjectDetails details)
     {

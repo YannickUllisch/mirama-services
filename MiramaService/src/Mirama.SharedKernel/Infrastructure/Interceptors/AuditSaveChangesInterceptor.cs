@@ -29,9 +29,9 @@ public sealed class AuditSaveChangesInterceptor(
         try { userId = context.UserId.ToString(); }
         catch (UnauthorizedAccessException) { userId = "anonymous"; }
 
-        var traceId   = Activity.Current?.TraceId.ToString() ?? string.Empty;
-        var tenantId  = context.TenantId?.ToString();
-        var orgId     = context.OrganizationId?.ToString();
+        var traceId = Activity.Current?.TraceId.ToString() ?? string.Empty;
+        var tenantId = context.TenantId?.ToString();
+        var orgId = context.OrganizationId?.ToString();
         var projectId = context.ProjectId?.ToString();
 
         foreach (var entry in db.ChangeTracker.Entries())
@@ -43,9 +43,9 @@ public sealed class AuditSaveChangesInterceptor(
                 continue;
 
             var entityType = entry.Entity.GetType().Name;
-            var entityId   = GetEntityId(entry);
-            var operation  = entry.State.ToString();
-            var changes    = GetChanges(entry);
+            var entityId = GetEntityId(entry);
+            var operation = entry.State.ToString();
+            var changes = GetChanges(entry);
 
             auditLogger.LogWrite(entityType, entityId, operation,
                 userId, tenantId, orgId, projectId, changes, traceId);

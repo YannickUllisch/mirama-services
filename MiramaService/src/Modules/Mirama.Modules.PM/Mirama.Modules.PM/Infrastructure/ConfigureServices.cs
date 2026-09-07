@@ -6,10 +6,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Mirama.Modules.PM.Application.Common;
 using Mirama.Modules.PM.Application.Common.Interfaces;
+using Mirama.Modules.PM.Contracts.Events;
 using Mirama.Modules.PM.Infrastructure.Persistence;
 using Mirama.Modules.PM.Infrastructure.Persistence.Repositories;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
+using Mirama.SharedKernel.Abstractions.Domain.Events;
 using Mirama.SharedKernel.Abstractions.Persistence;
+using Mirama.SharedKernel.Infrastructure.Messaging.Inbox;
+using Mirama.SharedKernel.Infrastructure.Messaging.Outbox;
 using Mirama.SharedKernel.Infrastructure.Options;
 
 namespace Mirama.Modules.PM.Infrastructure;
@@ -42,6 +46,12 @@ public static class DependencyInjection
             .AsImplementedInterfaces()
             .WithScopedLifetime());
 
+        services.Scan(scan => scan
+            .FromAssemblies(assembly)
+            .AddClasses(classes => classes.AssignableTo(typeof(IIntegrationEventMapper<>)), publicOnly: false)
+            .AsImplementedInterfaces()
+            .WithScopedLifetime());
+
         services.Decorate(typeof(IRequestHandler<,>), typeof(PMTransactionDecorator<,>));
 
         return services;
@@ -59,11 +69,17 @@ public static class DependencyInjection
                 .UseNpgsql(infra.DatabaseConnection, b => b
                     .MigrationsAssembly(typeof(PMDbContext).Assembly.FullName)
                     .MigrationsHistoryTable("__EFMigrationsHistory", "projects"))
-                .AddInterceptors(sp.GetRequiredService<Mirama.SharedKernel.Infrastructure.Interceptors.AuditSaveChangesInterceptor>());
+                .AddInterceptors(
+                    sp.GetRequiredService<Mirama.SharedKernel.Infrastructure.Interceptors.AuditStampingInterceptor>(),
+                    sp.GetRequiredService<Mirama.SharedKernel.Infrastructure.Interceptors.DomainEventDispatchInterceptor>(),
+                    sp.GetRequiredService<Mirama.SharedKernel.Infrastructure.Interceptors.AuditSaveChangesInterceptor>());
         });
 
         services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<PMDbContext>());
         services.AddScoped<IModuleMigrator, PMModuleMigrator>();
+
+        services.AddOutboxProcessor<PMDbContext>(config, moduleName: "PM", typeof(ProjectCreatedEvent).Assembly);
+        services.AddInboxProcessor<PMDbContext>(config, moduleName: "PM");
 
         return services;
     }

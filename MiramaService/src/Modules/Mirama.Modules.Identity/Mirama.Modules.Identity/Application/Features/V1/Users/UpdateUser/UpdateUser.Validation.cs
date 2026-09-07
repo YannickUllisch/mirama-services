@@ -1,13 +1,11 @@
 
 using FluentValidation;
-using Microsoft.EntityFrameworkCore;
-using Mirama.SharedKernel.Abstractions.Persistence;
 
 namespace Mirama.Modules.Identity.Application.Features.V1.Users.UpdateUser;
 
 internal class UpdateUserRequestValidator : AbstractValidator<UpdateUserCommand>
 {
-    public UpdateUserRequestValidator(IGlobalRoleProvider roleProvider)
+    public UpdateUserRequestValidator()
     {
         RuleFor(req => req.Id).NotEmpty();
 
@@ -19,10 +17,5 @@ internal class UpdateUserRequestValidator : AbstractValidator<UpdateUserCommand>
             .MinimumLength(3)
             .MaximumLength(25)
             .WithMessage("Name must be between 3 and 25 characters long");
-
-        RuleFor(req => req.Role)
-            .NotEmpty()
-            .Must(role => roleProvider.AllowedRoles.Contains(role, StringComparer.OrdinalIgnoreCase))
-            .WithMessage("Invalid Role Provided");
     }
 }

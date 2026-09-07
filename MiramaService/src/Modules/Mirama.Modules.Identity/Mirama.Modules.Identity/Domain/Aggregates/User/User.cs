@@ -48,7 +48,7 @@ public class User : AggregateRoot<UserId>
         this.Title = details.Title;
     }
 
-        public void SetDefaultOrganization(OrganizationId orgId)
+    public void SetDefaultOrganization(OrganizationId orgId)
     {
         this.DefaultOrganization = orgId;
     }
