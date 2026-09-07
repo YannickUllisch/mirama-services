@@ -8,6 +8,23 @@ namespace Mirama.Modules.Identity.Domain.Aggregates.Organization;
 
 public class Organization : AggregateRoot<OrganizationId>, ITenantOwned
 {
+    // Slugs that double as static top-level routes in the frontend (/about, /auth, /setup, ...)
+    // - keep in sync with RESERVED_ORG_SLUGS in the frontend's src/routes.ts.
+    public static readonly IReadOnlySet<string> ReservedSlugs = new HashSet<string>
+    {
+        "about",
+        "contact",
+        "cookies",
+        "privacy",
+        "termsofservice",
+        "not-found",
+        "unauthorized",
+        "auth",
+        "api",
+        "setup",
+        "home",
+    };
+
     public string Name { get; private set; } = string.Empty;
     public string Slug { get; private set; } = string.Empty;
     public string? Logo { get; private set; }

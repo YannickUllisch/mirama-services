@@ -14,7 +14,9 @@ internal class CreateOrganizationCommandValidator : AbstractValidator<CreateOrga
             .MinimumLength(3)
             .MaximumLength(63)
             .Matches(@"^[a-z0-9]+(-[a-z0-9]+)*$")
-            .WithMessage("URL can only contain lowercase letters, numbers and hyphens, and can't start or end with a hyphen.");
+            .WithMessage("URL can only contain lowercase letters, numbers and hyphens, and can't start or end with a hyphen.")
+            .Must(slug => !Organization.ReservedSlugs.Contains(slug))
+            .WithMessage("This name is reserved, please choose another.");
 
         RuleFor(c => c.Street).NotEmpty().MaximumLength(200);
         RuleFor(c => c.City).NotEmpty().MaximumLength(100);
