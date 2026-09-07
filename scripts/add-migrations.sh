@@ -11,18 +11,22 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SERVICE_ROOT="$REPO_ROOT/MiramaService"
 STARTUP="src/Mirama.Api"
 
-declare -A MODULES=(
-  ["Identity"]="src/Modules/Mirama.Modules.Identity/Mirama.Modules.Identity"
-  ["Clients"]="src/Modules/Mirama.Modules.Clients/Mirama.Modules.Clients"
-  ["PM"]="src/Modules/Mirama.Modules.PM/Mirama.Modules.PM"
-  ["Workspace"]="src/Modules/Mirama.Modules.Workspace/Mirama.Modules.Workspace"
+MODULE_NAMES=(Identity Clients PM Workspace)
+MODULE_PATHS=(
+  "src/Modules/Mirama.Modules.Identity/Mirama.Modules.Identity"
+  "src/Modules/Mirama.Modules.Clients/Mirama.Modules.Clients"
+  "src/Modules/Mirama.Modules.PM/Mirama.Modules.PM"
+  "src/Modules/Mirama.Modules.Workspace/Mirama.Modules.Workspace"
 )
 
 SUCCESS=()
 FAILED=()
 
-for module in "${!MODULES[@]}"; do
-  project="${MODULES[$module]}"
+cd "$SERVICE_ROOT"
+
+for i in "${!MODULE_NAMES[@]}"; do
+  module="${MODULE_NAMES[$i]}"
+  project="${MODULE_PATHS[$i]}"
   echo ""
   echo "==> [$module] Adding migration '$MIGRATION_NAME'..."
 
