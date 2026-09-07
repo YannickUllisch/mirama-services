@@ -2,7 +2,6 @@ using ErrorOr;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Mirama.Modules.Identity.Domain.Aggregates.Organization;
 using Mirama.Modules.Identity.Domain.Aggregates.User;
 using Mirama.Modules.Identity.Infrastructure.Persistence;
 using Mirama.SharedKernel.Abstractions.Common.Interfaces;
@@ -10,11 +9,6 @@ using Mirama.SharedKernel.Models;
 
 namespace Mirama.Modules.Identity.Application.Features.V1.Auth;
 
-// Looked up by slug rather than the organization's Guid: this is the endpoint NextAuth calls
-// (both on explicit "switch organization" and when resolving /organization/{slug}/... routes)
-// to verify membership and mint fresh session claims. The Guid this returns is what actually
-// ends up in the JWT/session (RequestContextProvider, EF global filters, etc. still key
-// everything off it) - the slug is purely how the caller identifies which organization it means.
 [AllowAnonymous]
 public class GetOrgMembershipController : ApiControllerBase
 {
@@ -45,9 +39,6 @@ internal class GetOrgMembershipQueryHandler(
 
         var normalizedSlug = request.Slug.Trim().ToLowerInvariant();
 
-        // Slug is globally unique (see OrganizationConfig), so this alone identifies the
-        // organization - no tenant/org filter can be applied yet at this point anyway, since
-        // resolving it is exactly how we find out which tenant/org the caller means.
         var org = await dbContext.Organizations
             .AsNoTracking()
             .IgnoreQueryFilters()
