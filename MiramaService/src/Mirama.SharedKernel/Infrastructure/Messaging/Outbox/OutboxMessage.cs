@@ -38,4 +38,6 @@ public sealed class OutboxMessage
     public int RetryCount { get; set; }
 
     public string? Error { get; set; }
+
+    public DateTime? ProcessedAtUtc { get; set; }
 }

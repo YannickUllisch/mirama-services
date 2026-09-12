@@ -79,6 +79,7 @@ public static class DependencyInjection
         services.AddScoped<IModuleMigrator, PMModuleMigrator>();
 
         services.AddOutboxProcessor<PMDbContext>(config, moduleName: "PM", typeof(ProjectCreatedEvent).Assembly);
+        services.AddOutboxCleanup<PMDbContext>(config, moduleName: "PM");
         services.AddInboxProcessor<PMDbContext>(config, moduleName: "PM");
 
         return services;

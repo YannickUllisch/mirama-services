@@ -87,6 +87,7 @@ public static class ConfigureServices
         services.AddScoped<IModuleMigrator, ClientsModuleMigrator>();
 
         services.AddOutboxProcessor<ClientsDbContext>(config, moduleName: "Clients", typeof(ClientCreatedEvent).Assembly);
+        services.AddOutboxCleanup<ClientsDbContext>(config, moduleName: "Clients");
         services.AddInboxProcessor<ClientsDbContext>(config, moduleName: "Clients");
 
         return services;

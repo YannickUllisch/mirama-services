@@ -28,6 +28,7 @@ public abstract class AuditableUnitOfWorkDbContext : DbContext, IUnitOfWork
 
     public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
     public DbSet<OutboxDeadLetter> OutboxDeadLetters => Set<OutboxDeadLetter>();
+    public DbSet<OutboxHistory> OutboxHistories => Set<OutboxHistory>();
     public DbSet<InboxMessage> InboxMessages => Set<InboxMessage>();
     public DbSet<InboxDeadLetter> InboxDeadLetters => Set<InboxDeadLetter>();
 
@@ -73,8 +74,18 @@ public abstract class AuditableUnitOfWorkDbContext : DbContext, IUnitOfWork
         {
             e.Property(m => m.Headers).HasColumnType("jsonb");
 
+            // Partial: excludes already-processed rows, which OutboxCleanupWorker archives
+            // out to OutboxHistory anyway, so the claim query this index serves never has
+            // to scan past rows it can no longer claim.
             e.HasIndex(m => new { m.AvailableAtUtc, m.LockedUntilUtc })
-             .HasDatabaseName($"IX_{SchemaName}_OutboxMessages_Claimable");
+             .HasDatabaseName($"IX_{SchemaName}_OutboxMessages_Claimable")
+             .HasFilter("\"ProcessedAtUtc\" IS NULL");
+
+            // Complements the partial index above: serves OutboxCleanupWorker's own scan
+            // for rows to archive, which looks at exactly the rows the index above skips.
+            e.HasIndex(m => m.ProcessedAtUtc)
+             .HasDatabaseName($"IX_{SchemaName}_OutboxMessages_Processed")
+             .HasFilter("\"ProcessedAtUtc\" IS NOT NULL");
         });
 
         builder.Entity<OutboxDeadLetter>(e =>
@@ -82,6 +93,13 @@ public abstract class AuditableUnitOfWorkDbContext : DbContext, IUnitOfWork
             e.Property(d => d.Headers).HasColumnType("jsonb");
             e.HasIndex(d => d.OrganizationId)
              .HasDatabaseName($"IX_{SchemaName}_OutboxDeadLetters_OrganizationId");
+        });
+
+        builder.Entity<OutboxHistory>(e =>
+        {
+            e.Property(h => h.Headers).HasColumnType("jsonb");
+            e.HasIndex(h => h.OrganizationId)
+             .HasDatabaseName($"IX_{SchemaName}_OutboxHistory_OrganizationId");
         });
 
         builder.Entity<InboxMessage>(e =>

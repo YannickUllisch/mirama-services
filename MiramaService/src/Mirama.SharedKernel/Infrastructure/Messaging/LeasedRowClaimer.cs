@@ -29,7 +29,8 @@ internal static class LeasedRowClaimer
         int batchSize,
         TimeSpan leaseDuration,
         string instanceId,
-        CancellationToken ct)
+        CancellationToken ct,
+        string? additionalWhereClause = null)
     {
         var ownsConnection = conn.State != ConnectionState.Open;
         if (ownsConnection) await conn.OpenAsync(ct);
@@ -49,11 +50,12 @@ internal static class LeasedRowClaimer
                 // with whatever DateTime.Kind convention EF+Npgsql already uses for these
                 // columns elsewhere in the codebase, rather than guessing at timestamp vs
                 // timestamptz semantics for a raw SQL function call.
+                var extraFilter = additionalWhereClause is null ? "" : $"AND ({additionalWhereClause})\n                      ";
                 select.CommandText = $"""
                     SELECT "Id" FROM {qualifiedTable}
                     WHERE "AvailableAtUtc" <= @now
                       AND ("LockedUntilUtc" IS NULL OR "LockedUntilUtc" < @now)
-                    ORDER BY "OccurredAtUtc"
+                      {extraFilter}ORDER BY "OccurredAtUtc"
                     LIMIT @batchSize
                     FOR UPDATE SKIP LOCKED
                     """;

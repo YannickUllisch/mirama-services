@@ -62,13 +62,13 @@ For each claimed message, in its own scope and `DbContext` instance, inside one 
 1. The message's stored type name is resolved back to a CLR type via a per-module lookup built once at startup from that module's own `*.Contracts` assembly.
 2. Every `INotificationHandler<T>` registered anywhere in the process for that concrete type is resolved - this reaches across every module because every module is composed into one shared dependency injection container.
 3. For each resolved handler, its owning module's schema is looked up (every module registers this once at startup - see `IModuleSchemaRegistry`), and one `InboxMessage` row is inserted directly into that module's own Inbox table: the event's payload, its assembly-qualified type name, which handler it is for, and its `AggregateId`.
-4. The outbox message row is deleted.
+4. The outbox message row is marked processed (`ProcessedAtUtc` set) rather than deleted. It stays in the live `OutboxMessages` table - excluded from further claiming, but still present - until a separate, much slower background process archives it. See Part 10.
 
 **A handler in the same module as the aggregate goes through exactly the same fan-out as a handler in any other module.** Nothing about this process treats "same module" as a shortcut: if `Mirama.Modules.Clients` both raises the domain event (via its mapper) and hosts a handler for the resulting integration event, that handler's owning schema - resolved the same way as any other - happens to be `clients`, so the `InboxMessage` row lands in the Clients module's own inbox table, right next to any other module's. See Part 4 for why this uniformity is intentional rather than an oversight.
 
-Steps 1–4 either all happen or none of them do: fan-out touches nothing but the local database, with no external I/O anywhere in it, so the whole thing runs inside one transaction per message. There is no partial state a retry could ever observe - either the Inbox rows exist and the outbox row is gone, or nothing changed and the next poll tries again from scratch. If resolving the type fails, or the database rejects a write, the message's own retry count increments with backoff, and after enough failures it is moved to that module's `OutboxDeadLetter` table and removed from the live outbox (Part 5).
+Steps 1–4 either all happen or none of them do: fan-out touches nothing but the local database, with no external I/O anywhere in it, so the whole thing runs inside one transaction per message. There is no partial state a retry could ever observe - either the Inbox rows exist and the outbox row is marked processed, or nothing changed and the next poll tries again from scratch. If resolving the type fails, or the database rejects a write, the message's own retry count increments with backoff, and after enough failures it is moved to that module's `OutboxDeadLetter` table and removed from the live outbox (Part 5).
 
-From here, what happens to a fanned-out `InboxMessage` - claiming it, invoking its handler, retrying, ordering, dead-lettering - is entirely `background-jobs-inbox-design.md`'s subject, not this document's. The outbox's job ends the moment the row exists somewhere and its own row is gone.
+From here, what happens to a fanned-out `InboxMessage` - claiming it, invoking its handler, retrying, ordering, dead-lettering - is entirely `background-jobs-inbox-design.md`'s subject, not this document's. The outbox's job ends the moment the row exists somewhere and the original message is marked processed - what happens to that processed row afterward is Part 9's subject, not this one.
 
 **Every message also carries a small envelope alongside its payload**, stamped once by the same base persistence class that builds the `OutboxMessage` rows, and copied verbatim onto every `InboxMessage` a message fans out into (and onto `OutboxDeadLetter`/`InboxDeadLetter` if either side ever dead-letters it): `OrganizationId` and `TenantId` (the caller's, at the moment of the original save), `TraceId` (from the ambient `Activity`, the same source already used for audit logging elsewhere in the codebase), a `CorrelationId` (currently mirroring `TraceId`, reserved for a distinct concept later), and an open `Headers` JSON column for anything else that doesn't yet warrant its own field. None of this is required reading to follow the flow above - it exists for operational queries (`OrganizationId` above all) and future tracing needs, not for fan-out logic itself, which never inspects any of it.
 
@@ -96,6 +96,8 @@ The lease is what makes a crash safe: if an instance claims a batch and dies bef
 
 Fan-out has no ordering concern of its own - it only copies rows into each consumer's inbox and never executes anything, so a claimed batch runs with full bounded parallelism (`OutboxOptions.MaxDegreeOfParallelism`) across every claimed message, with no sequential groups to account for. Ordering, where it matters, is enforced entirely on the inbox side - see `background-jobs-inbox-design.md` Part 3.
 
+The archival worker introduced in Part 9 runs under the same multi-instance assumption and reuses the identical skip-on-conflict pattern for its own row selection, so it needs no special treatment here beyond what already applies to claiming.
+
 ## Part 7 - Evolving an event's shape
 
 A stored outbox message records its type by a short name and its payload as JSON. Renaming or restructuring an event type breaks resolution for any row already sitting in the outbox under the old shape; the type lookup fails loudly rather than silently corrupting data, which turns the mistake into a retrying, eventually dead-lettering message (Part 5) rather than a corrupted delivery.
@@ -119,7 +121,23 @@ What remains a caller's responsibility:
 
 Everything about what happens to a fanned-out event afterward - idempotency, ordering, speed, dead-letter recognition on the handler side - is `background-jobs-inbox-design.md`'s responsibility list, not this one.
 
-## Part 9 - Edge cases
+## Part 9 - Archival of processed messages
+
+A fanned-out message is not deleted (Part 3); it is marked processed and left in place. A separate background worker, `OutboxCleanupWorker`, moves processed rows out of the live `OutboxMessages` table into a durable `OutboxHistory` table, on its own schedule, independent of fan-out.
+
+This exists to resolve a tension between two things the live outbox table needs at once: staying small, so the claim query in Part 3 stays cheap as volume grows, and not silently discarding the record that a public fact was ever published. Deleting on success (the original design) satisfied the first at the cost of the second. Marking processed and archiving separately satisfies both, at the cost of one extra background process.
+
+**Why this is a separate worker rather than part of fan-out.** Fan-out (Part 3) already runs inside a tight, frequent poll loop tuned for low latency - claim, fan out, repeat, backing off only when idle. Archival has no latency requirement at all; nothing is waiting on a message moving from `OutboxMessages` to `OutboxHistory`. Folding archival into the fan-out transaction would add unnecessary write cost to the latency-sensitive path for no benefit. Instead it runs on its own, deliberately much longer interval (`OutboxCleanupOptions.Interval`, minutes rather than milliseconds) and its own batch size (`OutboxCleanupOptions.BatchSize`) - simpler options than `OutboxOptions`/`InboxOptions` since there is no busy/idle split or lease duration to tune for housekeeping work.
+
+**How a batch moves.** Each pass selects a batch of rows where `ProcessedAtUtc IS NOT NULL`, using the same `FOR UPDATE SKIP LOCKED` row selection that claiming uses elsewhere in this system, and moves them with a single atomic statement - a data-modifying CTE that deletes the selected rows from `OutboxMessages`, returning their data, and inserts that data into `OutboxHistory` (stamping an `ArchivedAtUtc`) in the same statement. Being one Postgres statement, the move is atomic by construction: there is no transaction to explicitly manage, and no window in which a row could be observed as removed from one table but not yet present in the other.
+
+**Multi-instance safety** follows directly from Part 6: any instance's cleanup worker can run this pass at any time, and `FOR UPDATE SKIP LOCKED` means two instances racing for the same batch simply select disjoint rows rather than blocking or double-archiving.
+
+**Relationship to dead-lettering.** `OutboxHistory` and `OutboxDeadLetter` (Part 5) are mutually exclusive destinations for a given message: a message reaches `OutboxHistory` only after fan-out succeeds and is later archived; a message reaches `OutboxDeadLetter` only after fan-out permanently fails. Neither table's row for a given message ever produces a row in the other.
+
+**What archival does not guarantee.** `OutboxHistory` is a durable operational record of what was published and when - not a general-purpose event-sourcing or audit-log table, and not a substitute for a deliberate, per-aggregate durable history entity where one is actually needed. `OutboxHistory` and `OutboxDeadLetter` themselves have no retention or purge job of their own yet (Part 10); they will grow without bound until one is added.
+
+## Part 10 - Edge cases
 
 | Situation | Behavior |
 |---|---|
@@ -131,5 +149,8 @@ Everything about what happens to a fanned-out event afterward - idempotency, ord
 | A mapper throws | Handled by failing fast - the transaction aborts; a throwing mapper indicates a defect, not a transient condition. |
 | A domain event with no registered mapper | Handled, silently - produces no integration events. |
 | An integration event raised directly from an aggregate, bypassing a mapper | Handled - rejected at runtime with an explicit error. |
-| An event raised with zero registered handlers | Handled, silently - fan-out finds nothing to insert and deletes the outbox row immediately. |
-| Unbounded outbox table growth | Mostly handled - a successfully fanned-out message is deleted immediately. Open for `OutboxDeadLetter` itself, which has no retention or purge job yet. |
+| An event raised with zero registered handlers | Handled, silently - fan-out finds nothing to insert and marks the outbox row processed anyway; it is archived on the same schedule as any other processed message. |
+| Unbounded live outbox table growth | Handled - a successfully fanned-out message is marked processed immediately, excluding it from the claim index (Part 9), and archived out to `OutboxHistory` on the cleanup worker's own longer interval. |
+| Crash mid-archival batch | Handled - archiving a batch is one atomic Postgres statement (a data-modifying CTE); there is no partial state where some rows moved and others didn't. |
+| Two instances racing to archive the same batch | Handled - the archival worker's row selection uses the same `FOR UPDATE SKIP LOCKED` pattern as claiming (Part 6), so instances never contend for the same row. |
+| Unbounded `OutboxHistory`/`OutboxDeadLetter` growth | Open - neither table has a retention or purge job yet. |

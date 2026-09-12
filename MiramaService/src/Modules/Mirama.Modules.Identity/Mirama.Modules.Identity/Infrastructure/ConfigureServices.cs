@@ -89,6 +89,7 @@ public static class DependencyInjection
         services.AddScoped<IModuleMigrator, IdentityModuleMigrator>();
 
         services.AddOutboxProcessor<IdentityDbContext>(config, moduleName: "Identity", typeof(IOrganizationService).Assembly);
+        services.AddOutboxCleanup<IdentityDbContext>(config, moduleName: "Identity");
         services.AddInboxProcessor<IdentityDbContext>(config, moduleName: "Identity");
 
         return services;

@@ -67,7 +67,9 @@ public sealed class OutboxProcessor<TDbContext>(
                 ?? throw new InvalidOperationException($"{typeof(TDbContext).Name} does not map OutboxMessage.");
             var qualified = LeasedRowClaimer.QualifyTable(entityType);
             var conn = (NpgsqlConnection)db.Database.GetDbConnection();
-            claimedIds = await LeasedRowClaimer.ClaimAsync(conn, qualified, opts.BatchSize, opts.LeaseDuration, _instanceId, ct);
+            claimedIds = await LeasedRowClaimer.ClaimAsync(
+                conn, qualified, opts.BatchSize, opts.LeaseDuration, _instanceId, ct,
+                additionalWhereClause: "\"ProcessedAtUtc\" IS NULL");
         }
 
         if (claimedIds.Count == 0) return false;
@@ -87,7 +89,7 @@ public sealed class OutboxProcessor<TDbContext>(
         await using (var scope = _scopeFactory.CreateAsyncScope())
         {
             var db = scope.ServiceProvider.GetRequiredService<TDbContext>();
-            var message = await db.Set<OutboxMessage>().AsNoTracking().FirstOrDefaultAsync(m => m.Id == messageId, ct);
+            var message = await db.Set<OutboxMessage>().FirstOrDefaultAsync(m => m.Id == messageId, ct);
             if (message is null) return; // already handled via another path; nothing to do
 
             await using var transaction = await db.Database.BeginTransactionAsync(ct);
@@ -131,7 +133,11 @@ public sealed class OutboxProcessor<TDbContext>(
                         ct);
                 }
 
-                db.Remove(message);
+                // Mark processed rather than delete: OutboxCleanupWorker archives it to
+                // OutboxHistory later, on its own longer-interval schedule, keeping this
+                // table's row count (and hence claim-query cost) small without losing the
+                // record of what was published.
+                message.ProcessedAtUtc = DateTime.UtcNow;
                 await db.SaveChangesAsync(ct);
                 await transaction.CommitAsync(ct);
             }
