@@ -34,12 +34,7 @@ public sealed class DomainEventDispatchInterceptor(
     {
         var domainEvents = db.ChangeTracker.Entries<IDomainEventEntity>()
             .Select(e => e.Entity)
-            .SelectMany(aggregate =>
-            {
-                var events = aggregate.GetDomainEvents();
-                aggregate.ClearDomainEvents();
-                return events;
-            })
+            .SelectMany(entity => entity.GetDomainEvents())
             .ToList();
 
         foreach (var domainEvent in domainEvents)

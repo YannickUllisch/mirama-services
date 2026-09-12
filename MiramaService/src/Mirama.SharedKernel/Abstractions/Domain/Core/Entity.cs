@@ -1,8 +1,12 @@
 
+using Mirama.SharedKernel.Abstractions.Domain.Events;
+
 namespace Mirama.SharedKernel.Abstractions.Domain.Core;
 
-public abstract class Entity<TID> : IAuditable
+public abstract class Entity<TID> : IAuditable, IDomainEventEntity
 {
+    private readonly DomainEventList _domainEvents = new();
+
     public TID Id { get; protected set; } = default!;
     public DateTime Created { get; private set; }
     public string? CreatedBy { get; private set; }
@@ -12,6 +16,10 @@ public abstract class Entity<TID> : IAuditable
     protected Entity() { }
 
     protected Entity(TID id) => Id = id;
+
+    protected void AddDomainEvent(IDomainEvent @event) => _domainEvents.Add(@event);
+
+    public IReadOnlyCollection<IDomainEvent> GetDomainEvents() => _domainEvents.DrainAll();
 
     public override bool Equals(object? obj)
     {
